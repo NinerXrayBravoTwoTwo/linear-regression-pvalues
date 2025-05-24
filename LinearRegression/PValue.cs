@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
-namespace MetabolicStat.StatMath;
+﻿namespace MetabolicStat.StatMath;
 
 public class PValueStat : Statistic
 {
     internal List<(double x, double y)> dataPoints = new();
 
-    public int DataPointsCount() 
+    public int DataPointsCount()
     {
         return dataPoints.Count;
     }

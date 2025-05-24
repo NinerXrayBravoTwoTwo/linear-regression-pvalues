@@ -168,7 +168,7 @@ public class Statistic
     }
 
     /// <summary>
-    ///     Merge two Regressions
+    ///     Merge two Regressions, DEPRECATED, use Merge(Statistic other) instead.`
     /// </summary>
     /// <param name="other"></param>
     public void Add(Statistic other)
