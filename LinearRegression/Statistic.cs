@@ -32,7 +32,7 @@
 [Serializable]
 public class Statistic
 {
-    private double N { get; set; }
+    internal double N { get; set; }
 
     //public int NumberSamples => (int)N;
 
@@ -373,4 +373,6 @@ public class Statistic
 
         return result;
     }
+
+
 }

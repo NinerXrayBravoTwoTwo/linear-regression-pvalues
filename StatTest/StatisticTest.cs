@@ -4,14 +4,9 @@ using Xunit.Abstractions;
 
 namespace StatTest;
 
-public class StatisticTest
+public class StatisticTest(ITestOutputHelper testOutputHelper)
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public StatisticTest(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
+    private readonly ITestOutputHelper _testOutputHelper = testOutputHelper;
 
     [Fact]
     public void EmptyStatIsNan()
@@ -46,69 +41,66 @@ public class StatisticTest
     [Fact]
     public void StatClone()
     {
-        var orig = new Statistic();
+        var original = new Statistic();
         double x = 0, y = -1;
 
         while (x < 100)
-            orig.Add(x++, y++);
+            original.Add(x++, y++);
 
+        _testOutputHelper.WriteLine(original.ToString());
 
-        _testOutputHelper.WriteLine(orig.ToString());
+        Assert.False(original.IsNaN);
 
-        Assert.False(orig.IsNaN);
-
-        var clone = new Statistic(orig);
+        var clone = new Statistic(original);
 
         Assert.False(clone.IsNaN);
 
-        Assert.Equal(orig.ToString(), clone.ToString());
+        Assert.Equal(original.ToString(), clone.ToString());
 
         // The clone should not update if the original changes, i.e. they are not the same instance
-        orig.Add(0, 0);
+        original.Add(0, 0);
         _testOutputHelper.WriteLine(clone.ToString());
 
-        Assert.NotEqual(orig.ToString(), clone.ToString());
-        Assert.Equal(clone.NumberSamples + 1, orig.NumberSamples);
+        Assert.NotEqual(original.ToString(), clone.ToString());
+        Assert.Equal(clone.NumberSamples + 1, original.NumberSamples);
     }
 
     [Fact]
     public void StatAddStat()
     {
         // set up
-        var orig = new Statistic();
+        var original = new Statistic(); 
 
         double x = 0, y = -1;
 
         while (x < 500)
-            orig.Add(x++, y++);
-        _testOutputHelper.WriteLine(orig.ToString());
+            original.Add(x++, y++);
+        _testOutputHelper.WriteLine(original.ToString());
 
-        var clone = new Statistic(orig); // Make a clone (new unrelated instance) of the statistic.
+        var clone = new Statistic(original); // Make a clone (new unrelated instance) of the statistic.
 
-
-        Assert.False(orig.IsNaN);
+        Assert.False(original.IsNaN);
         Assert.False(clone.IsNaN);
 
         // test - 
-        clone.Add(orig); // Adding the original statistic to its clone, 
+        clone.Add(original); // Adding the original statistic to its clone, 
         // a> should only effect the clone.
         // b> number of samples should double
         // c> variance should remain the same 
         // d> other sum attributes should all be doubled.
         // e> Mean should remain the same.
 
-        Assert.Equal(orig.NumberSamples * 2, clone.NumberSamples);
-        Assert.Equal(orig.Qx2(), clone.Qx2());
-        Assert.Equal(orig.Qy2(), clone.Qy2());
+        Assert.Equal(original.NumberSamples * 2, clone.NumberSamples);
+        Assert.Equal(original.Qx2(), clone.Qx2());
+        Assert.Equal(original.Qy2(), clone.Qy2());
 
-        Assert.Equal(orig.Sx * 2, clone.Sx);
-        Assert.Equal(orig.Sy * 2, clone.Sy);
-        Assert.Equal(orig.Sy2 * 2, clone.Sy2);
-        Assert.Equal(orig.Sxy * 2, clone.Sxy);
+        Assert.Equal(original.Sx * 2, clone.Sx);
+        Assert.Equal(original.Sy * 2, clone.Sy);
+        Assert.Equal(original.Sy2 * 2, clone.Sy2);
+        Assert.Equal(original.Sxy * 2, clone.Sxy);
 
-        Assert.Equal(orig.MeanX(), clone.MeanX());
-        Assert.Equal(orig.MeanY(), clone.MeanY());
-
+        Assert.Equal(original.MeanX(), clone.MeanX());
+        Assert.Equal(original.MeanY(), clone.MeanY());
 
         Assert.False(clone.IsNaN);
 
