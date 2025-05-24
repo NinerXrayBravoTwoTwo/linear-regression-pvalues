@@ -18,7 +18,7 @@
 ///     sx2 = sum x**2
 ///     sxy = sum x * y
 ///     mean x = mx = sx/n
-///     mean y = my = sy/k
+///     mean y = my = sy/n
 ///     standard deviation x = qx = sqr((sx2 - (sx**2 /n)) / (n-1) )
 ///     standard deviation y = qy = sqr((sy2 - (sy**2 /n)) / (n-1) )
 ///     variance x = qx2 = sx2 / n - mx**2
@@ -166,10 +166,10 @@ public class Statistic
     public void Add(double x, double y)
     {
         Sy += y;
-        Sy2 += Math.Pow(y, 2);
+        Sy2 += y * y;
         N++;
         Sx += x;
-        Sx2 += Math.Pow(x, 2);
+        Sx2 += x * x;
         Sxy += x * y;
 
         MaxX = Math.Max(MaxX, x);
@@ -196,10 +196,10 @@ public class Statistic
     public void Dec(double x, double y)
     {
         Sy -= y;
-        Sy2 -= Math.Pow(y, 2);
+        Sy2 -= y * y;
         N--;
         Sx -= x;
-        Sx2 -= Math.Pow(x, 2);
+        Sx2 -= x * x;
         Sxy -= x * y;
     }
 
@@ -250,7 +250,7 @@ public class Statistic
         // throw new InvalidOperationException(
         //"There must be more than one sample to find the Standard Deviation.");
 
-        return Math.Sqrt(Sx2 - Math.Pow(Sx, 2) / N) / (N - 1);
+        return Math.Sqrt(Sx2 - Sx * Sx / N) / (N - 1);
     }
 
     /// <summary>
@@ -263,7 +263,7 @@ public class Statistic
         //throw new InvalidOperationException(
         //    "There must be more than one sample to find the Standard Deviation.");
 
-        return Math.Sqrt(Sy2 - Math.Pow(Sy, 2) / N) / (N - 1);
+        return Math.Sqrt(Sy2 - (Sy * Sy) / N) / (N - 1);
     }
 
     /// <summary>
@@ -274,7 +274,7 @@ public class Statistic
     {
         if (!(N > 0)) throw new DivideByZeroException("Number of samples needs to be greater than 0.");
 
-        return Sx2 / N - Math.Pow(MeanX(), 2);
+        return Sx2 / N - MeanX() * MeanX();
     }
 
     /// <summary>
@@ -284,7 +284,7 @@ public class Statistic
     public double Qy2()
     {
         if (N > 0)
-            return Sy2 / N - Math.Pow(MeanY(), 2);
+            return Sy2 / N - (MeanY() * MeanY());
 
         throw new DivideByZeroException("Number of samples needs to be greater than 0.");
     }
@@ -298,10 +298,10 @@ public class Statistic
         if (N.Equals(0))
             throw new DivideByZeroException("Number of samples needs to be greater than 0 to calculate a slope.");
 
-        if (Sx2.Equals(0) || Sx.Equals(0))
-            throw new DivideByZeroException("X'2 in sample MUST be greater than zero to calculate slope.");
+        if (Math.Abs(Sx2 - Sx * Sx / N) < 1e-10)
+            return double.PositiveInfinity;
 
-        var divisor = Sx2 - Math.Pow(Sx, 2) / N;
+        var divisor = Sx2 - Sx * Sx / N;
 
         if (divisor.Equals(0))
             return double.PositiveInfinity; // Truly undefined ...
@@ -326,10 +326,16 @@ public class Statistic
     /// <returns>Correlation, range -1 .. 1.  2 if qy == 0;</returns>
     public double Correlation()
     {
-        if (Qy().Equals(0) || double.IsPositiveInfinity(Slope()))
-            return 2;
+        //    if (Qy().Equals(0) || double.IsPositiveInfinity(Slope()))
+        //        return 2;
 
-        return Slope() * Qx() / Qy();
+        //    return Slope() * Qx() / Qy();
+        double qy = Qy();
+        if (qy == 0 || double.IsInfinity(Slope()))
+        {
+            return double.NaN;
+        }
+        return Slope() * Qx() / qy;
     }
 
     public override string ToString()
