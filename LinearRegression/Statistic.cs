@@ -295,18 +295,12 @@ public class Statistic
     /// <returns>Slope.</returns>
     public double Slope()
     {
-        if (N.Equals(0))
+        if (N < 2) return double.NaN;    //  Insufficient data
             throw new DivideByZeroException("Number of samples needs to be greater than 0 to calculate a slope.");
 
-        if (Math.Abs(Sx2 - Sx * Sx / N) < 1e-10)
-            return double.PositiveInfinity;
-
-        var divisor = Sx2 - Sx * Sx / N;
-
-        if (divisor.Equals(0))
-            return double.PositiveInfinity; // Truly undefined ...
-
-        return (Sxy - Sx * Sy / N) / divisor;
+        double numerator = Sxy - (Sx * Sy / N);
+        double denominator = Sx2 - (Sx * Sx / N);
+        return denominator != 0 ? numerator / denominator : double.NaN;
     }
 
     /// <summary>
@@ -326,10 +320,6 @@ public class Statistic
     /// <returns>Correlation, range -1 .. 1.  2 if qy == 0;</returns>
     public double Correlation()
     {
-        //    if (Qy().Equals(0) || double.IsPositiveInfinity(Slope()))
-        //        return 2;
-
-        //    return Slope() * Qx() / Qy();
         double qy = Qy();
         if (qy == 0 || double.IsInfinity(Slope()))
         {
