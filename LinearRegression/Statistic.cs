@@ -32,6 +32,10 @@
 [Serializable]
 public class Statistic
 {
+    private double N { get; set; }
+
+    //public int NumberSamples => (int)N;
+
     /// <summary>
     ///     Initialize a new regression, all data set to zero with no samples.
     /// </summary>
@@ -84,7 +88,7 @@ public class Statistic
     /// <summary>
     ///     Number of Samples for this statistic.
     /// </summary>
-    public double N { get; set; }
+    public int NumberSamples => (int)N;
 
     /// <summary>
     ///     Sum y
@@ -137,6 +141,31 @@ public class Statistic
                          || double.IsNaN(Sy)
                          || double.IsPositiveInfinity(Slope())
                          || double.IsNaN(YIntercept());
+
+    /// <summary>
+    ///     Merge two Regressions into a new Statistic instance.
+    /// </summary>
+    /// <param name="other">The Statistic to merge with.</param>
+    /// <returns>A new Statistic representing the combined data.</returns> 
+    public Statistic Merge(Statistic other)
+    {
+        // if (other == null) throw new ArgumentNullException(nameof(other));
+        ArgumentException.ThrowIfNullOrEmpty(nameof(other));
+
+        return new Statistic
+        {
+            Sy = this.Sy + other.Sy,
+            Sy2 = this.Sy2 + other.Sy2,
+            N = this.N + other.N,
+            Sx = this.Sx + other.Sx,
+            Sx2 = this.Sx2 + other.Sx2,
+            Sxy = this.Sxy + other.Sxy,
+            MaxX = Math.Max(this.MaxX, other.MaxX),
+            MinX = Math.Min(this.MinX, other.MinX),
+            MaxY = Math.Max(this.MaxY, other.MaxY),
+            MinY = Math.Min(this.MinY, other.MinY)
+        };
+    }
 
     /// <summary>
     ///     Merge two Regressions
@@ -216,10 +245,10 @@ public class Statistic
     ///     Number of Samples. Same as this.N
     /// </summary>
     /// <returns>Number of samples taken</returns>
-    public double NumberSamples()
-    {
-        return N;
-    }
+    //public double NumberSamples()
+    //{
+    //    return N;
+    //}
 
     /// <summary>
     ///     mean x = sum(x) / n
@@ -296,7 +325,6 @@ public class Statistic
     public double Slope()
     {
         if (N < 2) return double.NaN;    //  Insufficient data
-            throw new DivideByZeroException("Number of samples needs to be greater than 0 to calculate a slope.");
 
         double numerator = Sxy - (Sx * Sy / N);
         double denominator = Sx2 - (Sx * Sx / N);

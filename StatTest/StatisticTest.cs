@@ -68,7 +68,7 @@ public class StatisticTest
         _testOutputHelper.WriteLine(clone.ToString());
 
         Assert.NotEqual(orig.ToString(), clone.ToString());
-        Assert.Equal(clone.N + 1, orig.N);
+        Assert.Equal(clone.NumberSamples + 1, orig.NumberSamples);
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public class StatisticTest
         // d> other sum attributes should all be doubled.
         // e> Mean should remain the same.
 
-        Assert.Equal(orig.N * 2, clone.N);
+        Assert.Equal(orig.NumberSamples * 2, clone.NumberSamples);
         Assert.Equal(orig.Qx2(), clone.Qx2());
         Assert.Equal(orig.Qy2(), clone.Qy2());
 
