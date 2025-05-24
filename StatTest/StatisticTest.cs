@@ -1,4 +1,4 @@
-using MetabolicStat.StatMath;
+﻿using MetabolicStat.StatMath;
 using Xunit;
 using Xunit.Abstractions;
 
