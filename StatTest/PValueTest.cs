@@ -1,4 +1,3 @@
-using MetabolicStat.StatMath;
 using Xunit.Abstractions;
 namespace StatTest;
 using LinearRegression; // Ensure this namespace matches your project structure
