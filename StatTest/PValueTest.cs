@@ -1,6 +1,7 @@
 using MetabolicStat.StatMath;
 using Xunit.Abstractions;
 namespace StatTest;
+using LinearRegression; // Ensure this namespace matches your project structure
 
 public class PValueTest(ITestOutputHelper testOutputHelper)
 {
@@ -31,5 +32,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         Assert.Equal(1, stat.Correlation());
         Assert.Equal(49.5, stat.MeanX());
         Assert.Equal(1, stat.Slope());
+
+        testOutputHelper.WriteLine(stat.PValue().ToString($"P-value: {stat.PValue():F4}")); // Print P-Value with 4 decimal places
     }
 }

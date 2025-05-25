@@ -1,4 +1,10 @@
-﻿namespace MetabolicStat.StatMath;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;  
+using MathNet.Numerics; // Ensure you have MathNet.Numerics installed for statistical functions
+
+
+namespace MetabolicStat.StatMath;
 
 /// <summary>
 ///     2D Statistic Generator (Bi-variate)

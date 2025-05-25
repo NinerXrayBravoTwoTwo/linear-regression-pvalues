@@ -1,4 +1,9 @@
-﻿namespace MetabolicStat.StatMath;
+﻿using MathNet.Numerics;
+using MathNet.Numerics.Distributions;
+using MetabolicStat.StatMath; // Ensure you have MathNet.Numerics installed for statistical functions
+
+
+namespace LinearRegression;
 
 public class PValueStat : Statistic
 {
@@ -14,7 +19,7 @@ public class PValueStat : Statistic
     public void AddDataPoint(double x, double y)
     {
         dataPoints.Add((x, y));
-        this.Add(x, y);
+        Add(x, y);
 
     }
     #endregion
@@ -70,8 +75,10 @@ public class PValueStat : Statistic
     /// </summary>
     private double TDistributionCdf(double t, double degreesOfFreedom)
     {
-        // Approximation for t-distribution CDF
-        // Replace this with a more accurate method or library call
-        throw new NotImplementedException("Use a library for t-distribution CDF or implement this function.");
+        // Create a t-distribution with specified degrees of freedom
+        var tDistribution = new StudentT(0, 1, degreesOfFreedom);
+
+        // Compute the CDF at t
+        return tDistribution.CumulativeDistribution(t);
     }
 }
