@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;  
-using MathNet.Numerics; // Ensure you have MathNet.Numerics installed for statistical functions
 
-
-namespace MetabolicStat.StatMath;
+namespace StatMath;
 
 /// <summary>
-///     2D Statistic Generator (Bi-variate)
+///     2D Regression Generator (Bi-variate)
 ///     Lineage from 1978 TI-58 and TI-59 calculators.  Ported to C in 1982, ported to Perl 3 in 1987.
 ///     Parameter names are more 'traditional' than newer code and am not going to upgrade them at this time.
 ///     Copyright (c) Jillian England, 2001, 2002, 2003, 2008, 2012, 2016, 2018, 2019, 2022
 /// </summary>
 /// <remarks>
-///     I am a 2D statistic generator
+///     I am a 2D Regression generator
 ///     I can add pairs of x, y data to myself
 ///     I can return the following properties of that data
 ///     Two dimensional statistical data
@@ -36,16 +34,14 @@ namespace MetabolicStat.StatMath;
 ///     correlation coefficient = R = (m qx) /qy
 /// </remarks>
 [Serializable]
-public class Statistic
+public class Regression
 {
     internal double N { get; set; }
-
-    //public int NumberSamples => (int)N;
 
     /// <summary>
     ///     Initialize a new regression, all data set to zero with no samples.
     /// </summary>
-    public Statistic()
+    public Regression()
     {
         Sy =
             Sy2 =
@@ -66,7 +62,7 @@ public class Statistic
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
-    public Statistic(double x, double y) : this()
+    public Regression(double x, double y) : this()
     {
         Add(x, y);
     }
@@ -75,7 +71,7 @@ public class Statistic
     ///     Clone a regression in a new instance
     /// </summary>
     /// <param name="cloneMe"></param>
-    public Statistic(Statistic cloneMe)
+    public Regression(Regression cloneMe)
     {
         Sy += cloneMe.Sy;
         Sy2 += cloneMe.Sy2;
@@ -149,16 +145,16 @@ public class Statistic
                          || double.IsNaN(YIntercept());
 
     /// <summary>
-    ///     Merge two Regressions into a new Statistic instance.
+    ///     Merge two Regressions into a new Regression instance.
     /// </summary>
-    /// <param name="other">The Statistic to merge with.</param>
-    /// <returns>A new Statistic representing the combined data.</returns> 
-    public Statistic Merge(Statistic other)
+    /// <param name="other">The Regression to merge with.</param>
+    /// <returns>A new Regression representing the combined data.</returns> 
+    public Regression Merge(Regression other)
     {
         // if (other == null) throw new ArgumentNullException(nameof(other));
         ArgumentException.ThrowIfNullOrEmpty(nameof(other));
 
-        return new Statistic
+        return new Regression
         {
             Sy = this.Sy + other.Sy,
             Sy2 = this.Sy2 + other.Sy2,
@@ -174,10 +170,10 @@ public class Statistic
     }
 
     /// <summary>
-    ///     Merge two Regressions, DEPRECATED, use Merge(Statistic other) instead.`
+    ///     Merge two Regressions, DEPRECATED, use Merge(Regression other) instead.`
     /// </summary>
     /// <param name="other"></param>
-    public void Add(Statistic other)
+    public void Add(Regression other)
     {
         Sy += other.Sy;
         Sy2 += other.Sy2;
@@ -370,7 +366,7 @@ public class Statistic
             var isInfin = double.IsPositiveInfinity(Slope());
             result = isInfin
                 ? $"NaN - {N}"
-                : $"Cor: {Correlation():F4} N: {N} MeanX: {MeanX():F2} MeanY: {MeanY():F2} Slp: {Slope():F2}  (Q:x{Qx():F3} y{Qy():F3})  (Q2: x{Qx2():F3} y{Qy2():F3})  Yincpt: {YIntercept():F3}, X({MinX:0.##} - {MaxX:0.##}), Y: ({MinY:0.####} - {MaxY:0.####}), N: {N}, isNAN:{IsNaN}";
+                : $"Cor: {Correlation():F4} N: {N} MeanX: {MeanX():F2} MeanY: {MeanY():F2} Slp: {Slope():F2}  (Q:x{Qx():F3} y{Qy():F3})  (Q2: x{Qx2():F3} y{Qy2():F3})  Yincpt: {YIntercept():F3}, X({MinX:0.##} <-> {MaxX:0.##}), Y: ({MinY:0.####} <-> {MaxY:0.####}), N: {N}, isNAN:{IsNaN}";
         }
         catch (Exception error)
         {
