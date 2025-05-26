@@ -1,29 +1,27 @@
-﻿
-using MathNet.Numerics.Distributions;
-using StatMath; // Ensure you have MathNet.Numerics installed for statistical functions
+﻿using MathNet.Numerics.Distributions;
 
 
 namespace LinearRegression;
 
 public class PValueStat : Regression
 {
-    internal List<(double x, double y)> dataPoints = new();
-    bool bDataContainsNan = false;
+    internal List<(double x, double y)> DataPoints = new();
+    private bool _isDataContainsNan;
 
     public int DataPointsCount()
     {
-        return dataPoints.Count;
+        return DataPoints.Count;
     }
 
     #region Add methods with data points
     // Changed the method name to avoid conflict with the base class method
     public void AddDataPoint(double x, double y)
     {
-        dataPoints.Add((x, y));
+        DataPoints.Add((x, y));
         Add(x, y);
         if(double.IsNaN(x) || double.IsNaN(y))
         {
-            bDataContainsNan = true; // Track if any data point is NaN
+            _isDataContainsNan = true; // Track if any data point is NaN
         }
 
     }
@@ -42,10 +40,10 @@ public class PValueStat : Regression
     /// <exception cref="InvalidOperationException"></exception>
     public double PValue()
     {
-        if (dataPoints.Count < 3)
+        if (DataPoints.Count < 3)
             throw new InvalidOperationException("At least 3 data points are required to compute the p-value.");
 
-        if (bDataContainsNan)
+        if (_isDataContainsNan)
             return double.NaN; // If data contains NaN, return NaN for P-Value
 
         // Calculate slope and standard error of the slope
@@ -55,7 +53,7 @@ public class PValueStat : Regression
             return 1.0; // No variation in X, slope is undefined or always zero, so p-value is 1
 
         double rss = ResidualSumOfSquares();
-        int n = dataPoints.Count;
+        int n = DataPoints.Count;
         double seSlope = Math.Sqrt(rss / (N - 2) / varianceX);
 
         if (seSlope == 0)
@@ -66,7 +64,7 @@ public class PValueStat : Regression
 
         // Calculate p-value from t-distribution (two-tailed test)
         double degreesOfFreedom = n - 2;
-        double pValue = 2 * (1 - TDistributionCdf(Math.Abs(t), degreesOfFreedom));
+        double pValue = 2 * (1 - DistributionCdf(Math.Abs(t), degreesOfFreedom));
 
         if (double.IsNaN(pValue) || pValue < 0 || pValue > 1 || double.IsInfinity(t))
             return 1.0; // Defensive: return 1 for degenerate cases
@@ -81,7 +79,7 @@ public class PValueStat : Regression
         double intercept = YIntercept();
 
         // Calculate RSS: sum of (y - predicted_y)^2
-        foreach (var (x, y) in dataPoints) // Assume you have a collection of data points
+        foreach (var (x, y) in DataPoints) // Assume you have a collection of data points
         {
             double predictedY = slope * x + intercept;
             rss += Math.Pow(y - predictedY, 2);
@@ -99,7 +97,7 @@ public class PValueStat : Regression
     /// CDF of the t-distribution (for calculating p-value).
     /// You can replace this with a library function if available.
     /// </summary>
-    private double TDistributionCdf(double t, double degreesOfFreedom)
+    private double DistributionCdf(double t, double degreesOfFreedom)
     {
         // Create a t-distribution with specified degrees of freedom
         var tDistribution = new StudentT(0, 1, degreesOfFreedom);

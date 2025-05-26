@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;  
-
-namespace StatMath;
+﻿namespace LinearRegression;
 
 /// <summary>
 ///     2D Regression Generator (Bi-variate)
@@ -156,16 +152,16 @@ public class Regression
 
         return new Regression
         {
-            Sy = this.Sy + other.Sy,
-            Sy2 = this.Sy2 + other.Sy2,
-            N = this.N + other.N,
-            Sx = this.Sx + other.Sx,
-            Sx2 = this.Sx2 + other.Sx2,
-            Sxy = this.Sxy + other.Sxy,
-            MaxX = Math.Max(this.MaxX, other.MaxX),
-            MinX = Math.Min(this.MinX, other.MinX),
-            MaxY = Math.Max(this.MaxY, other.MaxY),
-            MinY = Math.Min(this.MinY, other.MinY)
+            Sy = Sy + other.Sy,
+            Sy2 = Sy2 + other.Sy2,
+            N = N + other.N,
+            Sx = Sx + other.Sx,
+            Sx2 = Sx2 + other.Sx2,
+            Sxy = Sxy + other.Sxy,
+            MaxX = Math.Max(MaxX, other.MaxX),
+            MinX = Math.Min(MinX, other.MinX),
+            MaxY = Math.Max(MaxY, other.MaxY),
+            MinY = Math.Min(MinY, other.MinY)
         };
     }
 
@@ -243,14 +239,6 @@ public class Regression
         Dec(x, N - 1);
     }
 
-    /// <summary>
-    ///     Number of Samples. Same as this.N
-    /// </summary>
-    /// <returns>Number of samples taken</returns>
-    //public double NumberSamples()
-    //{
-    //    return N;
-    //}
 
     /// <summary>
     ///     mean x = sum(x) / n
@@ -294,7 +282,7 @@ public class Regression
         //throw new InvalidOperationException(
         //    "There must be more than one sample to find the Standard Deviation.");
 
-        return Math.Sqrt(Sy2 - (Sy * Sy) / N) / (N - 1);
+        return Math.Sqrt(Sy2 - Sy * Sy / N) / (N - 1);
     }
 
     /// <summary>
@@ -315,7 +303,7 @@ public class Regression
     public double Qy2()
     {
         if (N > 0)
-            return Sy2 / N - (MeanY() * MeanY());
+            return Sy2 / N - MeanY() * MeanY();
 
         throw new DivideByZeroException("Number of samples needs to be greater than 0.");
     }
@@ -328,8 +316,8 @@ public class Regression
     {
         if (N < 2) return double.NaN;    //  Insufficient data
 
-        double numerator = Sxy - (Sx * Sy / N);
-        double denominator = Sx2 - (Sx * Sx / N);
+        double numerator = Sxy - Sx * Sy / N;
+        double denominator = Sx2 - Sx * Sx / N;
         return denominator != 0 ? numerator / denominator : double.NaN;
     }
 
@@ -363,8 +351,8 @@ public class Regression
         string result;
         try
         {
-            var isInfin = double.IsPositiveInfinity(Slope());
-            result = isInfin
+            var isInfinity = double.IsPositiveInfinity(Slope());
+            result = isInfinity
                 ? $"NaN - {N}"
                 : $"Cor: {Correlation():F4} N: {N} MeanX: {MeanX():F2} MeanY: {MeanY():F2} Slp: {Slope():F2}  (Q:x{Qx():F3} y{Qy():F3})  (Q2: x{Qx2():F3} y{Qy2():F3})  Yincpt: {YIntercept():F3}, X({MinX:0.##} <-> {MaxX:0.##}), Y: ({MinY:0.####} <-> {MaxY:0.####}), N: {N}, isNAN:{IsNaN}";
         }
