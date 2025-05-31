@@ -8,7 +8,7 @@ public static class RandomGen
 {
     private static readonly Random Lcg = new();
 
-    #region Random Number Tools (Its better to use one sequence than several, using several will overlap sooner, be less 'random', than just using one.)
+    #region Random Number Tools (It is better to use one sequence than several, using several will overlap sooner, be less 'random', than just using one.)
 
     public static int Next()
     {
