@@ -40,3 +40,21 @@ The library is a C# project that can be included in your .NET solution:
 
 ```bash
 dotnet add package MathNet.Numerics
+
+## License
+
+This project is licensed under the [Affero General Public License (AGPL-3.0)](./LICENSE). See the `LICENSE` file for full details.
+
+## Contact
+
+Jillian England  
+jill.england@comcast.net
+
+For questions or feedback about the data, contact the Citizen Science Foundation or post on X with relevant tags (e.g., #KetoCTA, #CitizenScience).
+
+The Citizen Science Foundation dataset is available for public use, and this analysis is intended to support further research into the ketogenic diet's effects on cardiovascular health.
+
+Any omissions or errors in this software specification are unintentional and should be reported for correction. 
+
+This software specification is a prototype and may evolve with further analyses and user feedback. 
+It is not guaranteed or warranted for any specific use case beyond educational and research purposes.
