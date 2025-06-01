@@ -52,8 +52,10 @@ This project is licensed under the [Affero General Public License (AGPL-3.0)](./
 ## Contact
 
 Jillian England  
-jill.england@comcast.net
+Emai: jill.england@comcast.net
+
 X: @Firefox_XB9R
+
 FB: Jillian England Seattle
 
 Any omissions or errors in this software specification are unintentional and should be reported for correction. 
