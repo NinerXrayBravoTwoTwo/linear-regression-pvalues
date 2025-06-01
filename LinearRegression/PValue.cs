@@ -5,7 +5,7 @@ namespace LinearRegression;
 public class PValueStat : Regression
 {
     private bool _isDataContainsNan;
-    internal List<(double x, double y)> DataPoints = new();
+    internal List<(double x, double y)> DataPoints = [];
 
     public int DataPointsCount()
     {
@@ -76,7 +76,7 @@ public class PValueStat : Regression
     ///     CDF of the t-distribution (for calculating p-value).
     ///     You can replace this with a library function if available.
     /// </summary>
-    private double DistributionCdf(double t, double degreesOfFreedom)
+    private static double DistributionCdf(double t, double degreesOfFreedom)
     {
         // Create a t-distribution with specified degrees of freedom
         var tDistribution = new StudentT(0, 1, degreesOfFreedom);

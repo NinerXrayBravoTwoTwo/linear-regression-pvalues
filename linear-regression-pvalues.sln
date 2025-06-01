@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinearRegression", "LinearRegression\LinearRegression.csproj", "{C0A1635D-6BFC-42D4-9969-E1694038BFAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatTest", "StatTest\StatTest.csproj", "{FEA61FBD-AAE2-DBD5-B1AA-2DB3AEB5BC2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegressionTest", "StatTest\RegressionTest.csproj", "{FEA61FBD-AAE2-DBD5-B1AA-2DB3AEB5BC2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -2,7 +2,7 @@
  * Copyright (c) 2015-2022, Jillian England
  */
 
-namespace StatTest;
+namespace RegressionTest;
 
 public static class RandomGen
 {

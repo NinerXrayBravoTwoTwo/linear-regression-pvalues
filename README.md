@@ -1,35 +1,42 @@
-The code is pretty well documented
-===
+# Linear Regression Library
 
-But I will put some formulas in here to complete this.
+A robust and lightweight C# library for performing 2D (bivariate) linear regression analysis. This project calculates statistical properties such as slope, y-intercept, correlation coefficient, and p-value for paired x, y data. It is designed for technical users, including data scientists, statisticians, and developers working on statistical modeling.
 
-In the meantime;
----
-```
-    2D Regression Generator (Bi-variate)
-    Lineage from 1978 TI-58 and TI-59 calculators.  Ported to C in 1982, ported to Perl 3 in 1987.
-    Parameter names are more 'traditional' than newer code and am not going to upgrade them at this time.
-    Copyright (c) Jillian England, 2001, 2002, 2003, 2008, 2012, 2016, 2018, 2019, 2022
+## Overview
 
-    I am a 2D Regression generator
-    I can add pairs of x, y data to myself
-    I can return the following properties of that data
-    Two dimensional statistical data
-    sy  = sum y
-    sy2 = sum y**2
-    n
-    sx  = sum x
-    sx2 = sum x**2
-    sxy = sum x * y
-    mean x = mx = sx/n
-    mean y = my = sy/n
-    standard deviation x = qx = sqr((sx2 - (sx**2 /n)) / (n-1) )
-    standard deviation y = qy = sqr((sy2 - (sy**2 /n)) / (n-1) )
-    variance x = qx2 = sx2 / n - mx**2
-    variance y = qy2 = sy2 / n - my**2
-    Use N weighting for population studies
-    and N-1 for sample studies
-    Slope = m = sxy - (sx*sy)/n / sx2 - sx**2 /n
-    yIntercept = b = (sy - m*sx) / n
-    correlation coefficient = R = (m qx) /qy
-```
+The library provides a `Regression` class for computing 2D regression statistics and a `PValueStat` class for calculating the p-value of the regression slope. It supports adding, removing, and merging data points, with robust handling of edge cases like insufficient data or NaN values.
+
+### Lineage
+- Originated from 1978 TI-58 and TI-59 calculator algorithms.
+- Ported to C in 1982, then to Perl 3 in 1987.
+- Modernized in C# with updates in 2001, 2002, 2003, 2008, 2012, 2016, 2018, 2019, and 2022.
+- Copyright © Jillian England, 2001–2022.
+
+## Features
+
+- **Data Management**:
+  - Add individual (x, y) data points or merge multiple regression datasets.
+  - Remove data points (decrement) with support for both explicit y-values and implicit y (based on sample count).
+  - Track minimum and maximum x and y values.
+- **Statistical Calculations**:
+  - Sum of x, y, x², y², and x*y.
+  - Mean of x and y.
+  - Standard deviation and variance for x and y (with N or N-1 weighting for population or sample studies).
+  - Slope, y-intercept, and correlation coefficient.
+  - P-value for the regression slope (via `PValueStat` class).
+- **Robustness**:
+  - Handles edge cases (e.g., insufficient samples, division by zero, NaN, or infinite values).
+  - Returns `double.NaN` for invalid computations instead of throwing exceptions in most cases.
+- **Serialization**:
+  - The `Regression` class is marked `[Serializable]` for persistence.
+
+## Installation
+
+The library is a C# project that can be included in your .NET solution:
+
+1. Clone or download the repository.
+2. Add the project or source files (`Regression.cs`, `PValue.cs`) to your solution.
+3. Ensure the `MathNet.Numerics` NuGet package is installed for `PValueStat` (for t-distribution calculations).
+
+```bash
+dotnet add package MathNet.Numerics

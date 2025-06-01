@@ -1,5 +1,7 @@
-﻿using LinearRegression; // Ensure this namespace is correct and contains the 'Statistic' class.
+﻿using LinearRegression;
+using RegressionTest;
 using Xunit.Abstractions;
+// Ensure this namespace is correct and contains the 'Statistic' class.
 
 namespace StatTest;
 
@@ -212,6 +214,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // Assert
         _testOutputHelper.WriteLine(clone.ToString());
     }
+
     [Fact]
     public void StatAddStatWithNaNAndEmptyStatWithNaN()
     {
@@ -244,6 +247,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // Assert
         _testOutputHelper.WriteLine(clone.ToString());
     }
+
     [Fact]
     public void StatAddStatWithNaNAndEmptyStatWithNaNAndNaNDataPoint()
     {
@@ -273,13 +277,14 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         Assert.Equal(original.MeanX(), clone.MeanX());
         Assert.Equal(original.MeanY(), clone.MeanY());
         Assert.False(clone.IsNaN);
-        
+
         // Add a NaN data point to the clone
         clone.Add(double.NaN, double.NaN);
         _testOutputHelper.WriteLine(clone.ToString());
         // The NaN data point should not affect the statistics
         Assert.True(clone.IsNaN); // The presence of NaN should make the statistic NaN
     }
+
     [Fact]
     public void StatAddStatWithNaNAndEmptyStatWithNaNAndNaNDataPointAndNaNDataPoint()
     {
@@ -311,12 +316,13 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         Assert.False(clone.IsNaN);
         // Add a NaN data point to the clone
         clone.Add(double.NaN, double.NaN);
-        
+
         _testOutputHelper.WriteLine(clone.ToString());
-        
+
         // The NaN data point should not affect the statistics
         Assert.True(clone.IsNaN); // The presence of NaN should make the statistic NaN
     }
+
     [Fact]
     public void StatAddStatWithNaNAndEmptyStatWithNaNAndNaNDataPointAndNaNDataPointAndNaNDataPoint()
     {
@@ -346,14 +352,13 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         Assert.Equal(original.MeanX(), clone.MeanX());
         Assert.Equal(original.MeanY(), clone.MeanY());
         Assert.False(clone.IsNaN);
-        
+
         // Add a NaN data point to the clone
         clone.Add(double.NaN, double.NaN);
-        
+
         _testOutputHelper.WriteLine(clone.ToString());
-        
+
         // The NaN data point should not affect the statistics
         Assert.True(clone.IsNaN); // The presence of NaN should make the statistic NaN
     }
-
 }

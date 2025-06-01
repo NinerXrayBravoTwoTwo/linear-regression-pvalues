@@ -1,6 +1,8 @@
+using LinearRegression;
 using Xunit.Abstractions;
-namespace StatTest;
-using LinearRegression; // Ensure this namespace matches your project structure
+
+namespace RegressionTest;
+// Ensure this namespace matches your project structure
 
 public class PValueTest(ITestOutputHelper testOutputHelper)
 {
@@ -33,7 +35,8 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         Assert.Equal(49.5, stat.MeanX());
         Assert.Equal(1, stat.Slope());
 
-        testOutputHelper.WriteLine(stat.PValue().ToString($"P-value: {stat.PValue():F4}")); // Print P-Value with 4 decimal places
+        testOutputHelper.WriteLine(stat.PValue()
+            .ToString($"P-value: {stat.PValue():F4}")); // Print P-Value with 4 decimal places
     }
 
 
@@ -48,6 +51,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         // Assert that calling PValue throws an InvalidOperationException
         Assert.Throws<InvalidOperationException>(() => stat.PValue());
     }
+
     [Fact]
     public void PValueWithSufficientDataReturnsValidValue()
     {
@@ -59,9 +63,10 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         stat.AddDataPoint(3, 4);
 
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithNegativeSlopeReturnsValidValue()
     {
@@ -73,41 +78,38 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         stat.AddDataPoint(3, 1);
 
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithZeroSlopeReturnsValidValue()
     {
         // Create a PValueStat instance with sufficient data points
         var stat = new PValueStat();
         // Add 3 data points with a zero slope
-        int x = 3;
-        while (x-- > 0)
-        {
-            stat.AddDataPoint(x, 2);
-        }
+        var x = 3;
+        while (x-- > 0) stat.AddDataPoint(x, 2);
 
         testOutputHelper.WriteLine(stat.ToString());
 
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithLargeDatasetReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
         var stat = new PValueStat();
-        for (int i = 0; i < 1000; i++)
-        {
-            stat.AddDataPoint(i, 2 * i + 1); // Linear relationship
-        }
+        for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 2 * i + 1); // Linear relationship
 
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithNoVariationInXReturnsOne()
     {
@@ -120,7 +122,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.ToString());
 
         // Assert that PValue returns 1.0
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.Equal(1.0, pValue);
     }
 
@@ -137,9 +139,10 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.ToString());
 
         // Assert that PValue returns NaN
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(double.IsNaN(pValue), "P-value should be NaN when data contains NaN values.");
     }
+
     [Fact]
     public void PValueWithAllNaNValuesReturnsNaN()
     {
@@ -151,9 +154,10 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         stat.AddDataPoint(double.NaN, double.NaN);
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns NaN
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(double.IsNaN(pValue), "P-value should be NaN when all data points are NaN.");
     }
+
     [Fact]
     public void PValueWithSingleDataPointReturnsNaN()
     {
@@ -165,6 +169,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         // Assert that PValue returns NaN
         Assert.Throws<InvalidOperationException>(() => stat.PValue());
     }
+
     [Fact]
     public void PValueWithTwoDataPointsReturnsNaN()
     {
@@ -177,6 +182,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         // Assert that PValue returns NaN
         Assert.Throws<InvalidOperationException>(() => stat.PValue());
     }
+
     [Fact]
     public void PValueWithThreeDataPointsReturnsValidValue()
     {
@@ -188,9 +194,10 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         stat.AddDataPoint(3, 4);
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithNegativeSlopeAndNaNReturnsNaN()
     {
@@ -202,9 +209,10 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         stat.AddDataPoint(3, 1);
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns NaN
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(double.IsNaN(pValue), "P-value should be NaN when data contains NaN values.");
     }
+
     [Fact]
     public void PValueWithZeroSlopeAndNaNReturnsNaN()
     {
@@ -216,7 +224,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         stat.AddDataPoint(3, 2);
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns NaN
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(double.IsNaN(pValue), "P-value should be NaN when data contains NaN values.");
     }
 
@@ -225,60 +233,53 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     {
         // Create a PValueStat instance with a large dataset
         var stat = new PValueStat();
-        for (int i = 0; i < 1000; i++)
-        {
+        for (var i = 0; i < 1000; i++)
             if (i % 100 == 0) // Introduce NaN every 100th point
                 stat.AddDataPoint(i, double.NaN);
             else
                 stat.AddDataPoint(i, 2 * i + 1); // Linear relationship
-        }
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns NaN due to NaN in data
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(double.IsNaN(pValue), "P-value should be NaN when data contains NaN values.");
     }
+
     [Fact]
     public void PValueWithLargeDatasetAndNoVariationInXReturnsOne()
     {
         // Create a PValueStat instance with no variation in X
         var stat = new PValueStat();
-        for (int i = 0; i < 1000; i++)
-        {
-            stat.AddDataPoint(1, i); // All X values are 1
-        }
+        for (var i = 0; i < 1000; i++) stat.AddDataPoint(1, i); // All X values are 1
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns 1.0
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.Equal(1.0, pValue);
     }
+
     [Fact]
     public void PValueWithNegativeSlopeAndLargeDatasetReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
         var stat = new PValueStat();
-        for (int i = 0; i < 1000; i++)
-        {
-            stat.AddDataPoint(i, 1000 - i); // Negative slope
-        }
+        for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 1000 - i); // Negative slope
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithZeroSlopeAndLargeDatasetReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
         var stat = new PValueStat();
-        for (int i = 0; i < 1000; i++)
-        {
-            stat.AddDataPoint(i, 5); // All Y values are constant
-        }
+        for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 5); // All Y values are constant
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithMixedDataTypesReturnsNaN()
     {
@@ -290,9 +291,10 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         stat.AddDataPoint(3, 4);
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns NaN
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(double.IsNaN(pValue), "P-value should be NaN when data contains NaN values.");
     }
+
     [Fact]
     public void PValueWithNegativeAndPositiveValuesReturnsValidValue()
     {
@@ -304,9 +306,10 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         stat.AddDataPoint(1, 2);
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithLargeNegativeValuesReturnsValidValue()
     {
@@ -318,9 +321,10 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         stat.AddDataPoint(0, 0);
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithLargePositiveValuesReturnsValidValue()
     {
@@ -332,9 +336,10 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         stat.AddDataPoint(0, 0);
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithMixedSignValuesReturnsValidValue()
     {
@@ -346,107 +351,91 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         stat.AddDataPoint(1, 2);
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithLargeDatasetAndMixedSignValuesReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
         var stat = new PValueStat();
-        for (int i = -500; i < 500; i++)
-        {
-            stat.AddDataPoint(i, 2 * i + 1); // Linear relationship with mixed signs
-        }
+        for (var i = -500; i < 500; i++) stat.AddDataPoint(i, 2 * i + 1); // Linear relationship with mixed signs
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithLargeDatasetAndZeroValuesReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
         var stat = new PValueStat();
-        for (int i = 0; i < 1000; i++)
-        {
-            stat.AddDataPoint(i, 0); // All Y values are zero
-        }
+        for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 0); // All Y values are zero
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithLargeDatasetAndNegativeValuesReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
         var stat = new PValueStat();
-        for (int i = 0; i < 1000; i++)
-        {
-            stat.AddDataPoint(i, -2 * i - 1); // Linear relationship with negative values
-        }
+        for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, -2 * i - 1); // Linear relationship with negative values
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
-    [Fact]
 
+    [Fact]
     public void PValueWithLargeDatasetAndPositiveValuesReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
         var stat = new PValueStat();
-        for (int i = 0; i < 1000; i++)
-        {
-            stat.AddDataPoint(i, 2 * i + 1); // Linear relationship with positive values
-        }
+        for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 2 * i + 1); // Linear relationship with positive values
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        double pValue = stat.PValue();
+        var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
-    [Fact]  
+
+    [Fact]
     public void PValueWithLargeDatasetAndZeroSlopeReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
         var stat = new PValueStat();
-        for (int i = 0; i < 1000; i++)
-        {
-            stat.AddDataPoint(i, 5); // All Y values are constant
-        }
+        for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 5); // All Y values are constant
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
         var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
-    [Fact]  
+
+    [Fact]
     public void PValueWithLargeDatasetAndNegativeSlopeReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
         var stat = new PValueStat();
-        for (int i = 0; i < 1000; i++)
-        {
-            stat.AddDataPoint(i, 1000 - i); // Negative slope
-        }
+        for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 1000 - i); // Negative slope
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
         var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
+
     [Fact]
     public void PValueWithLargeDatasetAndPositiveSlopeReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
         var stat = new PValueStat();
-        for (var i = 0; i < 1000; i++)
-        {
-            stat.AddDataPoint(i, 2 * i + 1); // Linear relationship with positive slope
-        }
+        for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 2 * i + 1); // Linear relationship with positive slope
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
         var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
-
 }
