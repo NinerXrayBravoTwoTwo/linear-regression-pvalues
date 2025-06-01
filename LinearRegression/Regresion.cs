@@ -32,8 +32,6 @@
 [Serializable]
 public class Regression
 {
-    internal double N { get; set; }
-
     /// <summary>
     ///     Initialize a new regression, all data set to zero with no samples.
     /// </summary>
@@ -82,6 +80,8 @@ public class Regression
         MaxX = cloneMe.MaxX;
         MaxY = cloneMe.MaxY;
     }
+
+    internal double N { get; set; }
 
     /// <summary>
     ///     Number of Samples for this statistic.
@@ -144,7 +144,7 @@ public class Regression
     ///     Merge two Regressions into a new Regression instance.
     /// </summary>
     /// <param name="other">The Regression to merge with.</param>
-    /// <returns>A new Regression representing the combined data.</returns> 
+    /// <returns>A new Regression representing the combined data.</returns>
     public Regression Merge(Regression other)
     {
         // if (other == null) throw new ArgumentNullException(nameof(other));
@@ -314,10 +314,10 @@ public class Regression
     /// <returns>Slope.</returns>
     public double Slope()
     {
-        if (N < 2) return double.NaN;    //  Insufficient data
+        if (N < 2) return double.NaN; //  Insufficient data
 
-        double numerator = Sxy - Sx * Sy / N;
-        double denominator = Sx2 - Sx * Sx / N;
+        var numerator = Sxy - Sx * Sy / N;
+        var denominator = Sx2 - Sx * Sx / N;
         return denominator != 0 ? numerator / denominator : double.NaN;
     }
 
@@ -338,11 +338,8 @@ public class Regression
     /// <returns>Correlation, range -1 .. 1.  2 if qy == 0;</returns>
     public double Correlation()
     {
-        double qy = Qy();
-        if (qy == 0 || double.IsInfinity(Slope()))
-        {
-            return double.NaN;
-        }
+        var qy = Qy();
+        if (qy == 0 || double.IsInfinity(Slope())) return double.NaN;
         return Slope() * Qx() / qy;
     }
 
@@ -363,6 +360,4 @@ public class Regression
 
         return result;
     }
-
-
 }
