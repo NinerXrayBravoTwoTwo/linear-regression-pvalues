@@ -1,3 +1,7 @@
+# License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
 # Linear Regression Library
 
 A robust and lightweight C# library for performing 2D (bivariate) linear regression analysis. This project calculates statistical properties such as slope, y-intercept, correlation coefficient, and p-value for paired x, y data. It is designed for technical users, including data scientists, statisticians, and developers working on statistical modeling.
@@ -9,7 +13,7 @@ The library provides a `Regression` class for computing 2D regression statistics
 ### Lineage
 - Originated from 1978 TI-58 and TI-59 calculator algorithms.
 - Ported to C in 1982, then to Perl 3 in 1987.
-- Modernized in C# with updates in 2001, 2002, 2003, 2008, 2012, 2016, 2018, 2019, and 2022.
+- Modernized in C# with updates in 2001, 2002, 2003, 2008, 2012, 2016, 2018, 2019, 2022, 2025
 - Copyright © Jillian England, 2001–2022.
 
 ## Features
@@ -40,7 +44,7 @@ The library is a C# project that can be included in your .NET solution:
 
 ```bash
 dotnet add package MathNet.Numerics
-```
+ire
 ## License
 
 This project is licensed under the [Affero General Public License (AGPL-3.0)](./LICENSE). See the `LICENSE` file for full details.
@@ -49,12 +53,7 @@ This project is licensed under the [Affero General Public License (AGPL-3.0)](./
 
 Jillian England  
 jill.england@comcast.net
-
-For questions or feedback about the data, contact the Citizen Science Foundation or post on X with relevant tags (e.g., #KetoCTA, #CitizenScience).
-
-The Citizen Science Foundation dataset is available for public use, and this analysis is intended to support further research into the ketogenic diet's effects on cardiovascular health.
+X: @Firefox_XB9R
+FB: Jillian England Seattle
 
 Any omissions or errors in this software specification are unintentional and should be reported for correction. 
-
-This software specification is a prototype and may evolve with further analyses and user feedback. 
-It is not guaranteed or warranted for any specific use case beyond educational and research purposes.
