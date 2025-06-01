@@ -44,7 +44,7 @@ The library is a C# project that can be included in your .NET solution:
 
 ```bash
 dotnet add package MathNet.Numerics
-ire
+```
 ## License
 
 This project is licensed under the [Affero General Public License (AGPL-3.0)](./LICENSE). See the `LICENSE` file for full details.
