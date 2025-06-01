@@ -1,7 +1,3 @@
-# License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
 # Linear Regression Library
 
 A robust and lightweight C# library for performing 2D (bivariate) linear regression analysis. This project calculates statistical properties such as slope, y-intercept, correlation coefficient, and p-value for paired x, y data. It is designed for technical users, including data scientists, statisticians, and developers working on statistical modeling.
@@ -14,7 +10,7 @@ The library provides a `Regression` class for computing 2D regression statistics
 - Originated from 1978 TI-58 and TI-59 calculator algorithms.
 - Ported to C in 1982, then to Perl 3 in 1987.
 - Modernized in C# with updates in 2001, 2002, 2003, 2008, 2012, 2016, 2018, 2019, 2022, 2025
-- Copyright © Jillian England, 2001–2022.
+- Copyright Â© Jillian England, 2001â€“2022.
 
 ## Features
 
@@ -23,7 +19,7 @@ The library provides a `Regression` class for computing 2D regression statistics
   - Remove data points (decrement) with support for both explicit y-values and implicit y (based on sample count).
   - Track minimum and maximum x and y values.
 - **Statistical Calculations**:
-  - Sum of x, y, x², y², and x*y.
+  - Sum of x, y, xÂ², yÂ², and x*y.
   - Mean of x and y.
   - Standard deviation and variance for x and y (with N or N-1 weighting for population or sample studies).
   - Slope, y-intercept, and correlation coefficient.
