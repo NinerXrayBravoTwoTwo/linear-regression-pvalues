@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2015-2022, Jillian England
+ * Copyright (c) 2015-2025, Jillian England
  */
 
 namespace RegressionTest;

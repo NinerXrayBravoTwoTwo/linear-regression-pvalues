@@ -3,18 +3,23 @@
 namespace LinearRegression;
 
 [Serializable]
-public class PValueStat : Regression
+public class RegressionPvalue : Regression
 {
+    public RegressionPvalue()
+    {
+        DataPoints = []; // Initialize DataPoints to avoid null reference
+    }
+
     private bool _isDataContainsNan;
 
-    // Constructor fix: Add 'this' initializer and specify a return type
-    public PValueStat(List<(double x, double y)> dataPoints) : base(dataPoints)
+    public RegressionPvalue(List<(double x, double y)> dataPoints) : base(dataPoints)
     {
-        DataPoints = dataPoints;
-        foreach (var (x, y) in dataPoints)
+        DataPoints = dataPoints; // Initialize DataPoints with provided data
+
+        foreach (var item in dataPoints.Where(item => item.x is double.NaN || item.y is double.NaN))
         {
-            Add(x, y); // Initialize base class with data points
-            if (double.IsNaN(x) || double.IsNaN(y)) _isDataContainsNan = true; // Track NaN values
+            _isDataContainsNan = true;
+            break;
         }
     }
 
@@ -101,14 +106,14 @@ public class PValueStat : Regression
     #region Add methods with data points
 
     // Changed the method name to avoid conflict with the base class method
-    public void AddDataPoint(double x, double y)
+    private void AddDataPoint(double x, double y)
     {
         DataPoints.Add((x, y));
         Add(x, y);
         if (double.IsNaN(x) || double.IsNaN(y)) _isDataContainsNan = true; // Track if any data point is NaN
     }
 
-    public void AddDataPoint(double x)
+    private void AddDataPoint(double x)
     {
         var y = N + 1;
         Add(x, y);

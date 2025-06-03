@@ -34,7 +34,7 @@ public class Regression
 {
     public Regression(List<(double x, double y)> dataPoints)
     {
-        foreach (var item in dataPoints) Add(item.x, item.y);
+        foreach (var (x, y) in dataPoints) Add(x, y);
     }
 
     /// <summary>
