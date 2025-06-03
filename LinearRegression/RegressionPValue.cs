@@ -5,12 +5,12 @@ namespace LinearRegression;
 [Serializable]
 public class RegressionPvalue : Regression
 {
+    private bool _isDataContainsNan;
+
     public RegressionPvalue()
     {
         DataPoints = []; // Initialize DataPoints to avoid null reference
     }
-
-    private bool _isDataContainsNan;
 
     public RegressionPvalue(List<(double x, double y)> dataPoints) : base(dataPoints)
     {
@@ -103,21 +103,4 @@ public class RegressionPvalue : Regression
         return tDistribution.CumulativeDistribution(t);
     }
 
-    #region Add methods with data points
-
-    // Changed the method name to avoid conflict with the base class method
-    private void AddDataPoint(double x, double y)
-    {
-        DataPoints.Add((x, y));
-        Add(x, y);
-        if (double.IsNaN(x) || double.IsNaN(y)) _isDataContainsNan = true; // Track if any data point is NaN
-    }
-
-    private void AddDataPoint(double x)
-    {
-        var y = N + 1;
-        Add(x, y);
-    }
-
-    #endregion
 }

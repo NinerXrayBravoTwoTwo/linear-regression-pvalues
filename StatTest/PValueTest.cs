@@ -6,7 +6,6 @@ namespace RegressionTest;
 
 public class PValueTest(ITestOutputHelper testOutputHelper)
 {
-
     [Fact]
     public void EmptyPValueIsNaN() // Fixed spelling: PValue -> PValue, Nan -> NaN
     {
@@ -140,7 +139,6 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     [Fact]
     public void PValueWithNaNValuesReturnsNaN()
     {
-
         var dataPoints = new List<(double x, double y)>
         {
             (1, double.NaN),
@@ -188,7 +186,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         // Create a PValueStat instance
         var dataPoints = new List<(double x, double y)>
         {
-            (1, 2),
+            (1, 2)
         };
         var stat = new RegressionPvalue(dataPoints);
         // Add a single data point
@@ -205,8 +203,8 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         // Create a PValueStat instance
         var dataPoints = new List<(double x, double y)>
         {
-            (1,2),
-            (2, 3),
+            (1, 2),
+            (2, 3)
         };
 
         var stat = new RegressionPvalue(dataPoints);
@@ -226,13 +224,13 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var dataPoints = new List<(double x, double y)>
         {
             (1, 2),
-            (2,3),
-            (3,4),
+            (2, 3),
+            (3, 4)
         };
 
         var stat = new RegressionPvalue(dataPoints);
 
-        ;
+
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
         var pValue = stat.PValue();
@@ -353,9 +351,9 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     {
         // Create a PValueStat instance
         // Add data points with mixed types (e.g., string, null)
-        var dataPoints = new List<(double x, double y)>()
+        var dataPoints = new List<(double x, double y)>
         {
-            (1,2), 
+            (1, 2),
             (2, double.NaN), // Introduce NaN
             (3, 4)
         };
@@ -403,7 +401,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
             (0, 0)
         };
         var stat = new RegressionPvalue(dataPoints);
-   
+
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
         var pValue = stat.PValue();
@@ -420,12 +418,12 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
             (1000, 2000),
             (500, 1000),
             (0, 0)
-        };  
+        };
 
         var stat = new RegressionPvalue(dataPoints);
-  
+
         testOutputHelper.WriteLine(stat.ToString());
-        
+
         // Assert that PValue returns a valid double value
         var pValue = stat.PValue();
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
@@ -455,7 +453,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     {
         // Create a PValueStat instance with a large dataset
         var dataPoints = new List<(double x, double y)>();
-        
+
         for (var i = -500; i < 500; i++) dataPoints.Add((i, 2 * i + 1)); // Linear relationship with mixed signs
 
         var stat = new RegressionPvalue(dataPoints);
@@ -471,7 +469,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithLargeDatasetAndZeroValuesReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
-        var dataPoints = new List<(double x, double y)>();  
+        var dataPoints = new List<(double x, double y)>();
         for (var i = 0; i < 1000; i++) dataPoints.Add((i, 0)); // All Y values are zero
         var stat = new RegressionPvalue(dataPoints);
 
@@ -498,7 +496,6 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     [Fact]
     public void PValueWithLargeDatasetAndPositiveValuesReturnsValidValue()
     {
-        
         // Create a PValueStat instance with a large dataset
         var dataPoints = new List<(double x, double y)>();
         for (var i = 0; i < 1000; i++) dataPoints.Add((i, 2 * i + 1)); // Linear relationship with positive values

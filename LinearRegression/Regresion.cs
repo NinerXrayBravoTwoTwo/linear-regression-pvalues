@@ -289,9 +289,9 @@ public class Regression
 
         return Math.Sqrt(Sy2 - Sy * Sy / N) / (N - 1);
     }
-    
+
     /// <summary>
-    /// Calculates the variance of X.
+    ///     Calculates the variance of X.
     /// </summary>
     /// <returns>The unweighted variance of X, calculated as Sx2 / N - (MeanX)².</returns>
     /// <exception cref="DivideByZeroException">Thrown when the number of samples (N) is less than or equal to 0.</exception>
@@ -303,7 +303,7 @@ public class Regression
     }
 
     /// <summary>
-    /// Calculates the variance of Y.
+    ///     Calculates the variance of Y.
     /// </summary>
     /// <returns>The unweighted variance of Y, calculated as Sy2 / N - (MeanY)².</returns>
     /// <exception cref="DivideByZeroException">Thrown when the number of samples (N) is less than or equal to 0.</exception>
@@ -316,9 +316,12 @@ public class Regression
     }
 
     /// <summary>
-    /// Calculates the slope of the linear regression line.
+    ///     Calculates the slope of the linear regression line.
     /// </summary>
-    /// <returns>The slope (m) of the regression line, calculated as (Sxy - Sx*Sy/N) / (Sx2 - Sx²/N). Returns double.NaN if N &lt; 2 or the denominator is zero.</returns>
+    /// <returns>
+    ///     The slope (m) of the regression line, calculated as (Sxy - Sx*Sy/N) / (Sx2 - Sx²/N). Returns double.NaN if N
+    ///     &lt; 2 or the denominator is zero.
+    /// </returns>
     public double Slope()
     {
         if (N < 2) return double.NaN; // Insufficient data
@@ -329,7 +332,7 @@ public class Regression
     }
 
     /// <summary>
-    /// Calculates the y-intercept of the linear regression line.
+    ///     Calculates the y-intercept of the linear regression line.
     /// </summary>
     /// <returns>The y-intercept (b) of the regression line, calculated as (Sy - m*Sx) / N.</returns>
     public double YIntercept()
@@ -340,9 +343,12 @@ public class Regression
     }
 
     /// <summary>
-    /// Calculates the Pearson correlation coefficient between X and Y.
+    ///     Calculates the Pearson correlation coefficient between X and Y.
     /// </summary>
-    /// <returns>The correlation coefficient (R), ranging from -1 to 1. Returns double.NaN if Qy is zero or the slope is infinite.</returns>
+    /// <returns>
+    ///     The correlation coefficient (R), ranging from -1 to 1. Returns double.NaN if Qy is zero or the slope is
+    ///     infinite.
+    /// </returns>
     public double Correlation()
     {
         var qy = Qy();
@@ -351,12 +357,15 @@ public class Regression
     }
 
     /// <summary>
-    /// Calculates the coefficient of determination (R²) for the linear regression.
+    ///     Calculates the coefficient of determination (R²) for the linear regression.
     /// </summary>
-    /// <returns>The R² value, ranging from 0 to 1, representing the proportion of variance in Y explained by X. Returns double.NaN if the correlation coefficient is invalid.</returns>
+    /// <returns>
+    ///     The R² value, ranging from 0 to 1, representing the proportion of variance in Y explained by X. Returns
+    ///     double.NaN if the correlation coefficient is invalid.
+    /// </returns>
     public double RSquared()
     {
-        double r = Correlation();
+        var r = Correlation();
         if (double.IsNaN(r)) return double.NaN;
         return r * r;
     }
