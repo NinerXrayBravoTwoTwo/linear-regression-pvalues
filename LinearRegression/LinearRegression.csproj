@@ -1,17 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="PValueStat.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="PValueStat.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+		<!-- NuGet metadata -->
+		<PackageId>My.LinearRegression</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Jillian England</Authors>
+		<Company>YourCompanyName</Company>
+		<Description>A simple, fast linear regression library for .NET</Description>
+		<PackageTags>regression;statistics;machine-learning;dotnet</PackageTags>
+		<RepositoryUrl>https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues</RepositoryUrl>
+
+	</PropertyGroup>
+
 
 </Project>

@@ -32,6 +32,11 @@
 [Serializable]
 public class Regression
 {
+    public Regression(List<(double x, double y)> dataPoints)
+    {
+        foreach (var item in dataPoints) Add(item.x, item.y);
+    }
+
     /// <summary>
     ///     Initialize a new regression, all data set to zero with no samples.
     /// </summary>
@@ -356,6 +361,7 @@ public class Regression
         catch (Exception error)
         {
             result = error.GetType().ToString();
+            throw;
         }
 
         return result;

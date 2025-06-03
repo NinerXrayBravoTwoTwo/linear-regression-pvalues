@@ -7,10 +7,19 @@ namespace RegressionTest;
 public class PValueTest(ITestOutputHelper testOutputHelper)
 {
     [Fact]
+    public void PValueStatIsNaN() // Fixed spelling: PValueStat -> PValueStat, Nan -> NaN
+    {
+        // Create
+        var test = new PValueStat([]); // Ensure the constructor is correct
+
+        Assert.True(test.IsNaN);
+    }
+
+    [Fact]
     public void EmptyPValueIsNaN() // Fixed spelling: PValue -> PValue, Nan -> NaN
     {
         // Create
-        var test = new PValueStat();
+        var test = new PValueStat([]);
         Assert.True(test.IsNaN);
     }
 
@@ -18,7 +27,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void KnownDatasetStat()
     {
         // Fixed method name to match the class name
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         double x = 0;
         double y = -1;
 
@@ -44,10 +53,13 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithInsufficientDataThrowsException()
     {
         // Create a PValueStat instance with insufficient data points
-        var stat = new PValueStat();
+        var dataPoints = new List<(double x, double y)>
+        {
+            (1, 2),
+            (2, 3)
+        };
+        var stat = new PValueStat(dataPoints);
         // Add only 2 data points
-        stat.AddDataPoint(1, 2);
-        stat.AddDataPoint(2, 3);
         // Assert that calling PValue throws an InvalidOperationException
         Assert.Throws<InvalidOperationException>(() => stat.PValue());
     }
@@ -56,11 +68,15 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithSufficientDataReturnsValidValue()
     {
         // Create a PValueStat instance with sufficient data points
-        var stat = new PValueStat();
+        var dataPoints = new List<(double x, double y)>
+        {
+            (1, 2),
+            (2, 3),
+            (3, 4)
+        };
+        var stat = new PValueStat(dataPoints);
         // Add 3 data points
-        stat.AddDataPoint(1, 2);
-        stat.AddDataPoint(2, 3);
-        stat.AddDataPoint(3, 4);
+
 
         // Assert that PValue returns a valid double value
         var pValue = stat.PValue();
@@ -70,12 +86,16 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     [Fact]
     public void PValueWithNegativeSlopeReturnsValidValue()
     {
+        var dataPoints = new List<(double x, double y)>
+        {
+            (1, 3.4),
+            (2, 2),
+            (3, 1)
+        };
+
         // Create a PValueStat instance with sufficient data points
-        var stat = new PValueStat();
+        var stat = new PValueStat(dataPoints);
         // Add 3 data points with a negative slope
-        stat.AddDataPoint(1, 3);
-        stat.AddDataPoint(2, 2);
-        stat.AddDataPoint(3, 1);
 
         // Assert that PValue returns a valid double value
         var pValue = stat.PValue();
@@ -86,7 +106,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithZeroSlopeReturnsValidValue()
     {
         // Create a PValueStat instance with sufficient data points
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add 3 data points with a zero slope
         var x = 3;
         while (x-- > 0) stat.AddDataPoint(x, 2);
@@ -102,7 +122,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithLargeDatasetReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 2 * i + 1); // Linear relationship
 
         // Assert that PValue returns a valid double value
@@ -113,11 +133,15 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     [Fact]
     public void PValueWithNoVariationInXReturnsOne()
     {
+        var dataPoints = new List<(double x, double y)>
+        {
+            (1, 2),
+            (1, 3),
+            (1, 4)
+        };
         // Create a PValueStat instance with no variation in X
-        var stat = new PValueStat();
-        stat.AddDataPoint(1, 2);
-        stat.AddDataPoint(1, 3);
-        stat.AddDataPoint(1, 4);
+        var stat = new PValueStat(dataPoints);
+
 
         testOutputHelper.WriteLine(stat.ToString());
 
@@ -130,7 +154,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithNaNValuesReturnsNaN()
     {
         // Create a PValueStat instance
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add data points with NaN values
         stat.AddDataPoint(1, double.NaN);
         stat.AddDataPoint(2, 3);
@@ -147,7 +171,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithAllNaNValuesReturnsNaN()
     {
         // Create a PValueStat instance
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add data points with all NaN values
         stat.AddDataPoint(double.NaN, double.NaN);
         stat.AddDataPoint(double.NaN, double.NaN);
@@ -162,7 +186,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithSingleDataPointReturnsNaN()
     {
         // Create a PValueStat instance
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add a single data point
         stat.AddDataPoint(1, 2);
         testOutputHelper.WriteLine(stat.ToString());
@@ -174,7 +198,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithTwoDataPointsReturnsNaN()
     {
         // Create a PValueStat instance
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add two data points
         stat.AddDataPoint(1, 2);
         stat.AddDataPoint(2, 3);
@@ -187,7 +211,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithThreeDataPointsReturnsValidValue()
     {
         // Create a PValueStat instance
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add three data points
         stat.AddDataPoint(1, 2);
         stat.AddDataPoint(2, 3);
@@ -202,7 +226,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithNegativeSlopeAndNaNReturnsNaN()
     {
         // Create a PValueStat instance
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add data points with a negative slope and NaN
         stat.AddDataPoint(1, 3);
         stat.AddDataPoint(2, double.NaN);
@@ -217,7 +241,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithZeroSlopeAndNaNReturnsNaN()
     {
         // Create a PValueStat instance
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add data points with a zero slope and NaN
         stat.AddDataPoint(1, 2);
         stat.AddDataPoint(2, double.NaN);
@@ -232,7 +256,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithLargeDatasetAndNaNReturnsNaN()
     {
         // Create a PValueStat instance with a large dataset
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         for (var i = 0; i < 1000; i++)
             if (i % 100 == 0) // Introduce NaN every 100th point
                 stat.AddDataPoint(i, double.NaN);
@@ -248,7 +272,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithLargeDatasetAndNoVariationInXReturnsOne()
     {
         // Create a PValueStat instance with no variation in X
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         for (var i = 0; i < 1000; i++) stat.AddDataPoint(1, i); // All X values are 1
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns 1.0
@@ -260,7 +284,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithNegativeSlopeAndLargeDatasetReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 1000 - i); // Negative slope
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
@@ -272,7 +296,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithZeroSlopeAndLargeDatasetReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 5); // All Y values are constant
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
@@ -284,7 +308,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithMixedDataTypesReturnsNaN()
     {
         // Create a PValueStat instance
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add data points with mixed types (e.g., string, null)
         stat.AddDataPoint(1, 2);
         stat.AddDataPoint(2, double.NaN); // NaN value
@@ -299,7 +323,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithNegativeAndPositiveValuesReturnsValidValue()
     {
         // Create a PValueStat instance
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add data points with both negative and positive values
         stat.AddDataPoint(-1, -2);
         stat.AddDataPoint(0, 0);
@@ -314,7 +338,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithLargeNegativeValuesReturnsValidValue()
     {
         // Create a PValueStat instance
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add data points with large negative values
         stat.AddDataPoint(-1000, -2000);
         stat.AddDataPoint(-500, -1000);
@@ -329,7 +353,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithLargePositiveValuesReturnsValidValue()
     {
         // Create a PValueStat instance
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add data points with large positive values
         stat.AddDataPoint(1000, 2000);
         stat.AddDataPoint(500, 1000);
@@ -344,7 +368,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithMixedSignValuesReturnsValidValue()
     {
         // Create a PValueStat instance
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         // Add data points with mixed sign values
         stat.AddDataPoint(-1, -2);
         stat.AddDataPoint(0, 0);
@@ -359,7 +383,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithLargeDatasetAndMixedSignValuesReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         for (var i = -500; i < 500; i++) stat.AddDataPoint(i, 2 * i + 1); // Linear relationship with mixed signs
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
@@ -371,7 +395,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithLargeDatasetAndZeroValuesReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 0); // All Y values are zero
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
@@ -383,7 +407,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithLargeDatasetAndNegativeValuesReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, -2 * i - 1); // Linear relationship with negative values
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
@@ -395,7 +419,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithLargeDatasetAndPositiveValuesReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 2 * i + 1); // Linear relationship with positive values
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
@@ -407,7 +431,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithLargeDatasetAndZeroSlopeReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 5); // All Y values are constant
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
@@ -419,7 +443,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     public void PValueWithLargeDatasetAndNegativeSlopeReturnsValidValue()
     {
         // Create a PValueStat instance with a large dataset
-        var stat = new PValueStat();
+        var stat = new PValueStat([]);
         for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 1000 - i); // Negative slope
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
@@ -430,9 +454,18 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     [Fact]
     public void PValueWithLargeDatasetAndPositiveSlopeReturnsValidValue()
     {
-        // Create a PValueStat instance with a large dataset
-        var stat = new PValueStat();
-        for (var i = 0; i < 1000; i++) stat.AddDataPoint(i, 2 * i + 1); // Linear relationship with positive slope
+        var dataPoints = new List<(double x, double y)>();
+
+
+        for (var i = 0; i < 1000; i++)
+            dataPoints.Add((i, 2 * i + 1)); // Linear relationship with positive slope
+
+        // Create a PValueStat instance with sufficient data points
+        // Create a PValueStat instance with a large dataset.
+        var stat = new PValueStat(dataPoints);
+
+        //testOutputHelper.WriteLine(stat.ToString());
+
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
         var pValue = stat.PValue();

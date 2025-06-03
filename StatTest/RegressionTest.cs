@@ -1,9 +1,9 @@
 ﻿using LinearRegression;
-using RegressionTest;
 using Xunit.Abstractions;
+
 // Ensure this namespace is correct and contains the 'Statistic' class.
 
-namespace StatTest;
+namespace RegressionTest;
 
 public class RegressionTest(ITestOutputHelper testOutputHelper)
 {

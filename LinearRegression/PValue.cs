@@ -2,10 +2,23 @@
 
 namespace LinearRegression;
 
+[Serializable]
 public class PValueStat : Regression
 {
     private bool _isDataContainsNan;
-    internal List<(double x, double y)> DataPoints = [];
+
+    // Constructor fix: Add 'this' initializer and specify a return type
+    public PValueStat(List<(double x, double y)> dataPoints) : base(dataPoints)
+    {
+        DataPoints = dataPoints;
+        foreach (var (x, y) in dataPoints)
+        {
+            Add(x, y); // Initialize base class with data points
+            if (double.IsNaN(x) || double.IsNaN(y)) _isDataContainsNan = true; // Track NaN values
+        }
+    }
+
+    private List<(double x, double y)> DataPoints { get; init; }
 
     public int DataPointsCount()
     {
@@ -33,7 +46,7 @@ public class PValueStat : Regression
 
         var rss = ResidualSumOfSquares();
         var n = DataPoints.Count;
-        var seSlope = Math.Sqrt(rss / (N - 2) / varianceX);
+        var seSlope = Math.Sqrt(rss / (n - 2) / varianceX);
 
         if (seSlope == 0)
             return slope == 0 ? 1.0 : 0.0; // If standard error is zero, p-value is 1 if slope is zero, else 0
