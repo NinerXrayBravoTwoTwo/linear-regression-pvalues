@@ -10,17 +10,6 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
     private readonly ITestOutputHelper _testOutputHelper = testOutputHelper;
 
     [Fact]
-    public void EmptyStatIsNan()
-    {
-        // create statistic
-        var test = new Regression();
-
-        Assert.True(test.IsNaN);
-
-        _testOutputHelper.WriteLine(test.ToString());
-    }
-
-    [Fact]
     public void KnownDatasetStat()
     {
         var stat = new Regression();
@@ -351,6 +340,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         Assert.Equal(original.Sxy, clone.Sxy);
         Assert.Equal(original.MeanX(), clone.MeanX());
         Assert.Equal(original.MeanY(), clone.MeanY());
+        Assert.Equal(original.RSquared(), clone.RSquared());
         Assert.False(clone.IsNaN);
 
         // Add a NaN data point to the clone
@@ -358,6 +348,43 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
 
         _testOutputHelper.WriteLine(clone.ToString());
 
+        // The NaN data point should not affect the statistics
+        Assert.True(clone.IsNaN); // The presence of NaN should make the statistic NaN
+    }
+
+    [Fact]
+    public void StatAddStatWithNaNAndEmptyStatWithNaNAndNaNDataPointAndNaNDataPointAndNaNDataPointAndNaNDataPoint()
+    {
+        // set up
+        var original = new Regression();
+        double x = 0, y = -1;
+        while (x < 500)
+            original.Add(x++, y++);
+        _testOutputHelper.WriteLine(original.ToString());
+        var clone = new Regression(original); // Make a clone (new unrelated instance) of the statistic.
+        Assert.False(original.IsNaN);
+        Assert.False(clone.IsNaN);
+        // test - 
+        clone.Add(new Regression()); // Adding an empty statistic to its clone, 
+        // a> should not affect the clone.
+        // b> number of samples should remain the same
+        // c> variance should remain the same 
+        // d> other sum attributes should remain the same.
+        // e> Mean should remain the same.
+        Assert.Equal(original.NumberSamples, clone.NumberSamples);
+        Assert.Equal(original.Qx2(), clone.Qx2());
+        Assert.Equal(original.Qy2(), clone.Qy2());
+        Assert.Equal(original.Sx, clone.Sx);
+        Assert.Equal(original.Sy, clone.Sy);
+        Assert.Equal(original.Sy2, clone.Sy2);
+        Assert.Equal(original.Sxy, clone.Sxy);
+        Assert.Equal(original.MeanX(), clone.MeanX());
+        Assert.Equal(original.MeanY(), clone.MeanY());
+        Assert.Equal(original.RSquared(), clone.RSquared());
+        Assert.False(clone.IsNaN);
+        // Add a NaN data point to the clone
+        clone.Add(double.NaN, double.NaN);
+        _testOutputHelper.WriteLine(clone.ToString());
         // The NaN data point should not affect the statistics
         Assert.True(clone.IsNaN); // The presence of NaN should make the statistic NaN
     }
