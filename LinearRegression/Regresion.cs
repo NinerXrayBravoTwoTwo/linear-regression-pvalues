@@ -289,11 +289,12 @@ public class Regression
 
         return Math.Sqrt(Sy2 - Sy * Sy / N) / (N - 1);
     }
-
+    
     /// <summary>
-    ///     Variance of X, vx2 = sx2 / n - mx**2.
+    /// Calculates the variance of X.
     /// </summary>
-    /// <returns>Unweighted variance of X.</returns>
+    /// <returns>The unweighted variance of X, calculated as Sx2 / N - (MeanX)².</returns>
+    /// <exception cref="DivideByZeroException">Thrown when the number of samples (N) is less than or equal to 0.</exception>
     public double Qx2()
     {
         if (!(N > 0)) throw new DivideByZeroException("Number of samples needs to be greater than 0.");
@@ -302,9 +303,10 @@ public class Regression
     }
 
     /// <summary>
-    ///     Variance of X, qy2 = sy2 / n - my**2
+    /// Calculates the variance of Y.
     /// </summary>
-    /// <returns>Unweighted variance of Y.</returns>
+    /// <returns>The unweighted variance of Y, calculated as Sy2 / N - (MeanY)².</returns>
+    /// <exception cref="DivideByZeroException">Thrown when the number of samples (N) is less than or equal to 0.</exception>
     public double Qy2()
     {
         if (N > 0)
@@ -314,12 +316,12 @@ public class Regression
     }
 
     /// <summary>
-    ///     Slope = m = sxy - (sx*sy)/n / sx2 - sx**2 /n
+    /// Calculates the slope of the linear regression line.
     /// </summary>
-    /// <returns>Slope.</returns>
+    /// <returns>The slope (m) of the regression line, calculated as (Sxy - Sx*Sy/N) / (Sx2 - Sx²/N). Returns double.NaN if N &lt; 2 or the denominator is zero.</returns>
     public double Slope()
     {
-        if (N < 2) return double.NaN; //  Insufficient data
+        if (N < 2) return double.NaN; // Insufficient data
 
         var numerator = Sxy - Sx * Sy / N;
         var denominator = Sx2 - Sx * Sx / N;
@@ -327,25 +329,36 @@ public class Regression
     }
 
     /// <summary>
-    ///     yIntercept = b = (sy - m*sx) / n
+    /// Calculates the y-intercept of the linear regression line.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The y-intercept (b) of the regression line, calculated as (Sy - m*Sx) / N.</returns>
     public double YIntercept()
     {
         // If something needs to be thrown it will happen
-        // in slope().
+        // in Slope().
         return (Sy - Slope() * Sx) / N;
     }
 
     /// <summary>
-    ///     Correlation Coefficient X vs Y, R - (m qx) / qy.
+    /// Calculates the Pearson correlation coefficient between X and Y.
     /// </summary>
-    /// <returns>Correlation, range -1 .. 1.  2 if qy == 0;</returns>
+    /// <returns>The correlation coefficient (R), ranging from -1 to 1. Returns double.NaN if Qy is zero or the slope is infinite.</returns>
     public double Correlation()
     {
         var qy = Qy();
         if (qy == 0 || double.IsInfinity(Slope())) return double.NaN;
         return Slope() * Qx() / qy;
+    }
+
+    /// <summary>
+    /// Calculates the coefficient of determination (R²) for the linear regression.
+    /// </summary>
+    /// <returns>The R² value, ranging from 0 to 1, representing the proportion of variance in Y explained by X. Returns double.NaN if the correlation coefficient is invalid.</returns>
+    public double RSquared()
+    {
+        double r = Correlation();
+        if (double.IsNaN(r)) return double.NaN;
+        return r * r;
     }
 
     public override string ToString()
