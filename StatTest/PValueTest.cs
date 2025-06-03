@@ -47,8 +47,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.PValue()
             .ToString($"P-value: {stat.PValue():F4}")); // Print P-Value with 4 decimal places
     }
-
-
+    
     [Fact]
     public void PValueWithInsufficientDataThrowsException()
     {
