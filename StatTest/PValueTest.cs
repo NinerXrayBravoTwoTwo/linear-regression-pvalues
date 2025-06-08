@@ -42,6 +42,23 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
             .ToString($"P-value: {stat.PValue():F4}")); // Print P-Value with 4 decimal places
     }
 
+
+    [Fact]
+    public void DatapointsIsReadAccessable()
+    {
+        var dataPoints = new List<(double x, double y)>
+        {
+            (1, 2),
+            (2, 3)
+        };
+        var stat = new RegressionPvalue(dataPoints);
+        // Assert that DataPoints is accessible and contains the expected data
+        Assert.NotNull(stat.DataPoints);
+        Assert.Equal(2, stat.DataPoints.Count);
+        Assert.Equal((1, 2), stat.DataPoints[0]);
+        Assert.Equal((2, 3), stat.DataPoints[1]);
+    }
+
     [Fact]
     public void PValueWithInsufficientDataThrowsException()
     {

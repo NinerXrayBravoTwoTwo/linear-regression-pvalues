@@ -6,24 +6,34 @@ namespace LinearRegression;
 public class RegressionPvalue : Regression
 {
     private bool _isDataContainsNan;
+    public List<(double x, double y)> DataPoints { get; init; }
 
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RegressionPvalue"/> class.
+    /// </summary>
+    /// <remarks>This constructor initializes the <see cref="DataPoints"/> collection to ensure it is not
+    /// null.</remarks>
     public RegressionPvalue()
     {
         DataPoints = []; // Initialize DataPoints to avoid null reference
     }
 
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RegressionPvalue"/> class with the specified data points.
+    /// </summary>
+    /// <remarks>If any of the provided data points contain <see cref="double.NaN"/> for either the X or Y
+    /// value, the instance will mark the data as containing invalid values.</remarks>
+    /// <param name="dataPoints">A list of tuples representing the data points for regression analysis, where each tuple contains an X value and
+    /// a Y value.</param>
     public RegressionPvalue(List<(double x, double y)> dataPoints) : base(dataPoints)
     {
         DataPoints = dataPoints; // Initialize DataPoints with provided data
 
-        foreach (var item in dataPoints.Where(item => item.x is double.NaN || item.y is double.NaN))
-        {
-            _isDataContainsNan = true;
-            break;
-        }
+        _isDataContainsNan = dataPoints.Any(item => item.x is double.NaN || item.y is double.NaN);
     }
-
-    private List<(double x, double y)> DataPoints { get; init; }
 
     public int DataPointsCount()
     {

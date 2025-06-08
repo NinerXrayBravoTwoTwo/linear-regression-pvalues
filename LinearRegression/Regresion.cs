@@ -86,12 +86,8 @@ public class Regression
         MaxY = cloneMe.MaxY;
     }
 
-    internal double N { get; set; }
+    public double N { get; private set; }
 
-    /// <summary>
-    ///     Number of Samples for this statistic.
-    /// </summary>
-    public int NumberSamples => (int)N;
 
     /// <summary>
     ///     Sum y
@@ -375,7 +371,7 @@ public class Regression
         var isInfinity = double.IsPositiveInfinity(Slope());
         var result = isInfinity
             ? $"NaN - {N}"
-            : $"Cor: {Correlation():F4} N: {N} MeanX: {MeanX():F2} MeanY: {MeanY():F2} Slp: {Slope():F2} R^2: {RSquared():f3} (Q:x{Qx():F3} y{Qy():F3})  (Q2: x{Qx2():F3} y{Qy2():F3})  Yintercept: {YIntercept():F3}, X({MinX:0.##} <-> {MaxX:0.##}), Y: ({MinY:0.####} <-> {MaxY:0.####}), N: {N}, isNAN:{IsNaN}";
+            : $"Slope: {Slope():F2} R^2: {RSquared():f3} N={N} (Q:x{Qx():F3} y{Qy():F3})  (Q2: x{Qx2():F3} y{Qy2():F3})  Yintercept: {YIntercept():F3}  Cor: {Correlation():F4}  MeanX: {MeanX():F2} MeanY: {MeanY():F2} X({MinX:0.##} <-> {MaxX:0.##}), Y: ({MinY:0.####} <-> {MaxY:0.####}), N: {N}, isNAN:{IsNaN}";
 
         return result;
     }

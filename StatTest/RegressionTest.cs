@@ -8,6 +8,54 @@ namespace RegressionTest;
 public class RegressionTest(ITestOutputHelper testOutputHelper)
 {
     private readonly ITestOutputHelper _testOutputHelper = testOutputHelper;
+    [Fact]
+    public void StatTestAccessDataPoints()
+    {
+        var stat = new Regression();
+        double x = 0;
+        double y = -1;
+        while (x < 100)
+            stat.Add(x++, y++);
+
+        _testOutputHelper.WriteLine(stat.ToString());
+        Assert.False(stat.IsNaN);
+        Assert.Equal(0, stat.MinX);
+        Assert.Equal(1, stat.Correlation());
+        Assert.Equal(49.5, stat.MeanX());
+        Assert.Equal(1, stat.Slope());
+
+        // Assert.Equal(100, stat.DataPoints.Count);
+    }
+
+    [Fact]
+    public void StatTestInitializeWithDataPoints()
+    {
+
+        // Create a PValueStat instance with insufficient data points
+        var dataPoints = new List<(double x, double y)>
+        {
+            (100, 99),
+            (101, 100)
+        };
+        var stat = new Regression(dataPoints);
+        Assert.Equal(2, dataPoints.Count);
+        double x = 0;
+        double y = -1;
+        while (x < 100)
+            stat.Add(x++, y++);
+
+        _testOutputHelper.WriteLine(stat.ToString());
+
+        //        Assert.Equal(102, stat.DataPointsCount());  
+        Assert.Equal(102, stat.N);
+        Assert.False(stat.IsNaN);
+        Assert.Equal(0, stat.MinX);
+        Assert.Equal(1, stat.Correlation());
+        Assert.Equal(50.5, stat.MeanX());
+        Assert.Equal(1, stat.Slope());
+
+        //      Assert.Equal(100, stat.DataPoints.Count);
+    }
 
     [Fact]
     public void KnownDatasetStat()
@@ -52,7 +100,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         _testOutputHelper.WriteLine(clone.ToString());
 
         Assert.NotEqual(original.ToString(), clone.ToString());
-        Assert.Equal(clone.NumberSamples + 1, original.NumberSamples);
+        Assert.Equal(clone.N + 1, original.N);
     }
 
     [Fact]
@@ -80,7 +128,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // d> other sum attributes should all be doubled.
         // e> Mean should remain the same.
 
-        Assert.Equal(original.NumberSamples * 2, clone.NumberSamples);
+        Assert.Equal(original.N * 2, clone.N);
         Assert.Equal(original.Qx2(), clone.Qx2());
         Assert.Equal(original.Qy2(), clone.Qy2());
 
@@ -123,7 +171,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // d> other sum attributes should all be doubled.
         // e> Mean should remain the same.
 
-        Assert.Equal(original.NumberSamples * 2, clone.NumberSamples);
+        Assert.Equal(original.N * 2, clone.N);
         Assert.Equal(original.Qx2(), clone.Qx2());
         Assert.Equal(original.Qy2(), clone.Qy2());
         Assert.Equal(original.Sx * 2, clone.Sx);
@@ -157,7 +205,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // c> variance should remain the same 
         // d> other sum attributes should all be doubled.
         // e> Mean should remain the same.
-        Assert.Equal(original.NumberSamples * 2, clone.NumberSamples);
+        Assert.Equal(original.N * 2, clone.N);
         Assert.Equal(original.Qx2(), clone.Qx2());
         Assert.Equal(original.Qy2(), clone.Qy2());
         Assert.Equal(original.Sx * 2, clone.Sx);
@@ -190,7 +238,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // c> variance should remain the same 
         // d> other sum attributes should remain the same.
         // e> Mean should remain the same.
-        Assert.Equal(original.NumberSamples, clone.NumberSamples);
+        Assert.Equal(original.N, clone.N);
         Assert.Equal(original.Qx2(), clone.Qx2());
         Assert.Equal(original.Qy2(), clone.Qy2());
         Assert.Equal(original.Sx, clone.Sx);
@@ -223,7 +271,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // c> variance should remain the same 
         // d> other sum attributes should remain the same.
         // e> Mean should remain the same.
-        Assert.Equal(original.NumberSamples, clone.NumberSamples);
+        Assert.Equal(original.N, clone.N);
         Assert.Equal(original.Qx2(), clone.Qx2());
         Assert.Equal(original.Qy2(), clone.Qy2());
         Assert.Equal(original.Sx, clone.Sx);
@@ -256,7 +304,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // c> variance should remain the same 
         // d> other sum attributes should remain the same.
         // e> Mean should remain the same.
-        Assert.Equal(original.NumberSamples, clone.NumberSamples);
+        Assert.Equal(original.N, clone.N);
         Assert.Equal(original.Qx2(), clone.Qx2());
         Assert.Equal(original.Qy2(), clone.Qy2());
         Assert.Equal(original.Sx, clone.Sx);
@@ -293,7 +341,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // c> variance should remain the same 
         // d> other sum attributes should remain the same.
         // e> Mean should remain the same.
-        Assert.Equal(original.NumberSamples, clone.NumberSamples);
+        Assert.Equal(original.N, clone.N);
         Assert.Equal(original.Qx2(), clone.Qx2());
         Assert.Equal(original.Qy2(), clone.Qy2());
         Assert.Equal(original.Sx, clone.Sx);
@@ -331,7 +379,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // c> variance should remain the same 
         // d> other sum attributes should remain the same.
         // e> Mean should remain the same.
-        Assert.Equal(original.NumberSamples, clone.NumberSamples);
+        Assert.Equal(original.N, clone.N);
         Assert.Equal(original.Qx2(), clone.Qx2());
         Assert.Equal(original.Qy2(), clone.Qy2());
         Assert.Equal(original.Sx, clone.Sx);
@@ -371,7 +419,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // c> variance should remain the same 
         // d> other sum attributes should remain the same.
         // e> Mean should remain the same.
-        Assert.Equal(original.NumberSamples, clone.NumberSamples);
+        Assert.Equal(original.N, clone.N);
         Assert.Equal(original.Qx2(), clone.Qx2());
         Assert.Equal(original.Qy2(), clone.Qy2());
         Assert.Equal(original.Sx, clone.Sx);
