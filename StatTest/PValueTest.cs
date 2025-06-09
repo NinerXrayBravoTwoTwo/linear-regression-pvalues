@@ -15,6 +15,35 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
+    public void NewRegressionFromDataPointsHasSameValues()
+    {
+        var dataPoints = new List<(double x, double y)>();
+
+
+        double x = 0;
+        double y = -1;
+
+        while (x < 100)
+            dataPoints.Add((x++, y++)); // Changed to AddDataPoint to match the method in PValueStat
+
+        var original = new RegressionPvalue(dataPoints);
+        var newFromDataPoints = new RegressionPvalue(original.DataPoints);
+
+        // Assert that the new instance has the same data points as the original
+        Assert.Equal(original.DataPoints.Count, newFromDataPoints.DataPoints.Count);
+        for (int i = 0; i < original.DataPoints.Count; i++)
+        {
+            Assert.Equal(original.DataPoints[i].x, newFromDataPoints.DataPoints[i].x);
+            Assert.Equal(original.DataPoints[i].y, newFromDataPoints.DataPoints[i].y);
+        }
+        //Assert that Slope of the new instance is the same as the original
+        Assert.Equal(original.Slope(), newFromDataPoints.Slope());
+
+        // Assert that R2 of the new instance is the same as the original
+
+
+    }
+    [Fact]
     public void KnownDatasetStat()
     {
         // Create a PValueStat instance with three data points
