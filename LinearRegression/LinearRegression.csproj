@@ -20,6 +20,7 @@
 
 		<!-- NuGet metadata -->
 		<PackageId>LinearRegression.Pvalues</PackageId>
+
 		<Version>1.0.5</Version>
 		<Authors>Jillian England</Authors>
 		<Company>Hyperfaceted</Company>
