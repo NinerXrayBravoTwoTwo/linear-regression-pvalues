@@ -119,6 +119,52 @@ public class RegressionPvalue : Regression
         return (lowerBound, upperBound);
     }
 
+    /// <summary>
+    /// Calculates the 95% confidence interval for the linear regression slope, along with additional statistics.
+    ///  This method extends the basic confidence interval calculation to include the slope, standard error, and p-value.
+    ///  More computationally expensive than the basic ConfidenceInterval method.
+    /// </summary>
+    /// <param name="confidenceLevel">The confidence level for the interval (default: 0.95).</param>
+    /// <returns>A tuple containing the lower bound, upper bound, slope, standard error, and p-value.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if there are insufficient data points.</exception>
+    public (double Lower, double Upper, double Slope, double StandardError, double PValue) ConfidenceIntervalExtension(double confidenceLevel = 0.95)
+    {
+        if (DataPoints.Count < 3)
+            throw new InvalidOperationException("At least 3 data points are required to compute the confidence interval.");
+
+        if (_isDataContainsNan)
+            return (double.NaN, double.NaN, double.NaN, double.NaN, double.NaN);
+
+        // Calculate slope, p-value, and standard error (reuse existing logic)
+        var slope = Slope();
+        var varianceX = VarianceX();
+        if (varianceX == 0)
+            return (double.NaN, double.NaN, slope, double.NaN, 1.0);
+
+        var rss = ResidualSumOfSquares();
+        var n = DataPoints.Count;
+        var seSlope = Math.Sqrt(rss / (n - 2) / varianceX);
+
+        if (seSlope == 0)
+            return (slope, slope, slope, 0.0, slope == 0 ? 1.0 : 0.0);
+
+        // Calculate p-value (using existing method for consistency)
+        var pValue = PValue();
+
+        // Get critical t-value for the confidence level
+        var degreesOfFreedom = n - 2;
+        var tDistribution = new StudentT(0, 1, degreesOfFreedom);
+        var alpha = 1 - confidenceLevel;
+        var tCritical = tDistribution.InverseCumulativeDistribution(1 - alpha / 2);
+
+        // Calculate CI bounds
+        var marginOfError = tCritical * seSlope;
+        var lowerBound = slope - marginOfError;
+        var upperBound = slope + marginOfError;
+
+        return (lowerBound, upperBound, slope, seSlope, pValue);
+    }
+
     private double ResidualSumOfSquares()
     {
         double rss = 0;
@@ -137,7 +183,7 @@ public class RegressionPvalue : Regression
 
     private double VarianceX()
     {
-        return Sx2 / N - Math.Pow(Sx / N, 2);
+        return Qx2();
     }
 
     /// <summary>

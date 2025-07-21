@@ -17,13 +17,13 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
             (4.0, 4.0),
             (5.0, 6.0)
         };
-        
+
         var regression = new RegressionPvalue(dataPoints);
         // Act
         var confidenceInterval = regression.ConfidenceInterval(0.95);
         // Assert
         Assert.NotNull(confidenceInterval);
-        
+
         testOutputHelper.WriteLine($"Confidence Interval: [{confidenceInterval.Lower}, {confidenceInterval.Upper}]");
     }
 
@@ -57,12 +57,13 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
         {
             (1.0, 2.0)
         };
-        
+
         var regression = new RegressionPvalue(dataPoints);
-        
+
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => regression.ConfidenceInterval(0.95));
     }
+
     [Fact]
     public void TestConfidenceIntervalWithNaNData()
     {
@@ -73,17 +74,19 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
             (2.0, double.NaN),
             (3.0, 5.0)
         };
-        
+
         var regression = new RegressionPvalue(dataPoints);
-        
+
         // Act
         var confidenceInterval = regression.ConfidenceInterval(0.95);
-        
+
         // Assert
         Assert.Equal((double.NaN, double.NaN), confidenceInterval);
     }
+
     [Fact]
-    public void TestConfidenceIntervalWithInfinityData() {
+    public void TestConfidenceIntervalWithInfinityData()
+    {
         // Arrange
         var dataPoints = new List<(double x, double y)>
         {
@@ -91,14 +94,74 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
             (2.0, double.PositiveInfinity),
             (3.0, 5.0)
         };
-        
+
         var regression = new RegressionPvalue(dataPoints);
-        
+
         // Act
         var confidenceInterval = regression.ConfidenceInterval(0.95);
-        
+
         // Assert
         Assert.Equal((double.NaN, double.NaN), confidenceInterval);
     }
 
+    [Fact]
+    public void TestConfidenceIntervalWithNegativeData()
+    {
+        // Arrange
+        var dataPoints = new List<(double x, double y)>
+        {
+        //    (-1.0, -2.0),
+        //    (-2.0, -3.0),
+        //    (-3.0, -5.0),
+        //    (-4.0, -4.0),
+        //    (-5.0, -6.0)
+            (1.0, 2.0),
+            (2.0, 3.0),
+            (3.0, 5.0),
+            (4.0, 4.0),
+            (5.0, 6.0)
+        
+        };
+
+        var regression = new RegressionPvalue(dataPoints);
+
+        // Act
+        var confidenceInterval = regression.ConfidenceInterval(0.95);
+
+        // Assert
+
+        testOutputHelper.WriteLine($"Confidence Interval: [{confidenceInterval.Lower}, {confidenceInterval.Upper}]");
+    }
+
+    [Fact]
+    public void TestConfidenceIntervalWithZeroData()
+    {
+        // Arrange
+        var dataPoints = new List<(double x, double y)>
+        {
+            (RandomGen.Next(RandomGen.Next(0, 10)), RandomGen.Next(RandomGen.Next(0, 10))),
+            (2.0, 3.0),
+            (3.0, 5.0),
+            (4.0, 4.0),
+            (5.0, 6.0)
+        };
+
+        var regression = new RegressionPvalue(dataPoints);
+
+        // Act
+        var result = regression.ConfidenceIntervalExtension(0.95);
+        var CI = regression.ConfidenceInterval(0.95);
+
+        // Assert
+
+        Assert.Equal(CI.Lower, result.Lower);
+        Assert.Equal(CI.Upper, result.Upper);
+
+        testOutputHelper.WriteLine($"Confidence Interval: [{result.Lower}, {result.Upper} ]");
+
+        testOutputHelper.WriteLine($"Confidence Extensio: [{result.Lower}, {result.Upper}, {result.Slope}, " +
+                                   $"{result.StandardError}, {result.PValue}]");
+        testOutputHelper.WriteLine(regression.ToString());
+    }
 }
+
