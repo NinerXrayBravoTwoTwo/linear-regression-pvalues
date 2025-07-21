@@ -84,7 +84,7 @@ public class RegressionPvalue : Regression
     /// </summary>
     /// <returns>A tuple containing the lower and upper bounds of the 95% CI.</returns>
     /// <exception cref="InvalidOperationException">Thrown if there are insufficient data points.</exception>
-    public (double Lower, double Upper) ConfidenceIntervalTuple(double confidenceLevel = 0.95)
+    public (double Lower, double Upper) ConfidenceInterval(double confidenceLevel = 0.95)
     {
         if (DataPoints.Count < 3)
             throw new InvalidOperationException("At least 3 data points are required to compute the confidence interval.");
@@ -127,7 +127,7 @@ public class RegressionPvalue : Regression
     /// <param name="confidenceLevel">The confidence level for the interval (default: 0.95).</param>
     /// <returns>A tuple containing the lower bound, upper bound, slope, standard error, and p-value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if there are insufficient data points.</exception>
-    public (double Lower, double Upper, double Slope, double StandardError, double PValue) ConfidenceIntervalValueTuple(double confidenceLevel = 0.95)
+    public (double Lower, double Upper, double Slope, double StandardError, double PValue) ConfidenceIntervalPlus(double confidenceLevel = 0.95)
     {
         if (DataPoints.Count < 3)
             throw new InvalidOperationException("At least 3 data points are required to compute the confidence interval.");

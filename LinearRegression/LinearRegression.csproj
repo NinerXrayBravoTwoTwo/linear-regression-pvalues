@@ -27,7 +27,7 @@
 		<Description>A simple, fast linear regression library for .NET</Description>
 		<PackageTags>regression;statistics;machine-learning;dotnet</PackageTags>
 		<RepositoryUrl>https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues</RepositoryUrl>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReadmeFile>./README.md</PackageReadmeFile>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 	</PropertyGroup>
 	<ItemGroup>
