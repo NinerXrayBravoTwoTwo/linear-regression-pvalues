@@ -79,6 +79,46 @@ public class RegressionPvalue : Regression
         return pValue;
     }
 
+    /// <summary>
+    /// Calculates the 95% confidence interval for the linear regression slope.
+    /// </summary>
+    /// <returns>A tuple containing the lower and upper bounds of the 95% CI.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if there are insufficient data points.</exception>
+    public (double Lower, double Upper) ConfidenceInterval(double confidenceLevel = 0.95)
+    {
+        if (DataPoints.Count < 3)
+            throw new InvalidOperationException("At least 3 data points are required to compute the confidence interval.");
+
+        if (_isDataContainsNan)
+            return (double.NaN, double.NaN); // Return NaN for invalid data
+
+        // Calculate slope and standard error (same as in PValue)
+        var slope = Slope();
+        var varianceX = VarianceX();
+        if (varianceX == 0)
+            return (double.NaN, double.NaN); // No variation in X, CI is undefined
+
+        var rss = ResidualSumOfSquares();
+        var n = DataPoints.Count;
+        var seSlope = Math.Sqrt(rss / (n - 2) / varianceX);
+
+        if (seSlope == 0)
+            return (slope, slope); // If SE is zero, CI collapses to the slope
+
+        // Get critical t-value for the confidence level (two-tailed)
+        var degreesOfFreedom = n - 2;
+        var tDistribution = new StudentT(0, 1, degreesOfFreedom);
+        var alpha = 1 - confidenceLevel;
+        var tCritical = tDistribution.InverseCumulativeDistribution(1 - alpha / 2); // PPF for two-tailed CI
+
+        // Calculate margin of error and CI bounds
+        var marginOfError = tCritical * seSlope;
+        var lowerBound = slope - marginOfError;
+        var upperBound = slope + marginOfError;
+
+        return (lowerBound, upperBound);
+    }
+
     private double ResidualSumOfSquares()
     {
         double rss = 0;
