@@ -20,7 +20,7 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
 
         var regression = new RegressionPvalue(dataPoints);
         // Act
-        var confidenceInterval = regression.ConfidenceInterval(0.95);
+        var confidenceInterval = regression.ConfidenceIntervalTuple(0.95);
         // Assert
         Assert.NotNull(confidenceInterval);
 
@@ -42,7 +42,7 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
 
         var regression = new RegressionPvalue(dataPoints);
         // Act
-        var confidenceInterval = regression.ConfidenceInterval(0.85);
+        var confidenceInterval = regression.ConfidenceIntervalTuple(0.85);
         // Assert
         Assert.NotNull(confidenceInterval);
 
@@ -61,7 +61,7 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
         var regression = new RegressionPvalue(dataPoints);
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => regression.ConfidenceInterval(0.95));
+        Assert.Throws<InvalidOperationException>(() => regression.ConfidenceIntervalTuple(0.95));
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
         var regression = new RegressionPvalue(dataPoints);
 
         // Act
-        var confidenceInterval = regression.ConfidenceInterval(0.95);
+        var confidenceInterval = regression.ConfidenceIntervalTuple(0.95);
 
         // Assert
         Assert.Equal((double.NaN, double.NaN), confidenceInterval);
@@ -98,7 +98,7 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
         var regression = new RegressionPvalue(dataPoints);
 
         // Act
-        var confidenceInterval = regression.ConfidenceInterval(0.95);
+        var confidenceInterval = regression.ConfidenceIntervalTuple(0.95);
 
         // Assert
         Assert.Equal((double.NaN, double.NaN), confidenceInterval);
@@ -126,7 +126,7 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
         var regression = new RegressionPvalue(dataPoints);
 
         // Act
-        var confidenceInterval = regression.ConfidenceInterval(0.95);
+        var confidenceInterval = regression.ConfidenceIntervalTuple(0.95);
 
         // Assert
 
@@ -149,8 +149,8 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
         var regression = new RegressionPvalue(dataPoints);
 
         // Act
-        var result = regression.ConfidenceIntervalExtension(0.95);
-        var CI = regression.ConfidenceInterval(0.95);
+        var result = regression.ConfidenceIntervalValueTuple(0.95);
+        var CI = regression.ConfidenceIntervalTuple(0.95);
 
         // Assert
 
@@ -159,7 +159,7 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine($"Confidence Interval: [{result.Lower}, {result.Upper} ]");
 
-        testOutputHelper.WriteLine($"Confidence Extensio: [{result.Lower}, {result.Upper}, {result.Slope}, " +
+        testOutputHelper.WriteLine($"Confidence Extension: [{result.Lower}, {result.Upper}, {result.Slope}, " +
                                    $"{result.StandardError}, {result.PValue}]");
         testOutputHelper.WriteLine(regression.ToString());
     }
