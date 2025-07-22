@@ -27,7 +27,7 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void TestConfidenceInterval85percent()
+    public void TestConfidenceInterval85Percent()
     {
         // Arrange
         var dataPoints = new List<(double x, double y)>
