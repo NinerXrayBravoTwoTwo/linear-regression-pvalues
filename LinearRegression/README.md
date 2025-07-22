@@ -7,7 +7,10 @@ A robust and lightweight C# library for performing 2D (bivariate) linear regress
 The library provides a `Regression` class for computing 2D regression statistics and a `PValueStat` class for calculating the p-value of the regression slope. It supports adding, removing, and merging data points, with robust handling of edge cases like insufficient data or NaN values.
 
 ### Release Notes
-- **July 21, 2025**: 
+- **Version 1.06:  July 21, 2025**: 
+- add new method to complement the CidenceInterval methods, MeanConfidencceInterval which provides a +/- value for MeanX or MeanY
+- Split the Confidence Interval work into partial classes to limit impact of changes.
+- **Version 1.05:  July 21, 2025**: 
 - Updated `PValueStat` to include for;
 - Added `ConfidenceInterval` method to compute the confidence interval for the regression slope.
 - Added `StandardError` as well for the standard error of the regression slope.
