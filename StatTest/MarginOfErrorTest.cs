@@ -22,7 +22,7 @@ public class MarginOfErrorTest(ITestOutputHelper testOutputHelper)
         var regression = new RegressionPvalue(dataPoints);
 
         // Act
-        var moe = regression.MarginOfError(false, 0.95);
+        var moe = regression.MarginOfError();
 
         // Assert
         Assert.Equal(regression.MeanX(), moe.Mean);
@@ -44,7 +44,7 @@ public class MarginOfErrorTest(ITestOutputHelper testOutputHelper)
         };
         var regression = new RegressionPvalue(dataPoints);
         // Act
-        var moe = regression.MarginOfError(true, 0.95);
+        var moe = regression.MarginOfError(true);
 
         // Assert
         Assert.Equal(regression.MeanY(), moe.Mean);

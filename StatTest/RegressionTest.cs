@@ -7,7 +7,6 @@ namespace RegressionTest;
 
 public class RegressionTest(ITestOutputHelper testOutputHelper)
 {
-    private readonly ITestOutputHelper _testOutputHelper = testOutputHelper;
     [Fact]
     public void StatTestAccessDataPoints()
     {
@@ -17,7 +16,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         while (x < 100)
             stat.Add(x++, y++);
 
-        _testOutputHelper.WriteLine(stat.ToString());
+        testOutputHelper.WriteLine(stat.ToString());
         Assert.False(stat.IsNaN);
         Assert.Equal(0, stat.MinX);
         Assert.Equal(1, stat.Correlation());
@@ -44,7 +43,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         while (x < 100)
             stat.Add(x++, y++);
 
-        _testOutputHelper.WriteLine(stat.ToString());
+        testOutputHelper.WriteLine(stat.ToString());
 
         //        Assert.Equal(102, stat.DataPointsCount());  
         Assert.Equal(102, stat.N);
@@ -67,7 +66,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         while (x < 100)
             stat.Add(x++, y++);
 
-        _testOutputHelper.WriteLine(stat.ToString());
+        testOutputHelper.WriteLine(stat.ToString());
 
         Assert.False(stat.IsNaN);
         Assert.Equal(0, stat.MinX);
@@ -85,7 +84,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         while (x < 100)
             original.Add(x++, y++);
 
-        _testOutputHelper.WriteLine(original.ToString());
+        testOutputHelper.WriteLine(original.ToString());
 
         Assert.False(original.IsNaN);
 
@@ -97,7 +96,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
 
         // The clone should not update if the original changes, i.e. they are not the same instance
         original.Add(0, 0);
-        _testOutputHelper.WriteLine(clone.ToString());
+        testOutputHelper.WriteLine(clone.ToString());
 
         Assert.NotEqual(original.ToString(), clone.ToString());
         Assert.Equal(clone.N + 1, original.N);
@@ -113,7 +112,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
 
         while (x < 500)
             original.Add(x++, y++);
-        _testOutputHelper.WriteLine(original.ToString());
+        testOutputHelper.WriteLine(original.ToString());
 
         var clone = new Regression(original); // Make a clone (new unrelated instance) of the statistic.
 
@@ -143,7 +142,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         Assert.False(clone.IsNaN);
 
         // Assert
-        _testOutputHelper.WriteLine(clone.ToString());
+        testOutputHelper.WriteLine(clone.ToString());
     }
 
     [Fact]
@@ -160,8 +159,8 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // test - 
         var clone = original.Merge(original); // Merging the original statistic to its clone, 
 
-        _testOutputHelper.WriteLine(original.ToString());
-        _testOutputHelper.WriteLine(clone.ToString());
+        testOutputHelper.WriteLine(original.ToString());
+        testOutputHelper.WriteLine(clone.ToString());
 
         Assert.False(clone.IsNaN);
 
@@ -183,7 +182,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         Assert.False(clone.IsNaN);
 
         // Assert
-        _testOutputHelper.WriteLine(clone.ToString());
+        testOutputHelper.WriteLine(clone.ToString());
     }
 
     [Fact]
@@ -194,7 +193,7 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         double x = 0, y = -1;
         while (x < 500)
             original.Add(x++, y++);
-        _testOutputHelper.WriteLine(original.ToString());
+        testOutputHelper.WriteLine(original.ToString());
         var clone = new Regression(original); // Make a clone (new unrelated instance) of the statistic.
         Assert.False(original.IsNaN);
         Assert.False(clone.IsNaN);
@@ -216,6 +215,6 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         Assert.Equal(original.MeanY(), clone.MeanY());
         Assert.False(clone.IsNaN);
         // Assert
-        _testOutputHelper.WriteLine(clone.ToString());
+        testOutputHelper.WriteLine(clone.ToString());
     }
-    }
+}

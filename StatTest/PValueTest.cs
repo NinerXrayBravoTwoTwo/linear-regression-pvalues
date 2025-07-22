@@ -73,7 +73,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
 
     [Fact]
-    public void DatapointsIsReadAccessable()
+    public void DataPointsIsReadAccessible()
     {
         var dataPoints = new List<(double x, double y)>
         {
@@ -151,11 +151,6 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
             dataPoints.Add((j++, 2 * j + 1)); // Changed to AddDataPoint to match the method in PValueStat
 
         var stat = new RegressionPvalue(dataPoints);
-
-        //// Create a PValueStat instance with a large dataset
-        //var statx = new RegressionPvalue([]);
-        //for (var i = 0; i < 1000; i++) 
-        //    stat.AddDataPoint(i, 2 * i + 1); // Linear relationship
 
         // Assert that PValue returns a valid double value
         var pValue = stat.PValue();
@@ -328,12 +323,8 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var dataPoints = new List<(double x, double y)>();
 
 
-        for (var i = 0; i < 1000; i++)
-            if (i % 100 == 0) // Introduce NaN every 100th point
-                dataPoints.Add((i, double.NaN));
-            else
-                dataPoints.Add((i, 2 * i + 1)); // Linear relationship
-
+        for (var i = 0; i < 1000; i++) dataPoints.Add(i % 100 == 0 ? (i, double.NaN) : (i, 2 * i + 1)); // Linear relationship
+        // Introduce NaN every 100th point
         var stat = new RegressionPvalue(dataPoints);
 
         testOutputHelper.WriteLine(stat.ToString());
