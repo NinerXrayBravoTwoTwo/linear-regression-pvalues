@@ -371,7 +371,7 @@ public class Regression
         var isInfinity = double.IsPositiveInfinity(Slope());
         var result = isInfinity
             ? $"NaN - {N}"
-            : $"Slope: {Slope():F2} R^2: {RSquared():f3} N={N} (Q:x{StdDevX():F3} y{StdDevY():F3})  (Q2: x{VarianceX():F3} y{VarianceY():F3})  Y-intercept: {YIntercept():F3}  Cor: {Correlation():F4}  MeanX: {MeanX():F2} MeanY: {MeanY():F2} X({MinX:0.##} <-> {MaxX:0.##}), Y: ({MinY:0.####} <-> {MaxY:0.####}), N: {N}, isNAN:{IsNaN}";
+            : $"Slope: {Slope():F2} R^2: {RSquared():f3} N={N} (StdDev: (x{StdDevX():F3}, y{StdDevY():F3})  (Variance: (x{VarianceX():F3}, y{VarianceY():F3})  Y-intercept: {YIntercept():F3}  Cor: {Correlation():F4}  MeanX: {MeanX():F2} MeanY: {MeanY():F2} X({MinX:0.##} <-> {MaxX:0.##}), Y: ({MinY:0.####} <-> {MaxY:0.####}), N: {N}, isNAN:{IsNaN}";
 
         return result;
     }
