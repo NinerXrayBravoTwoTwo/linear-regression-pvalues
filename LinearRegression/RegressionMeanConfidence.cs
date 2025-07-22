@@ -11,7 +11,7 @@ public partial class RegressionPvalue
     /// <param name="confidenceLevel">The confidence level for the interval, between 0 and 1 (default: 0.95 for 95% CI).</param>
     /// <returns>A tuple containing the mean and margin of error for reporting like 'Mean ± MOE'.</returns>
     /// <exception cref="InvalidOperationException">Thrown if there are fewer than 2 data points.</exception>
-    public (double Mean, double MarginOfError) MeanConfidenceInterval(bool useY = false, double confidenceLevel = 0.95)
+    public (double Mean, double MarginOfError) MarginOfError(bool useY = false, double confidenceLevel = 0.95)
     {
         if (DataPoints.Count < 2)
             throw new InvalidOperationException("At least 2 data points are required to compute the mean CI.");

@@ -8,7 +8,7 @@ The library provides a `Regression` class for computing 2D regression statistics
 
 ### Release Notes
 - **Version 1.06:  July 21, 2025**: 
-- add new method to complement the CidenceInterval methods, MeanConfidencceInterval which provides a +/- value for MeanX or MeanY
+	- add new method to complement the CidenceInterval methods, 'MarginOfError` which provides a +/- value for MeanX or MeanY
 - Split the Confidence Interval work into partial classes to limit impact of changes.
 - **Version 1.05:  July 21, 2025**: 
 - Updated `PValueStat` to include for;
