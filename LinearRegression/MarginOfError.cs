@@ -21,7 +21,7 @@ public partial class RegressionPvalue
 
         // Calculate mean and standard deviation
         var mean = useY ? MeanY() : MeanX();
-        var stdDev = useY ? Qy() : Qx();
+        var stdDev = useY ? StdDevY() : StdDevX();
 
         // Calculate standard error
         var seMean = stdDev / Math.Sqrt(N);

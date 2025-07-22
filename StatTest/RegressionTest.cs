@@ -128,8 +128,8 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // e> Mean should remain the same.
 
         Assert.Equal(original.N * 2, clone.N);
-        Assert.Equal(original.Qx2(), clone.Qx2());
-        Assert.Equal(original.Qy2(), clone.Qy2());
+        Assert.Equal(original.VarianceX(), clone.VarianceX());
+        Assert.Equal(original.VarianceY(), clone.VarianceY());
 
         Assert.Equal(original.Sx * 2, clone.Sx);
         Assert.Equal(original.Sy * 2, clone.Sy);
@@ -171,8 +171,8 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // e> Mean should remain the same.
 
         Assert.Equal(original.N * 2, clone.N);
-        Assert.Equal(original.Qx2(), clone.Qx2());
-        Assert.Equal(original.Qy2(), clone.Qy2());
+        Assert.Equal(original.VarianceX(), clone.VarianceX());
+        Assert.Equal(original.VarianceY(), clone.VarianceY());
         Assert.Equal(original.Sx * 2, clone.Sx);
         Assert.Equal(original.Sy * 2, clone.Sy);
         Assert.Equal(original.Sy2 * 2, clone.Sy2);
@@ -205,8 +205,8 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // d> other sum attributes should all be doubled.
         // e> Mean should remain the same.
         Assert.Equal(original.N * 2, clone.N);
-        Assert.Equal(original.Qx2(), clone.Qx2());
-        Assert.Equal(original.Qy2(), clone.Qy2());
+        Assert.Equal(original.VarianceX(), clone.VarianceX());
+        Assert.Equal(original.VarianceY(), clone.VarianceY());
         Assert.Equal(original.Sx * 2, clone.Sx);
         Assert.Equal(original.Sy * 2, clone.Sy);
         Assert.Equal(original.Sy2 * 2, clone.Sy2);

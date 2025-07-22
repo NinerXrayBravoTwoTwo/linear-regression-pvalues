@@ -53,7 +53,7 @@ public partial class RegressionPvalue : Regression
 
         // Calculate slope and standard error of the slope
         var slope = Slope();
-        var varianceX = Qx2();
+        var varianceX = VarianceX();
         if (varianceX == 0)
             return 1.0; // No variation in X, slope is undefined or always zero, so p-value is 1
 

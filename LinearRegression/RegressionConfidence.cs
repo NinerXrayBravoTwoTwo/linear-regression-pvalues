@@ -20,7 +20,7 @@ public partial class RegressionPvalue
 
         // Calculate slope and standard error (same as in PValue)
         var slope = Slope();
-        var varianceX = Qx2();
+        var varianceX = VarianceX();
         if (varianceX == 0)
             return (double.NaN, double.NaN); // No variation in X, CI is undefined
 
@@ -65,7 +65,7 @@ public partial class RegressionPvalue
 
         // Calculate slope, p-value, and standard error (reuse existing logic)
         var slope = Slope();
-        var varianceX = Qx2();
+        var varianceX = VarianceX();
         if (varianceX == 0)
             return (double.NaN, double.NaN, slope, double.NaN, 1.0);
 

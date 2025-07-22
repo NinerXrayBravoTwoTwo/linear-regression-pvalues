@@ -19,10 +19,10 @@
 ///     sxy = sum x * y
 ///     mean x = mx = sx/n
 ///     mean y = my = sy/n
-///     standard deviation x = qx = sqr((sx2 - (sx^2 /n)) / (n-1) )
-///     standard deviation y = qy = sqr((sy2 - (sy^2 /n)) / (n-1) )
-///     variance x = qx2 = sx2 / n - mx^2
-///     variance y = qy2 = sy2 / n - my^2
+///     standard deviation x = StdDevX = sqr((sx2 - (sx^2 /n)) / (n-1) )
+///     standard deviation y = StdDevY= sqr((sy2 - (sy^2 /n)) / (n-1) )
+///     variance x = VarianceX = sx2 / n - mx^2
+///     variance y = VarianceY = sy2 / n - my^2
 ///     Use N weighting for population studies
 ///     and N-1 for sample studies
 ///     Slope = m = sxy - (sx*sy)/n / sx2 - sx^2 /n
@@ -134,8 +134,8 @@ public class Regression
     /// </summary>
     public double MinY { get; set; }
 
-    public bool IsNaN => double.IsNaN(Qx())
-                         || double.IsNaN(Qy())
+    public bool IsNaN => double.IsNaN(StdDevX())
+                         || double.IsNaN(StdDevY())
                          || double.IsNaN(Sx)
                          || double.IsNaN(Sy)
                          || double.IsPositiveInfinity(Slope())
@@ -263,7 +263,7 @@ public class Regression
     ///     Standard Deviation of X (requires at least 2 samples)
     /// </summary>
     /// <returns>Standard Deviation of X</returns>
-    public double Qx()
+    public double StdDevX()
     {
         if (!(N > 1)) return double.NaN;
 
@@ -277,7 +277,7 @@ public class Regression
     ///     Standard Deviation of Y (requires at least 2 samples)
     /// </summary>
     /// <returns>Standard Deviation of Y</returns>
-    public double Qy()
+    public double StdDevY()
     {
         if (!(N > 1)) return double.NaN;
         //throw new InvalidOperationException(
@@ -291,7 +291,7 @@ public class Regression
     /// </summary>
     /// <returns>The unweighted variance of X, calculated as Sx2 / N - (MeanX)².</returns>
     /// <exception cref="DivideByZeroException">Thrown when the number of samples (N) is less than or equal to 0.</exception>
-    public double Qx2()
+    public double VarianceX()
     {
         if (!(N > 0)) throw new DivideByZeroException("Number of samples needs to be greater than 0.");
 
@@ -303,7 +303,7 @@ public class Regression
     /// </summary>
     /// <returns>The unweighted variance of Y, calculated as Sy2 / N - (MeanY)².</returns>
     /// <exception cref="DivideByZeroException">Thrown when the number of samples (N) is less than or equal to 0.</exception>
-    public double Qy2()
+    public double VarianceY()
     {
         if (N > 0)
             return Sy2 / N - MeanY() * MeanY();
@@ -347,9 +347,9 @@ public class Regression
     /// </returns>
     public double Correlation()
     {
-        var qy = Qy();
+        var qy = StdDevY();
         if (qy == 0 || double.IsInfinity(Slope())) return double.NaN;
-        return Slope() * Qx() / qy;
+        return Slope() * StdDevX() / qy;
     }
 
     /// <summary>
@@ -371,7 +371,7 @@ public class Regression
         var isInfinity = double.IsPositiveInfinity(Slope());
         var result = isInfinity
             ? $"NaN - {N}"
-            : $"Slope: {Slope():F2} R^2: {RSquared():f3} N={N} (Q:x{Qx():F3} y{Qy():F3})  (Q2: x{Qx2():F3} y{Qy2():F3})  Y-intercept: {YIntercept():F3}  Cor: {Correlation():F4}  MeanX: {MeanX():F2} MeanY: {MeanY():F2} X({MinX:0.##} <-> {MaxX:0.##}), Y: ({MinY:0.####} <-> {MaxY:0.####}), N: {N}, isNAN:{IsNaN}";
+            : $"Slope: {Slope():F2} R^2: {RSquared():f3} N={N} (Q:x{StdDevX():F3} y{StdDevY():F3})  (Q2: x{VarianceX():F3} y{VarianceY():F3})  Y-intercept: {YIntercept():F3}  Cor: {Correlation():F4}  MeanX: {MeanX():F2} MeanY: {MeanY():F2} X({MinX:0.##} <-> {MaxX:0.##}), Y: ({MinY:0.####} <-> {MaxY:0.####}), N: {N}, isNAN:{IsNaN}";
 
         return result;
     }
