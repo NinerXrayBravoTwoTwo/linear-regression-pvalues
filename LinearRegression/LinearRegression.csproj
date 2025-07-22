@@ -20,18 +20,22 @@
 
 		<!-- NuGet metadata -->
 		<PackageId>LinearRegression.Pvalues</PackageId>
-
 		<Version>1.0.5</Version>
 		<Authors>Jillian England</Authors>
 		<Company>Hyperfaceted</Company>
 		<Description>A simple, fast linear regression library for .NET</Description>
 		<PackageTags>regression;statistics;machine-learning;dotnet</PackageTags>
 		<RepositoryUrl>https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues</RepositoryUrl>
-		<PackageReadmeFile>./README.md</PackageReadmeFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+		<IncludeSymbols>true</IncludeSymbols>
+		<IncludeSource>true</IncludeSource>
+		<!-- Optional: includes source files for Source Link -->
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<!-- Modern symbol package format -->
 	</PropertyGroup>
 	<ItemGroup>
-		<None Include="README.md" Pack="true" PackagePath="" />
+		<Resource Include="README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 
 </Project>
