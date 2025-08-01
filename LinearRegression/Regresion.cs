@@ -134,12 +134,12 @@ public class Regression
     /// </summary>
     public double MinY { get; set; }
 
-    public bool IsNaN => double.IsNaN(StdDevX())
-                         || double.IsNaN(StdDevY())
+    public bool IsNaN => double.IsNaN(StdDevX)
+                         || double.IsNaN(StdDevY)
                          || double.IsNaN(Sx)
                          || double.IsNaN(Sy)
-                         || double.IsPositiveInfinity(Slope())
-                         || double.IsNaN(YIntercept());
+                         || double.IsPositiveInfinity(Slope)
+                         || double.IsNaN(YIntercept);
 
     /// <summary>
     ///     Merge two Regressions into a new Regression instance.
@@ -245,45 +245,45 @@ public class Regression
     ///     mean x = sum(x) / n
     /// </summary>
     /// <returns>Mean of x</returns>
-    public double MeanX()
-    {
-        return N > 0 ? Sx / N : 0;
-    }
+    public double MeanX => N > 0 ? Sx / N : 0;
 
     /// <summary>
     ///     mean y = sum(y) / n
     /// </summary>
     /// <returns>Mean of y</returns>
-    public double MeanY()
-    {
-        return N > 0 ? Sy / N : 0;
-    }
+    public double MeanY => N > 0 ? Sy / N : 0;
 
     /// <summary>
     ///     Standard Deviation of X (requires at least 2 samples)
     /// </summary>
     /// <returns>Standard Deviation of X</returns>
-    public double StdDevX()
+    public double StdDevX
     {
-        if (!(N > 1)) return double.NaN;
+        get
+        {
+            if (!(N > 1)) return double.NaN;
 
-        // throw new InvalidOperationException(
-        //"There must be more than one sample to find the Standard Deviation.");
+            // throw new InvalidOperationException(
+            //"There must be more than one sample to find the Standard Deviation.");
 
-        return Math.Sqrt(Sx2 - Sx * Sx / N) / (N - 1);
+            return Math.Sqrt(Sx2 - Sx * Sx / N) / (N - 1);
+        }
     }
 
     /// <summary>
     ///     Standard Deviation of Y (requires at least 2 samples)
     /// </summary>
     /// <returns>Standard Deviation of Y</returns>
-    public double StdDevY()
+    public double StdDevY
     {
-        if (!(N > 1)) return double.NaN;
-        //throw new InvalidOperationException(
-        //    "There must be more than one sample to find the Standard Deviation.");
+        get
+        {
+            if (!(N > 1)) return double.NaN;
+            //throw new InvalidOperationException(
+            //    "There must be more than one sample to find the Standard Deviation.");
 
-        return Math.Sqrt(Sy2 - Sy * Sy / N) / (N - 1);
+            return Math.Sqrt(Sy2 - Sy * Sy / N) / (N - 1);
+        }
     }
 
     /// <summary>
@@ -291,11 +291,14 @@ public class Regression
     /// </summary>
     /// <returns>The unweighted variance of X, calculated as Sx2 / N - (MeanX)².</returns>
     /// <exception cref="DivideByZeroException">Thrown when the number of samples (N) is less than or equal to 0.</exception>
-    public double VarianceX()
+    public double VarianceX
     {
-        if (!(N > 0)) throw new DivideByZeroException("Number of samples needs to be greater than 0.");
+        get
+        {
+            if (!(N > 0)) throw new DivideByZeroException("Number of samples needs to be greater than 0.");
 
-        return Sx2 / N - MeanX() * MeanX();
+            return Sx2 / N - MeanX * MeanX;
+        }
     }
 
     /// <summary>
@@ -303,12 +306,15 @@ public class Regression
     /// </summary>
     /// <returns>The unweighted variance of Y, calculated as Sy2 / N - (MeanY)².</returns>
     /// <exception cref="DivideByZeroException">Thrown when the number of samples (N) is less than or equal to 0.</exception>
-    public double VarianceY()
+    public double VarianceY
     {
-        if (N > 0)
-            return Sy2 / N - MeanY() * MeanY();
+        get
+        {
+            if (N > 0)
+                return Sy2 / N - MeanY * MeanY;
 
-        throw new DivideByZeroException("Number of samples needs to be greater than 0.");
+            throw new DivideByZeroException("Number of samples needs to be greater than 0.");
+        }
     }
 
     /// <summary>
@@ -318,25 +324,35 @@ public class Regression
     ///     The slope (m) of the regression line, calculated as (Sxy - Sx*Sy/N) / (Sx2 - Sx²/N). Returns double.NaN if N
     ///     &lt; 2 or the denominator is zero.
     /// </returns>
-    public double Slope()
-    {
-        if (N < 2) return double.NaN; // Insufficient data
+    //public double SlopeI()
+    //{
+    //    if (N < 2) return double.NaN; // Insufficient data
 
-        var numerator = Sxy - Sx * Sy / N;
-        var denominator = Sx2 - Sx * Sx / N;
-        return denominator != 0 ? numerator / denominator : double.NaN;
+    //    var numerator = Sxy - Sx * Sy / N;
+    //    var denominator = Sx2 - Sx * Sx / N;
+    //    return denominator != 0 ? numerator / denominator : double.NaN;
+    //}
+
+    public double Slope
+    {
+        get
+        {
+            if (N < 2) return double.NaN; // Insufficient data
+
+            var numerator = Sxy - Sx * Sy / N;
+            var denominator = Sx2 - Sx * Sx / N;
+            return denominator != 0 ? numerator / denominator : double.NaN;
+        }
     }
 
     /// <summary>
     ///     Calculates the y-intercept of the linear regression line.
     /// </summary>
     /// <returns>The y-intercept (b) of the regression line, calculated as (Sy - m*Sx) / N.</returns>
-    public double YIntercept()
-    {
+    public double YIntercept =>
         // If something needs to be thrown it will happen
         // in Slope().
-        return (Sy - Slope() * Sx) / N;
-    }
+        (Sy - Slope * Sx) / N;
 
     /// <summary>
     ///     Calculates the Pearson correlation coefficient between X and Y.
@@ -345,11 +361,14 @@ public class Regression
     ///     The correlation coefficient (R), ranging from -1 to 1. Returns double.NaN if Qy is zero or the slope is
     ///     infinite.
     /// </returns>
-    public double Correlation()
+    public double Correlation
     {
-        var qy = StdDevY();
-        if (qy == 0 || double.IsInfinity(Slope())) return double.NaN;
-        return Slope() * StdDevX() / qy;
+        get
+        {
+            var qy = StdDevY;
+            if (qy == 0 || double.IsInfinity(Slope)) return double.NaN;
+            return Slope * StdDevX / qy;
+        }
     }
 
     /// <summary>
@@ -359,20 +378,23 @@ public class Regression
     ///     The R² value, ranging from 0 to 1, representing the proportion of variance in Y explained by X. Returns
     ///     double.NaN if the correlation coefficient is invalid.
     /// </returns>
-    public double RSquared()
+    public double RSquared
     {
-        var r = Correlation();
-        if (double.IsNaN(r)) return double.NaN;
-        return r * r;
+        get
+        {
+            var r = Correlation;
+            if (double.IsNaN(r)) return double.NaN;
+            return r * r;
+        }
     }
 
     public override string ToString()
     {
-        var isInfinity = double.IsPositiveInfinity(Slope());
+        var isInfinity = double.IsPositiveInfinity(Slope);
         var result = isInfinity
             ? $"NaN - {N}"
-            : $"Slope: {Slope():F2} R^2: {RSquared():f3} N={N} StdDev: (x{StdDevX():F3} y{StdDevY():F3}) Variance: (x{VarianceX():F3} y{VarianceY():F3}) Y-intercept: {YIntercept():F3}  Cor: {Correlation():F4} "+ 
-              $"Mean: (x{MeanX():F2} y{MeanY():F2}) MinMax: x({MinX:0.##} <-> {MaxX:0.##}) y({MinY:0.####} <-> {MaxY:0.####}) isNaN:{IsNaN}";
+            : $"Slope: {Slope:F2} R^2: {RSquared:f3} N={N} StdDev: (x{StdDevX:F3} y{StdDevY:F3}) Variance: (x{VarianceX:F3} y{VarianceY:F3}) Y-intercept: {YIntercept:F3}  Cor: {Correlation:F4} " +
+              $"Mean: (x{MeanX:F2} y{MeanY:F2}) MinMax: x({MinX:0.##} <-> {MaxX:0.##}) y({MinY:0.####} <-> {MaxY:0.####}) isNaN:{IsNaN}";
 
         return result;
     }

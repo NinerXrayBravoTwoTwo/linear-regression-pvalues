@@ -19,9 +19,9 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.ToString());
         Assert.False(stat.IsNaN);
         Assert.Equal(0, stat.MinX);
-        Assert.Equal(1, stat.Correlation());
-        Assert.Equal(49.5, stat.MeanX());
-        Assert.Equal(1, stat.Slope());
+        Assert.Equal(1, stat.Correlation);
+        Assert.Equal(49.5, stat.MeanX);
+        Assert.Equal(1, stat.Slope);
 
         // Assert.Equal(100, stat.DataPoints.Count);
     }
@@ -49,9 +49,9 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         Assert.Equal(102, stat.N);
         Assert.False(stat.IsNaN);
         Assert.Equal(0, stat.MinX);
-        Assert.Equal(1, stat.Correlation());
-        Assert.Equal(50.5, stat.MeanX());
-        Assert.Equal(1, stat.Slope());
+        Assert.Equal(1, stat.Correlation);
+        Assert.Equal(50.5, stat.MeanX);
+        Assert.Equal(1, stat.Slope);
 
         //      Assert.Equal(100, stat.DataPoints.Count);
     }
@@ -70,9 +70,9 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
 
         Assert.False(stat.IsNaN);
         Assert.Equal(0, stat.MinX);
-        Assert.Equal(1, stat.Correlation());
-        Assert.Equal(49.5, stat.MeanX());
-        Assert.Equal(1, stat.Slope());
+        Assert.Equal(1, stat.Correlation);
+        Assert.Equal(49.5, stat.MeanX);
+        Assert.Equal(1, stat.Slope);
     }
 
     [Fact]
@@ -128,16 +128,16 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // e> Mean should remain the same.
 
         Assert.Equal(original.N * 2, clone.N);
-        Assert.Equal(original.VarianceX(), clone.VarianceX());
-        Assert.Equal(original.VarianceY(), clone.VarianceY());
+        Assert.Equal(original.VarianceX, clone.VarianceX);
+        Assert.Equal(original.VarianceY, clone.VarianceY);
 
         Assert.Equal(original.Sx * 2, clone.Sx);
         Assert.Equal(original.Sy * 2, clone.Sy);
         Assert.Equal(original.Sy2 * 2, clone.Sy2);
         Assert.Equal(original.Sxy * 2, clone.Sxy);
 
-        Assert.Equal(original.MeanX(), clone.MeanX());
-        Assert.Equal(original.MeanY(), clone.MeanY());
+        Assert.Equal(original.MeanX, clone.MeanX);
+        Assert.Equal(original.MeanY, clone.MeanY);
 
         Assert.False(clone.IsNaN);
 
@@ -171,14 +171,14 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // e> Mean should remain the same.
 
         Assert.Equal(original.N * 2, clone.N);
-        Assert.Equal(original.VarianceX(), clone.VarianceX());
-        Assert.Equal(original.VarianceY(), clone.VarianceY());
+        Assert.Equal(original.VarianceX, clone.VarianceX);
+        Assert.Equal(original.VarianceY, clone.VarianceY);
         Assert.Equal(original.Sx * 2, clone.Sx);
         Assert.Equal(original.Sy * 2, clone.Sy);
         Assert.Equal(original.Sy2 * 2, clone.Sy2);
         Assert.Equal(original.Sxy * 2, clone.Sxy);
-        Assert.Equal(original.MeanX(), clone.MeanX());
-        Assert.Equal(original.MeanY(), clone.MeanY());
+        Assert.Equal(original.MeanX, clone.MeanX);
+        Assert.Equal(original.MeanY, clone.MeanY);
         Assert.False(clone.IsNaN);
 
         // Assert
@@ -205,14 +205,14 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // d> other sum attributes should all be doubled.
         // e> Mean should remain the same.
         Assert.Equal(original.N * 2, clone.N);
-        Assert.Equal(original.VarianceX(), clone.VarianceX());
-        Assert.Equal(original.VarianceY(), clone.VarianceY());
+        Assert.Equal(original.VarianceX, clone.VarianceX);
+        Assert.Equal(original.VarianceY, clone.VarianceY);
         Assert.Equal(original.Sx * 2, clone.Sx);
         Assert.Equal(original.Sy * 2, clone.Sy);
         Assert.Equal(original.Sy2 * 2, clone.Sy2);
         Assert.Equal(original.Sxy * 2, clone.Sxy);
-        Assert.Equal(original.MeanX(), clone.MeanX());
-        Assert.Equal(original.MeanY(), clone.MeanY());
+        Assert.Equal(original.MeanX, clone.MeanX);
+        Assert.Equal(original.MeanY, clone.MeanY);
         Assert.False(clone.IsNaN);
         // Assert
         testOutputHelper.WriteLine(clone.ToString());

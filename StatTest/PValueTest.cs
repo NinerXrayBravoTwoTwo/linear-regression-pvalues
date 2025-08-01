@@ -7,6 +7,21 @@ namespace RegressionTest;
 public class PValueTest(ITestOutputHelper testOutputHelper)
 {
     [Fact]
+    public void PValueToString()
+    {
+        // Create a PValueStat instance with 100 data points
+        var dataPoints = new List<(double x, double y)>();
+
+        double x = 0;
+        double y = -1;
+
+        while (x < 100)
+            dataPoints.Add((x++, y++)); // Changed to AddDataPoint to match the method in PValueStat
+        //
+        var regression = new RegressionPvalue(dataPoints);
+        testOutputHelper.WriteLine(regression.ToString()); //ToDo: create a more detailed ToString method in RegressionPvalue
+    }
+    [Fact]
     public void EmptyPValueIsNaN() // Fixed spelling: PValue -> PValue, Nan -> NaN
     {
         // Create
@@ -37,7 +52,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
             Assert.Equal(original.DataPoints[i].y, newFromDataPoints.DataPoints[i].y);
         }
         //Assert that Slope of the new instance is the same as the original
-        Assert.Equal(original.Slope(), newFromDataPoints.Slope());
+        Assert.Equal(original.Slope, newFromDataPoints.Slope);
 
         // Assert that R2 of the new instance is the same as the original
 
@@ -63,12 +78,12 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         Assert.Equal(100, stat.DataPointsCount()); // Check if the number of data points is correct
 
         Assert.Equal(0, stat.MinX);
-        Assert.Equal(1, stat.Correlation());
-        Assert.Equal(49.5, stat.MeanX());
-        Assert.Equal(1, stat.Slope());
+        Assert.Equal(1, stat.Correlation);
+        Assert.Equal(49.5, stat.MeanX);
+        Assert.Equal(1, stat.Slope);
 
-        testOutputHelper.WriteLine(stat.PValue()
-            .ToString($"P-value: {stat.PValue():F4}")); // Print P-Value with 4 decimal places
+        testOutputHelper.WriteLine(stat.PValue
+            .ToString($"P-value: {stat.PValue:F4}")); // Print P-Value with 4 decimal places
     }
 
 
@@ -100,7 +115,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var stat = new RegressionPvalue(dataPoints);
         // Add only 2 data points
         // Assert that calling PValue throws an InvalidOperationException
-        Assert.Throws<InvalidOperationException>(() => stat.PValue());
+        Assert.Throws<InvalidOperationException>(() => stat.PValue);
     }
 
     [Fact]
@@ -118,7 +133,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
 
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -137,7 +152,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         // Add 3 data points with a negative slope
 
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -153,7 +168,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var stat = new RegressionPvalue(dataPoints);
 
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -173,7 +188,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.ToString());
 
         // Assert that PValue returns 1.0
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.Equal(1.0, pValue);
     }
 
@@ -193,7 +208,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.ToString());
 
         // Assert that PValue returns NaN
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(double.IsNaN(pValue), "P-value should be NaN when data contains NaN values.");
     }
 
@@ -216,7 +231,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.ToString());
 
         // Assert that PValue returns NaN
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(double.IsNaN(pValue), "P-value should be NaN when all data points are NaN.");
     }
 
@@ -233,7 +248,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         // Add a single data point
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns NaN
-        Assert.Throws<InvalidOperationException>(() => stat.PValue());
+        Assert.Throws<InvalidOperationException>(() => stat.PValue);
     }
 
     [Fact]
@@ -255,7 +270,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.ToString());
 
         // Assert that PValue returns NaN
-        Assert.Throws<InvalidOperationException>(() => stat.PValue());
+        Assert.Throws<InvalidOperationException>(() => stat.PValue);
     }
 
     [Fact]
@@ -274,7 +289,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -292,7 +307,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns NaN
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(double.IsNaN(pValue), "P-value should be NaN when data contains NaN values.");
     }
 
@@ -312,7 +327,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.ToString());
 
         // Assert that PValue returns NaN
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(double.IsNaN(pValue), "P-value should be NaN when data contains NaN values.");
     }
 
@@ -329,7 +344,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns NaN due to NaN in data
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(double.IsNaN(pValue), "P-value should be NaN when data contains NaN values.");
     }
 
@@ -346,7 +361,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.ToString());
 
         // Assert that PValue returns 1.0
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.Equal(1.0, pValue);
     }
 
@@ -362,7 +377,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -379,7 +394,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -402,7 +417,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.ToString());
 
         // Assert that PValue returns NaN
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(double.IsNaN(pValue), "P-value should be NaN when data contains NaN values.");
     }
 
@@ -422,7 +437,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -441,7 +456,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -462,7 +477,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.ToString());
 
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -481,7 +496,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -498,7 +513,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.ToString());
 
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -512,7 +527,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -526,7 +541,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -540,7 +555,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -554,7 +569,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -570,7 +585,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 
@@ -591,7 +606,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value
-        var pValue = stat.PValue();
+        var pValue = stat.PValue;
         Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
     }
 }

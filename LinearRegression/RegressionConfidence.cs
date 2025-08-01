@@ -19,8 +19,8 @@ public partial class RegressionPvalue
             return (double.NaN, double.NaN); // Return NaN for invalid data
 
         // Calculate slope and standard error (same as in PValue)
-        var slope = Slope();
-        var varianceX = VarianceX();
+        var slope = Slope;
+        var varianceX = VarianceX;
         if (varianceX == 0)
             return (double.NaN, double.NaN); // No variation in X, CI is undefined
 
@@ -64,8 +64,8 @@ public partial class RegressionPvalue
             return (double.NaN, double.NaN, double.NaN, double.NaN, double.NaN);
 
         // Calculate slope, p-value, and standard error (reuse existing logic)
-        var slope = Slope();
-        var varianceX = VarianceX();
+        var slope = Slope;
+        var varianceX = VarianceX;
         if (varianceX == 0)
             return (double.NaN, double.NaN, slope, double.NaN, 1.0);
 
@@ -77,7 +77,7 @@ public partial class RegressionPvalue
             return (slope, slope, slope, 0.0, slope == 0 ? 1.0 : 0.0);
 
         // Calculate p-value (using existing method for consistency)
-        var pValue = PValue();
+        var pValue = PValue;
 
         // Get critical t-value for the confidence level
         var degreesOfFreedom = n - 2;

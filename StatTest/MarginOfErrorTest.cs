@@ -25,7 +25,7 @@ public class MarginOfErrorTest(ITestOutputHelper testOutputHelper)
         var moe = regression.MarginOfError();
 
         // Assert
-        Assert.Equal(regression.MeanX(), moe.Mean);
+        Assert.Equal(regression.MeanX, moe.Mean);
 
         testOutputHelper.WriteLine($"Mean and MarginOfError: [{moe.Mean}, {moe.MarginOfError:F4}]");
     }
@@ -47,7 +47,7 @@ public class MarginOfErrorTest(ITestOutputHelper testOutputHelper)
         var moe = regression.MarginOfError(true);
 
         // Assert
-        Assert.Equal(regression.MeanY(), moe.Mean);
+        Assert.Equal(regression.MeanY, moe.Mean);
         testOutputHelper.WriteLine($"Mean and MarginOfError: [{moe.Mean}, {moe.MarginOfError:F4}]");
     }
     [Fact]
