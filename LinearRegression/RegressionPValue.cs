@@ -59,7 +59,7 @@ public partial class RegressionPvalue : Regression
             if (varianceX == 0)
                 return 1.0; // No variation in X, slope is undefined or always zero, so p-value is 1
 
-            var rss = ResidualSumOfSquares();
+            var rss = ResidualSumOfSquares;
             var n = DataPoints.Count;
             var seSlope = Math.Sqrt(rss / (n - 2) / varianceX);
 
@@ -80,20 +80,23 @@ public partial class RegressionPvalue : Regression
         }
     }
 
-    private double ResidualSumOfSquares()
+    private double ResidualSumOfSquares
     {
-        double rss = 0;
-        var slope = Slope;
-        var intercept = YIntercept;
-
-        // Calculate RSS: sum of (y - predicted_y)^2
-        foreach (var (x, y) in DataPoints) // Assume you have a collection of data points
+        get
         {
-            var predictedY = slope * x + intercept;
-            rss += Math.Pow(y - predictedY, 2);
-        }
+            double rss = 0;
+            var slope = Slope;
+            var intercept = YIntercept;
 
-        return rss;
+            // Calculate RSS: sum of (y - predicted_y)^2
+            foreach (var (x, y) in DataPoints) // Assume you have a collection of data points
+            {
+                var predictedY = slope * x + intercept;
+                rss += Math.Pow(y - predictedY, 2);
+            }
+
+            return rss;
+        }
     }
 
     /// <summary>

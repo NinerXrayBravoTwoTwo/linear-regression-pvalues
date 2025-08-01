@@ -24,7 +24,7 @@ public partial class RegressionPvalue
         if (varianceX == 0)
             return (double.NaN, double.NaN); // No variation in X, CI is undefined
 
-        var rss = ResidualSumOfSquares();
+        var rss = ResidualSumOfSquares;
         var n = DataPoints.Count;
         var seSlope = Math.Sqrt(rss / (n - 2) / varianceX);
 
@@ -69,7 +69,7 @@ public partial class RegressionPvalue
         if (varianceX == 0)
             return (double.NaN, double.NaN, slope, double.NaN, 1.0);
 
-        var rss = ResidualSumOfSquares();
+        var rss = ResidualSumOfSquares;
         var n = DataPoints.Count;
         var seSlope = Math.Sqrt(rss / (n - 2) / varianceX);
 
