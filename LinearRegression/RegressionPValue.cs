@@ -9,15 +9,22 @@ public partial class RegressionPvalue : Regression
     public IEnumerable<(double x, double y)> DataPoints { get; init; }
     public IEnumerable<string> IdPoints { get; init; }
 
+    public RegressionPvalue() : base()
+    {
+        DataPoints = [];
+        IdPoints = [];
+    }
+    
     /// <summary>
     /// Initializes a new instance of the <see cref="RegressionPvalue"/> class.
     /// </summary>
+    /// <param name="originalDataPoints"></param>
     /// <remarks>This constructor initializes the <see cref="DataPoints"/> collection to ensure it is not
     /// null.</remarks>
-    public RegressionPvalue()
+    public RegressionPvalue(IEnumerable<(double x, double y)> originalDataPoints)
     {
-        DataPoints = []; // Initialize DataPoints to avoid null reference
-        IdPoints = []; 
+        DataPoints = [];
+        IdPoints = [];
     }
 
 
@@ -28,10 +35,10 @@ public partial class RegressionPvalue : Regression
     /// value, the instance will mark the data as containing invalid values.</remarks>
     /// <param name="dataPoints">A list of tuples representing the data points for regression analysis, where each tuple contains an X value and
     /// a Y value.</param>
-    public RegressionPvalue(IEnumerable<(double x, double y)> dataPoints) : base(dataPoints)
+    public RegressionPvalue(List<(double x, double y)> dataPoints) : base(dataPoints.Select(tuple => (tuple.x, tuple.y)))
     {
-        DataPoints = dataPoints; // Initialize DataPoints with provided data
-
+        DataPoints = dataPoints.Select(tuple => (tuple.x, tuple.y));
+        IdPoints = [];
         _isDataContainsNan = dataPoints.Any(item => item.x is double.NaN || item.y is double.NaN);
     }
 
@@ -43,10 +50,10 @@ public partial class RegressionPvalue : Regression
     /// value, the instance will mark the data as containing invalid values.</remarks>
     /// <param name="dataPoints">A list of tuples representing the data points for regression analysis, where each tuple contains an X value and
     /// a Y value.</param>
-    public RegressionPvalue(List<(string id, double x, double y)> dataPoints) : base(dataPoints.Select(tuple => (tuple.x, tuple.y)).ToList())
+    public RegressionPvalue(List<(string id, double x, double y)> dataPoints) : base(dataPoints.Select(tuple => (tuple.x, tuple.y)))
     {
-        DataPoints = dataPoints.Select(tuple => (tuple.x, tuple.y)).ToList();
-        IdPoints = dataPoints.Select(tuple => tuple.id).ToList();
+        DataPoints = dataPoints.Select(tuple => (tuple.x, tuple.y));
+        IdPoints = dataPoints.Select(tuple => tuple.id);
         _isDataContainsNan = dataPoints.Any(item => item.x is double.NaN || item.y is double.NaN);
     }
 
