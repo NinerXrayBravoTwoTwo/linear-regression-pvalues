@@ -13,7 +13,7 @@ public partial class RegressionPvalue
     /// <exception cref="InvalidOperationException">Thrown if there are fewer than 2 data points.</exception>
     public (double Mean, double MarginOfError) MarginOfError(bool useY = false, double confidenceLevel = 0.95)
     {
-        if (DataPoints.Count < 2)
+        if (DataPoints.Count() < 2)
             throw new InvalidOperationException("At least 2 data points are required to compute the mean CI.");
 
         if (_isDataContainsNan || confidenceLevel <= 0 || confidenceLevel >= 1)

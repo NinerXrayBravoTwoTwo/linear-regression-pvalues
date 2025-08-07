@@ -45,11 +45,11 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var newFromDataPoints = new RegressionPvalue(original.DataPoints);
 
         // Assert that the new instance has the same data points as the original
-        Assert.Equal(original.DataPoints.Count, newFromDataPoints.DataPoints.Count);
-        for (int i = 0; i < original.DataPoints.Count; i++)
+        Assert.Equal(original.DataPoints.Count(), newFromDataPoints.DataPoints.Count());
+        for (int i = 0; i < original.DataPoints.Count(); i++)
         {
-            Assert.Equal(original.DataPoints[i].x, newFromDataPoints.DataPoints[i].x);
-            Assert.Equal(original.DataPoints[i].y, newFromDataPoints.DataPoints[i].y);
+            Assert.Equal(original.DataPoints.ElementAt(i).x, newFromDataPoints.DataPoints.ElementAt(i).x);
+            Assert.Equal(original.DataPoints.ElementAt(i).y, newFromDataPoints.DataPoints.ElementAt(i).y);
         }
         //Assert that Slope of the new instance is the same as the original
         Assert.Equal(original.Slope, newFromDataPoints.Slope);
@@ -119,9 +119,9 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var stat = new RegressionPvalue(dataPoints);
         // Assert that DataPoints is accessible and contains the expected data
         Assert.NotNull(stat.DataPoints);
-        Assert.Equal(2, stat.DataPoints.Count);
-        Assert.Equal((1, 2), stat.DataPoints[0]);
-        Assert.Equal((2, 3), stat.DataPoints[1]);
+        Assert.Equal(2, stat.DataPoints.Count());
+        Assert.Equal((1, 2), stat.DataPoints.ElementAt(0));
+        Assert.Equal((2, 3), stat.DataPoints.ElementAt(1));
     }
 
     [Fact]

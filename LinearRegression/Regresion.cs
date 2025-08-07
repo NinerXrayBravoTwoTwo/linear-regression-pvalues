@@ -32,7 +32,7 @@
 [Serializable]
 public class Regression
 {
-    public Regression(List<(double x, double y)> dataPoints)
+    public Regression(IEnumerable<(double x, double y)> dataPoints)
     {
         foreach (var (x, y) in dataPoints) Add(x, y);
     }

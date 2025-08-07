@@ -11,7 +11,7 @@ public partial class RegressionPvalue
     /// <exception cref="InvalidOperationException">Thrown if there are insufficient data points.</exception>
     public (double Lower, double Upper) ConfidenceInterval(double confidenceLevel = 0.95)
     {
-        if (DataPoints.Count < 3)
+        if (DataPoints.Count() < 3)
             throw new InvalidOperationException(
                 "At least 3 data points are required to compute the confidence interval.");
 
@@ -25,7 +25,7 @@ public partial class RegressionPvalue
             return (double.NaN, double.NaN); // No variation in X, CI is undefined
 
         var rss = ResidualSumOfSquares;
-        var n = DataPoints.Count;
+        var n = DataPoints.Count();
         var seSlope = Math.Sqrt(rss / (n - 2) / varianceX);
 
         if (seSlope == 0)
@@ -56,7 +56,7 @@ public partial class RegressionPvalue
     public (double Lower, double Upper, double Slope, double StandardError, double PValue) ConfidenceIntervalPlus(
         double confidenceLevel = 0.95)
     {
-        if (DataPoints.Count < 3)
+        if (DataPoints.Count() < 3)
             throw new InvalidOperationException(
                 "At least 3 data points are required to compute the confidence interval.");
 
@@ -70,7 +70,7 @@ public partial class RegressionPvalue
             return (double.NaN, double.NaN, slope, double.NaN, 1.0);
 
         var rss = ResidualSumOfSquares;
-        var n = DataPoints.Count;
+        var n = DataPoints.Count();
         var seSlope = Math.Sqrt(rss / (n - 2) / varianceX);
 
         if (seSlope == 0)

@@ -6,8 +6,8 @@ namespace LinearRegression;
 public partial class RegressionPvalue : Regression
 {
     private bool _isDataContainsNan;
-    public List<(double x, double y)> DataPoints { get; init; }
-    public List<string> IdPoints { get; init; }
+    public IEnumerable<(double x, double y)> DataPoints { get; init; }
+    public IEnumerable<string> IdPoints { get; init; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RegressionPvalue"/> class.
@@ -28,7 +28,7 @@ public partial class RegressionPvalue : Regression
     /// value, the instance will mark the data as containing invalid values.</remarks>
     /// <param name="dataPoints">A list of tuples representing the data points for regression analysis, where each tuple contains an X value and
     /// a Y value.</param>
-    public RegressionPvalue(List<(double x, double y)> dataPoints) : base(dataPoints)
+    public RegressionPvalue(IEnumerable<(double x, double y)> dataPoints) : base(dataPoints)
     {
         DataPoints = dataPoints; // Initialize DataPoints with provided data
 
@@ -52,7 +52,7 @@ public partial class RegressionPvalue : Regression
 
     public int DataPointsCount()
     {
-        return DataPoints.Count;
+        return DataPoints.Count();
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public partial class RegressionPvalue : Regression
     {
         get
         {
-            if (DataPoints.Count < 3)
+            if (DataPoints.Count() < 3)
                 throw new InvalidOperationException("At least 3 data points are required to compute the p-value.");
 
             if (_isDataContainsNan)
@@ -77,7 +77,7 @@ public partial class RegressionPvalue : Regression
                 return 1.0; // No variation in X, slope is undefined or always zero, so p-value is 1
 
             var rss = ResidualSumOfSquares;
-            var n = DataPoints.Count;
+            var n = DataPoints.Count();
             var seSlope = Math.Sqrt(rss / (n - 2) / varianceX);
 
             if (seSlope == 0)

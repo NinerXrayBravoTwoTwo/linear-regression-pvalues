@@ -7,6 +7,10 @@ A robust and lightweight C# library for performing 2D (bivariate) linear regress
 The library provides a `Regression` class for computing 2D regression statistics and a `PValueStat` class for calculating the p-value of the regression slope. It supports adding, removing, and merging data points, with robust handling of edge cases like insufficient data or NaN values.
 
 ### Release Notes
+- **Version 1.1.1:  August 07, 2025**:
+- Generalize the Pvalue constructor to use more generized IEnumberable istead of List<>
+This means some of your code may need to be updated with the .ElementAt(x) to replace [i].
+Overall this should be a big win in compatability and portaability.
 - **Version 1.1.0:  August 07, 2025**:
 - Upgraded all the methods into properties so they are accessed without parens. *:) you are welcome*
 - Major change to the interface so I bumped a major version number
