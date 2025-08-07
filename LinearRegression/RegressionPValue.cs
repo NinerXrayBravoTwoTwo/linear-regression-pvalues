@@ -7,6 +7,7 @@ public partial class RegressionPvalue : Regression
 {
     private bool _isDataContainsNan;
     public List<(double x, double y)> DataPoints { get; init; }
+    public List<string> IdPoints { get; init; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RegressionPvalue"/> class.
@@ -16,6 +17,7 @@ public partial class RegressionPvalue : Regression
     public RegressionPvalue()
     {
         DataPoints = []; // Initialize DataPoints to avoid null reference
+        IdPoints = []; 
     }
 
 
@@ -30,6 +32,21 @@ public partial class RegressionPvalue : Regression
     {
         DataPoints = dataPoints; // Initialize DataPoints with provided data
 
+        _isDataContainsNan = dataPoints.Any(item => item.x is double.NaN || item.y is double.NaN);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RegressionPvalue"/> class with the specified data points including a key for each x, y pair.
+    /// The internal array is read only, ids are not required to be unique.
+    /// </summary>
+    /// <remarks>If any of the provided data points contain <see cref="double.NaN"/> for either the X or Y
+    /// value, the instance will mark the data as containing invalid values.</remarks>
+    /// <param name="dataPoints">A list of tuples representing the data points for regression analysis, where each tuple contains an X value and
+    /// a Y value.</param>
+    public RegressionPvalue(List<(string id, double x, double y)> dataPoints) : base(dataPoints.Select(tuple => (tuple.x, tuple.y)).ToList())
+    {
+        DataPoints = dataPoints.Select(tuple => (tuple.x, tuple.y)).ToList();
+        IdPoints = dataPoints.Select(tuple => tuple.id).ToList();
         _isDataContainsNan = dataPoints.Any(item => item.x is double.NaN || item.y is double.NaN);
     }
 

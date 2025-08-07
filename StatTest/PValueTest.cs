@@ -2,7 +2,6 @@ using LinearRegression;
 using Xunit.Abstractions;
 
 namespace RegressionTest;
-// Ensure this namespace matches your project structure
 
 public class PValueTest(ITestOutputHelper testOutputHelper)
 {
@@ -21,11 +20,12 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var regression = new RegressionPvalue(dataPoints);
         testOutputHelper.WriteLine(regression.ToString()); //ToDo: create a more detailed ToString method in RegressionPvalue
     }
+    
     [Fact]
     public void EmptyPValueIsNaN() // Fixed spelling: PValue -> PValue, Nan -> NaN
     {
         // Create
-        var test = new RegressionPvalue([]);
+        var test = new RegressionPvalue();
         Assert.True(test.IsNaN);
     }
 
@@ -58,6 +58,28 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
 
     }
+    
+    [Fact]
+    public void R2IsBetweenZeroAndOne()
+    {
+        var dataPoints = new List<(double x, double y)>();
+        for (int i = 0; i < 100; i++) dataPoints.Add((i, i * 2 + 1)); // Linear relationship
+
+        var stat = new RegressionPvalue(dataPoints);
+
+        testOutputHelper.WriteLine(stat.ToString());
+        var r2 = stat.RSquared;
+        Assert.True(r2 is >= 0 and <= 1, "R-squared should be between 0 and 1.");
+    }
+    
+    [Fact]
+    public void SlopeIsCorrect()
+    {
+        var dataPoints = new List<(double x, double y)>() { (1, 2), (2, 4), (3, 6) };
+        var stat = new RegressionPvalue(dataPoints);
+        Assert.Equal(2, stat.Slope);
+    }
+    
     [Fact]
     public void KnownDatasetStat()
     {
@@ -85,8 +107,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.PValue
             .ToString($"P-value: {stat.PValue:F4}")); // Print P-Value with 4 decimal places
     }
-
-
+    
     [Fact]
     public void DataPointsIsReadAccessible()
     {
