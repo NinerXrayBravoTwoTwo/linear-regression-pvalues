@@ -6,18 +6,6 @@ A robust and lightweight C# library for performing 2D (bivariate) linear regress
 
 The library provides a `Regression` class for computing 2D regression statistics and a `PValueStat` class for calculating the p-value of the regression slope. It supports adding, removing, and merging data points, with robust handling of edge cases like insufficient data or NaN values.
 
-### Release Notes
-- **Version 1.07:  July 22, 2025**: 
-- Big possible change.  Renamed legacy Qx,Qy, Qx2, Qy2 to Stdev and Variance.  Q was an old stand in for Sigma
-- **Version 1.06:  July 21, 2025**: 
-- Added `MarginOfError` method which provides a +/- value for MeanX or MeanY
-- Split the Confidence Interval work into partial classes to limit impact of changes.
-- **Version 1.05:  July 21, 2025**: 
-- Updated `PValueStat` to include for;
-- Added `ConfidenceInterval` method to compute the confidence interval for the regression slope.
-- Added `StandardError` as well for the standard error of the regression slope.
-- Fixed a possible bug in PValue regression that calculated the variance of 'x'  (called Qx2 by oldtimers) outside the checks build into the `Regression` class. 
-
 ### Lineage
 - Originated from 1978 TI-58 and TI-59 calculator algorithms.
 - Ported to C in 1982, then to Perl 3 in 1987.
