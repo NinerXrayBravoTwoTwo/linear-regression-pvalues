@@ -9,7 +9,7 @@ public class IdDataPointTests(ITestOutputHelper testOutputHelper)
     public void Test_IdDataPoint_Constructor()
     {
         //Arrange
-        var id = Guid.NewGuid();
+   
         var dataPoints = new List<(string id, double x, double y)> { ("a", 1, 2), ("b", 2, 4), ("c", 3, 6) };
 
         //Act

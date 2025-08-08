@@ -9,7 +9,7 @@ public partial class RegressionPvalue : Regression
     public IEnumerable<(double x, double y)> DataPoints { get; init; }
     public IEnumerable<string> IdPoints { get; init; }
 
-    public RegressionPvalue() : base()
+    public RegressionPvalue()
     {
         DataPoints = [];
         IdPoints = [];
