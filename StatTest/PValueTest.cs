@@ -20,7 +20,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var regression = new RegressionPvalue(dataPoints);
         testOutputHelper.WriteLine(regression.ToString()); //ToDo: create a more detailed ToString method in RegressionPvalue
     }
-    
+
     [Fact]
     public void EmptyPValueIsNaN() // Fixed spelling: PValue -> PValue, Nan -> NaN
     {
@@ -58,7 +58,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
 
     }
-    
+
     [Fact]
     public void R2IsBetweenZeroAndOne()
     {
@@ -71,7 +71,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var r2 = stat.RSquared;
         Assert.True(r2 is >= 0 and <= 1, "R-squared should be between 0 and 1.");
     }
-    
+
     [Fact]
     public void SlopeIsCorrect()
     {
@@ -79,7 +79,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var stat = new RegressionPvalue(dataPoints);
         Assert.Equal(2, stat.Slope);
     }
-    
+
     [Fact]
     public void KnownDatasetStat()
     {
@@ -107,7 +107,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(stat.PValue
             .ToString($"P-value: {stat.PValue:F4}")); // Print P-Value with 4 decimal places
     }
-    
+
     [Fact]
     public void DataPointsIsReadAccessible()
     {

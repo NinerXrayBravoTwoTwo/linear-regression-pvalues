@@ -14,7 +14,7 @@ public partial class RegressionPvalue : Regression
         DataPoints = [];
         IdPoints = [];
     }
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="RegressionPvalue"/> class.
     /// </summary>
