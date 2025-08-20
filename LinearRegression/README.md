@@ -22,7 +22,7 @@ Overall this should be a big win in compatability and portaability.
 The math does not require an id, that is it's feature.  Later processing might want to identify a point however.
 *"Wouldn't it be nice to have an array of ids that lines up with the (x,y) data points?"*
 - **Version 1.0.7:  July 22, 2025**: 
-- Big possible change.  Renamed legacy Qx,Qy, Qx2, Qy2 to Stdev and Variance.  Q was an old stand in for Sigma
+- Big possible change.  Renamed legacy Qx, Qy, Qx2, Qy2 to Stdev and Variance.  Q was an old stand in for Sigma
 - **Version 1.0.6:  July 21, 2025**: 
 - Added `MarginOfError` method which provides a +/- value for MeanX or MeanY
 - Split the Confidence Interval work into partial classes to limit impact of changes.
