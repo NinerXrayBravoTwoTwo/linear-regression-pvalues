@@ -1,4 +1,5 @@
-﻿using MathNet.Numerics.Distributions;
+﻿using System.Runtime.InteropServices.Marshalling;
+using MathNet.Numerics.Distributions;
 
 namespace LinearRegression;
 
@@ -62,6 +63,8 @@ public partial class RegressionPvalue : Regression
         return DataPoints.Count();
     }
 
+    private double _savedPvalue = double.NaN;
+    private bool _isSavedPvalue = false;
     /// <summary>
     ///     P-Value for the linear regression slope.
     /// </summary>
@@ -71,6 +74,9 @@ public partial class RegressionPvalue : Regression
     {
         get
         {
+            if (_isSavedPvalue)
+                return _savedPvalue;
+            
             if (DataPoints.Count() < 3)
                 throw new InvalidOperationException("At least 3 data points are required to compute the p-value.");
 
@@ -100,6 +106,9 @@ public partial class RegressionPvalue : Regression
             if (double.IsNaN(pValue) || pValue < 0 || pValue > 1 || double.IsInfinity(t))
                 return 1.0; // Defensive: return 1 for degenerate cases
 
+            _savedPvalue = pValue;
+            _isSavedPvalue = true;
+            
             return pValue;
         }
     }
