@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices.Marshalling;
-using MathNet.Numerics.Distributions;
+﻿using MathNet.Numerics.Distributions;
 
 namespace LinearRegression;
 
@@ -15,19 +14,6 @@ public partial class RegressionPvalue : Regression
         DataPoints = [];
         IdPoints = [];
     }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RegressionPvalue"/> class.
-    /// </summary>
-    /// <param name="originalDataPoints"></param>
-    /// <remarks>This constructor initializes the <see cref="DataPoints"/> collection to ensure it is not
-    /// null.</remarks>
-    public RegressionPvalue(IEnumerable<(double x, double y)> originalDataPoints)
-    {
-        DataPoints = [];
-        IdPoints = [];
-    }
-
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RegressionPvalue"/> class with the specified data points.

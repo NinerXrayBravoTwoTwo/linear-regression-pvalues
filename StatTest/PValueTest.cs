@@ -39,10 +39,10 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         double y = -1;
 
         while (x < 100)
-            dataPoints.Add((x++, y++)); // Changed to AddDataPoint to match the method in PValueStat
-
+            dataPoints.Add((x++, y++)); 
+        
         var original = new RegressionPvalue(dataPoints);
-        var newFromDataPoints = new RegressionPvalue(original.DataPoints);
+        var newFromDataPoints = new RegressionPvalue(original.DataPoints.ToList());
 
         // Assert that the new instance has the same data points as the original
         Assert.Equal(original.DataPoints.Count(), newFromDataPoints.DataPoints.Count());
