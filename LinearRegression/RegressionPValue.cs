@@ -5,7 +5,7 @@ namespace LinearRegression;
 [Serializable]
 public partial class RegressionPvalue : Regression
 {
-    private bool _isDataContainsNan;
+    protected bool _isDataContainsNan;
     public IEnumerable<(double x, double y)> DataPoints { get; init; }
     public IEnumerable<string> IdPoints { get; init; }
 
@@ -62,7 +62,7 @@ public partial class RegressionPvalue : Regression
         {
             if (_isSavedPvalue)
                 return _savedPvalue;
-            
+
             if (DataPoints.Count() < 3)
                 throw new InvalidOperationException("At least 3 data points are required to compute the p-value.");
 
@@ -94,7 +94,7 @@ public partial class RegressionPvalue : Regression
 
             _savedPvalue = pValue;
             _isSavedPvalue = true;
-            
+
             return pValue;
         }
     }

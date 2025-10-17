@@ -39,8 +39,8 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         double y = -1;
 
         while (x < 100)
-            dataPoints.Add((x++, y++)); 
-        
+            dataPoints.Add((x++, y++));
+
         var original = new RegressionPvalue(dataPoints);
         var newFromDataPoints = new RegressionPvalue(original.DataPoints.ToList());
 
