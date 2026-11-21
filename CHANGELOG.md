@@ -11,6 +11,12 @@ The NuGet package carries the same notes in its README. The git history has note
   an API overview, lineage, license (AGPL-3.0) and contact.
 - Added this changelog.
 
+### Cleanup
+- Reviewed unfinished scaffolding. Each item and its decision is recorded in
+  [docs/SCAFFOLDING.md](docs/SCAFFOLDING.md). `Regresion.cs` is renamed to `Regression.cs`.
+  Commented-out code is removed. `RegressionPvalue.ToString()` now includes the p-value. Two
+  unfinished tests are completed. No statistics changed.
+
 ## [1.1.3] - 2025-08-20
 Version in the repository; not yet published to NuGet (latest published: 1.1.2).
 - Cache the p-value after the first calculation so repeated reads of `PValue` are cheap.
