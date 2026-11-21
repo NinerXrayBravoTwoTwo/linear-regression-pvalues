@@ -20,13 +20,12 @@ public partial class RegressionPvalue
 
         // Calculate slope and standard error (same as in PValue)
         var slope = Slope;
-        var varianceX = VarianceX;
-        if (varianceX == 0)
+        var sxx = SumOfSquaresX;
+        if (sxx <= 0)
             return (double.NaN, double.NaN); // No variation in X, CI is undefined
 
-        var rss = ResidualSumOfSquares;
         var n = DataPoints.Count();
-        var seSlope = Math.Sqrt(rss / (n - 2) / varianceX);
+        var seSlope = SlopeStandardError(sxx, n);
 
         if (seSlope == 0)
             return (slope, slope); // If SE is zero, CI collapses to the slope
@@ -65,13 +64,12 @@ public partial class RegressionPvalue
 
         // Calculate slope, p-value, and standard error (reuse existing logic)
         var slope = Slope;
-        var varianceX = VarianceX;
-        if (varianceX == 0)
+        var sxx = SumOfSquaresX;
+        if (sxx <= 0)
             return (double.NaN, double.NaN, slope, double.NaN, 1.0);
 
-        var rss = ResidualSumOfSquares;
         var n = DataPoints.Count();
-        var seSlope = Math.Sqrt(rss / (n - 2) / varianceX);
+        var seSlope = SlopeStandardError(sxx, n);
 
         if (seSlope == 0)
             return (slope, slope, slope, 0.0, slope == 0 ? 1.0 : 0.0);

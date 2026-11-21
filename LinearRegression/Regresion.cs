@@ -266,7 +266,7 @@ public class Regression
             // throw new InvalidOperationException(
             //"There must be more than one sample to find the Standard Deviation.");
 
-            return Math.Sqrt(Sx2 - Sx * Sx / N) / (N - 1);
+            return Math.Sqrt((Sx2 - Sx * Sx / N) / (N - 1));
         }
     }
 
@@ -282,7 +282,7 @@ public class Regression
             //throw new InvalidOperationException(
             //    "There must be more than one sample to find the Standard Deviation.");
 
-            return Math.Sqrt(Sy2 - Sy * Sy / N) / (N - 1);
+            return Math.Sqrt((Sy2 - Sy * Sy / N) / (N - 1));
         }
     }
 
