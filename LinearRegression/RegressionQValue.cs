@@ -2,8 +2,8 @@
 {
     public class RegressionQValue : RegressionPvalue
     {
-        //private bool _isSavedQvalue;
-        //private double _savedQvalue;
+        // Q-values are not cached (unlike PValue): a q-value depends on the family of p-values
+        // passed in, so a cached value would be wrong for the next call with a different family.
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegressionQvalue"/> class with the specified data points.
@@ -30,9 +30,6 @@
         /// <exception cref="InvalidOperationException">Thrown if there are insufficient data points or P-values.</exception>
         public double QValue(IReadOnlyList<double> pValues)
         {
-            //if (_isSavedQvalue)
-            //    return _savedQvalue;
-
             if (DataPoints.Count() < 3)
                 throw new InvalidOperationException("At least 3 data points are required to compute the Q-value.");
 
@@ -67,9 +64,6 @@
 
             if (double.IsNaN(qValue) || double.IsInfinity(qValue))
                 qValue = 1.0; // Defensive: return 1 for degenerate cases
-
-            //_savedQvalue = qValue;
-            //_isSavedQvalue = true;
 
             return qValue;
         }
