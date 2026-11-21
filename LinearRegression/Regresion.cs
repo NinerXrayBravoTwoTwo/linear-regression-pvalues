@@ -165,8 +165,6 @@ public class Regression
         };
     }
 
-
-
     /// <summary>
     ///     Add data point.
     /// </summary>
