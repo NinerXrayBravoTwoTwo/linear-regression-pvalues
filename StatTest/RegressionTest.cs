@@ -112,21 +112,20 @@ public class RegressionTest(Xunit.ITestOutputHelper testOutputHelper)
 
         while (x < 500)
             original.Add(x++, y++);
+
         testOutputHelper.WriteLine(original.ToString());
 
-        var clone = new Regression(original); // Make a clone (new unrelated instance) of the statistic.
-
         Assert.False(original.IsNaN);
-        Assert.False(clone.IsNaN);
 
         // test - 
-        clone.Add(original); // Adding the original statistic to its clone, 
-        // a> should only affect the clone.
-        // b> number of samples should double
-        // c> variance should remain the same 
-        // d> other sum attributes should all be doubled.
-        // e> Mean should remain the same.
+        var clone = original.Merge(original); // Adding the original statistic to its clone, 
+                                              // a> should only affect the clone.
+                                              // b> number of samples should double
+                                              // c> variance should remain the same 
+                                              // d> other sum attributes should all be doubled.
+                                              // e> Mean should remain the same.
 
+        Assert.False(clone.IsNaN);
         Assert.Equal(original.N * 2, clone.N);
         Assert.Equal(original.VarianceX, clone.VarianceX);
         Assert.Equal(original.VarianceY, clone.VarianceY);
@@ -193,17 +192,19 @@ public class RegressionTest(Xunit.ITestOutputHelper testOutputHelper)
         double x = 0, y = -1;
         while (x < 500)
             original.Add(x++, y++);
+
         testOutputHelper.WriteLine(original.ToString());
-        var clone = new Regression(original); // Make a clone (new unrelated instance) of the statistic.
         Assert.False(original.IsNaN);
-        Assert.False(clone.IsNaN);
+
         // test - 
-        clone.Add(original); // Adding the original statistic to its clone, 
+        Regression clone = original.Merge(original); // Adding the original statistic to its clone, 
+
         // a> should only affect the clone.
         // b> number of samples should double
         // c> variance should remain the same 
         // d> other sum attributes should all be doubled.
         // e> Mean should remain the same.
+        Assert.False(clone.IsNaN);
         Assert.Equal(original.N * 2, clone.N);
         Assert.Equal(original.VarianceX, clone.VarianceX);
         Assert.Equal(original.VarianceY, clone.VarianceY);
