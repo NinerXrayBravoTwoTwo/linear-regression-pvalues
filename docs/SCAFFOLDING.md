@@ -13,17 +13,17 @@ each item, so nothing disappears silently. Statistics did not change. Tests: 86 
 | 6 | `//ToDo: create a more detailed ToString method in RegressionPvalue` (`PValueTest`) | Unfinished feature | **Finished**. `RegressionPvalue.ToString()` is `Regression.ToString()` + ` PValue: <G4>`, or `n/a (needs 3+ points)` when n < 3. Two tests added | `e166e47` |
 | 7 | Duplicated, commented-out `//testOutputHelper.WriteLine(...)` (`PValueTest`) | Leftover line | **Removed** | `e166e47` |
 | 8 | `TestConfidenceIntervalWithNegativeData` (`ConfidenceIntervalTest`) | The negative data set was commented out, so the test ran on positive data and asserted nothing | **Finished**. Negative data restored. It asserts slope 0.9 and the SciPy 95% CI [0.0991, 1.7009] | `0726d4a` |
-| 9 | `StatAddStatWithNaN` (`RegressionTest`) | A verbatim copy of `StatAddStat` with no NaN in it | **Finished**. It now adds a NaN point and checks that `Add(Regression)` keeps N and x sums while NaN propagates to the y sums and `IsNaN` | `0726d4a` |
+| 9 | `StatAddStatWithNaN` (`RegressionTest`) | A verbatim copy of `StatAddStat` with no NaN in it | **Finished**. It now adds a NaN point and checks that combining regressions keeps N and x sums while NaN propagates to the y sums and `IsNaN` | `0726d4a` |
 | 10 | Three commented-out asserts on `stat.DataPoints` / `DataPointsCount()` (`RegressionTest`) | `Regression` has no `DataPoints` (only `RegressionPvalue` does, and it is tested there) | **Removed** | `0726d4a` |
 | 11 | "Ensure this namespace ... contains the 'Statistic' class" (`RegressionTest`) | Stale comment from an old class name | **Removed** | `0726d4a` |
 | 12 | "Assuming a QValueCalculator class exists" (`QValueTest`) | Stale comment | **Replaced**: it's a test-only reference implementation, also used by `RegressionQValueTests` | `0726d4a` |
 | 13 | `RegressionPvalue` as a `partial` class over 3 files | Intentional since 1.0.6, to separate confidence-interval and margin-of-error code | **Kept**, documented here | — |
 | 14 | `RegressionQValue` marked experimental | Working and tested since PR 3 | **Kept** as experimental | — |
 | 15 | `StatTest/QValueCalculator.cs` | Test-only Benjamini-Hochberg implementation | **Kept** as a test reference | — |
+| 16 | `Regression.Add(Regression other)` | Older way to combine two regressions in place; its doc said "DEPRECATED, use Merge" | **Removed** (Jill's decision, 2026-11-21). `Merge` replaces it. Callers updated: `RegressionTest.StatAddStat` and `StatAddStatWithNaN` now use `clone = clone.Merge(original)`. Before removal, a check showed bit-identical sums, N and min/max (and the same `IsNaN`) for both on normal, NaN, ±∞ and empty inputs. Differences: `Merge` returns a new instance instead of changing the caller, and `Merge(null)` throws `ArgumentNullException` where `Add(null)` threw `NullReferenceException`. Breaking change, noted in CHANGELOG | "Remove Add(Regression); Merge replaces it" (PR 4) |
 
 ## Left for Jill to decide (not changed)
 
-- `Regression.Add(Regression)` XML doc still says "DEPRECATED, use Merge". Jill decided it's a supported way to combine regressions over the same kind of data, so the wording should change. That's out of scope here (no XML-doc changes).
 - `RegressionTest.StatTestAccessDataPoints` and `RegressionTest.KnownDatasetStat` are identical tests. Keep both, remove one, or turn one into a different check.
 - `PValueWithSingleDataPointReturnsNaN` and `PValueWithTwoDataPointsReturnsNaN` assert a throw, not NaN. The names are misleading.
 - `PValueWithMixedDataTypesReturnsNaN`: its comment mentions "string, null", but the data is only a NaN.

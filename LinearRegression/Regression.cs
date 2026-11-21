@@ -166,26 +166,6 @@ public class Regression
     }
 
     /// <summary>
-    ///     Merge two Regressions, DEPRECATED, use Merge(Regression other) instead.`
-    /// </summary>
-    /// <param name="other"></param>
-    public void Add(Regression other)
-    {
-        Sy += other.Sy;
-        Sy2 += other.Sy2;
-        N += other.N;
-        Sx += other.Sx;
-        Sx2 += other.Sx2;
-        Sxy += other.Sxy;
-
-        MaxX = Math.Max(MaxX, other.MaxX);
-        MinX = Math.Min(MinX, other.MinX);
-
-        MaxY = Math.Max(MaxY, other.MaxY);
-        MinY = Math.Min(MinY, other.MinY);
-    }
-
-    /// <summary>
     ///     Add data point.
     /// </summary>
     /// <param name="x">X value of data.</param>

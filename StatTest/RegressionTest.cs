@@ -113,13 +113,15 @@ public class RegressionTest(Xunit.ITestOutputHelper testOutputHelper)
         Assert.False(clone.IsNaN);
 
         // test - 
-        clone.Add(original); // Adding the original statistic to its clone, 
-        // a> should only affect the clone.
+        var originalN = original.N;
+        clone = clone.Merge(original); // Merging the original statistic into its clone (Merge replaced Add(Regression)),
+        // a> should only affect the clone; Merge returns a new instance and leaves both inputs unchanged.
         // b> number of samples should double
         // c> variance should remain the same 
         // d> other sum attributes should all be doubled.
         // e> Mean should remain the same.
 
+        Assert.Equal(originalN, original.N);
         Assert.Equal(original.N * 2, clone.N);
         Assert.Equal(original.VarianceX, clone.VarianceX);
         Assert.Equal(original.VarianceY, clone.VarianceY);
@@ -193,9 +195,9 @@ public class RegressionTest(Xunit.ITestOutputHelper testOutputHelper)
         var clone = new Regression(original); // Make a clone (new unrelated instance) of the statistic.
         Assert.True(clone.IsNaN);
 
-        // test - adding a NaN-containing regression keeps the counts and x sums right,
+        // test - merging a NaN-containing regression keeps the counts and x sums right,
         // and the NaN propagates into the y sums and IsNaN.
-        clone.Add(original);
+        clone = clone.Merge(original);
 
         Assert.Equal(original.N * 2, clone.N);
         Assert.Equal(original.Sx * 2, clone.Sx);

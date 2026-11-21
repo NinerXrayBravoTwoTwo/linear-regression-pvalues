@@ -5,6 +5,10 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
+### Breaking
+- Removed `Add(Regression)`; use `Merge`. `a.Add(b)` becomes `a = a.Merge(b)`; the sums, count and min/max
+  are the same, but `Merge` returns a new `Regression` instead of changing `a`.
+
 ### Documentation
 - Rewrote the root and package READMEs to match the current API (properties, not methods, since 1.1.0;
   `RegressionPvalue` instead of the old `PValueStat`), with installation, usage examples that compile,
