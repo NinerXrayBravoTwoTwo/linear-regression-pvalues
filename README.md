@@ -1,55 +1,179 @@
-# Linear Regression Library
+# Linear Regression P-Values
 
-A robust and lightweight C# library for performing 2D (bivariate) linear regression analysis. This project calculates statistical properties such as slope, y-intercept, correlation coefficient, and p-value for paired x, y data. It is designed for technical users, including data scientists, statisticians, and developers working on statistical modeling.
+A small, dependency-light C# library for bivariate (x, y) linear regression. It computes slope,
+y-intercept, correlation, R², means, standard deviations and variances from running sums, and adds a
+two-tailed p-value for the slope, slope confidence intervals, and a margin of error for the means.
+It is aimed at developers, analysts and statisticians who want these numbers without a large
+statistics package.
 
-## Overview
-
-The library provides a `Regression` class for computing 2D regression statistics and a `PValueStat` class for calculating the p-value of the regression slope. It supports adding, removing, and merging data points, with robust handling of edge cases like insufficient data or NaN values.
-
-### Lineage
-- Originated from 1978 TI-58 and TI-59 calculator algorithms.
-- Ported to C in 1982, then to Perl 3 in 1987.
-- Modernized in C# with updates in 2001, 2002, 2003, 2008, 2012, 2016, 2018, 2019, 2022, 2025
-- Copyright © Jillian England, 2001–2022.
+NuGet package: [`LinearRegression.Pvalues`](https://www.nuget.org/packages/LinearRegression.Pvalues)
 
 ## Features
 
-- **Data Management**:
-  - Add individual (x, y) data points or merge multiple regression datasets.
-  - Remove data points (decrement) with support for both explicit y-values and implicit y (based on sample count).
-  - Track minimum and maximum x and y values.
-- **Statistical Calculations**:
-  - Sum of x, y, x², y², and x*y.
-  - Mean of x and y.
-  - Standard deviation and variance for x and y (with N or N-1 weighting for population or sample studies).
-  - Slope, y-intercept, and correlation coefficient.
-  - P-value for the regression slope (via `PValueStat` class).
-- **Robustness**:
-  - Handles edge cases (e.g., insufficient samples, division by zero, NaN, or infinite values).
-  - Returns `double.NaN` for invalid computations instead of throwing exceptions in most cases.
-- **Serialization**:
-  - The `Regression` class is marked `[Serializable]` for persistence.
+- **Streaming by design** — `Regression` keeps only running sums, so points can be added, removed
+  (`Dec`) and whole regressions merged without storing the data.
+- **Descriptive statistics** — N, sums, min/max, means, standard deviation (n − 1), variance (n).
+- **Fit** — slope, y-intercept, Pearson correlation, R².
+- **Inference** (`RegressionPvalue`) — slope p-value (Student t, n − 2 degrees of freedom), confidence
+  interval at any level, standard error, margin of error for the mean of x or y.
+- **Point ids** — optionally tag each (x, y) with a string id that stays aligned with the data.
+- **Experimental q-values** (`RegressionQValue`) — Benjamini-Hochberg false-discovery-rate adjustment.
+- **No exceptions for ordinary bad data** — undefined results come back as `double.NaN`; the few
+  exceptions are listed in the API overview.
+- `Regression` and `RegressionPvalue` are marked `[Serializable]`.
 
 ## Installation
 
-The library is a C# project that can be included in your .NET solution:
-
-1. Clone or download the repository.
-2. Add the project or source files (`Regression.cs`, `PValue.cs`) to your solution.
-3. Ensure the `MathNet.Numerics` NuGet package is installed for `PValueStat` (for t-distribution calculations).
+From NuGet:
 
 ```bash
-dotnet add package MathNet.Numerics
+dotnet add package LinearRegression.Pvalues
 ```
+
+Or from source: clone this repository and add a project reference to `LinearRegression/LinearRegression.csproj`.
+
+Requirements: .NET 8 or later. The only dependency is [MathNet.Numerics](https://numerics.mathdotnet.com/) 5.0
+(for the Student t distribution), which NuGet installs for you.
+
+Build and test:
+
+```bash
+dotnet build
+dotnet test
+```
+
+## Quick start
+
+```csharp
+using LinearRegression;
+
+// 1. Running sums only (no points stored): add points one at a time.
+var r = new Regression();
+r.Add(1, 2);
+r.Add(2, 3);
+r.Add(3, 5);
+r.Add(4, 4);
+r.Add(5, 6);
+
+Console.WriteLine($"Slope {r.Slope}, intercept {r.YIntercept}, r {r.Correlation}, R² {r.RSquared}");
+Console.WriteLine($"Mean x {r.MeanX}, mean y {r.MeanY}, N {r.N}");
+
+// 2. Keep the points so the slope can be tested: p-value and confidence intervals.
+var data = new List<(double x, double y)> { (1, 2), (2, 3), (3, 5), (4, 4), (5, 6) };
+var pr = new RegressionPvalue(data);
+
+double p = pr.PValue;                                  // two-tailed p-value for slope != 0 (needs n >= 3)
+var (lower, upper) = pr.ConfidenceInterval();          // 95% CI for the slope
+var plus = pr.ConfidenceIntervalPlus(0.90);            // (Lower, Upper, Slope, StandardError, PValue)
+var (mean, moe) = pr.MarginOfError(useY: true);        // mean of y ± margin of error (95%)
+
+Console.WriteLine($"p = {p}, 95% CI [{lower}, {upper}], 90% SE {plus.StandardError}, y = {mean} ± {moe}");
+
+// 3. Optional ids that line up with the points.
+var tagged = new RegressionPvalue(new List<(string id, double x, double y)>
+{
+    ("a", 1, 2), ("b", 2, 3), ("c", 3, 5)
+});
+Console.WriteLine($"{tagged.IdPoints.ElementAt(0)} -> {tagged.DataPoints.ElementAt(0)}");
+
+// 4. Combine two running regressions.
+var left = new Regression(new List<(double x, double y)> { (1, 2), (2, 3) });
+var right = new Regression(new List<(double x, double y)> { (3, 5), (4, 4), (5, 6) });
+Regression combined = left.Merge(right);
+Console.WriteLine(combined);
+```
+
+### Experimental: q-values (false discovery rate)
+
+When many regressions are screened at once, `RegressionQValue` adjusts a slope's p-value against
+the whole family with the Benjamini-Hochberg procedure. This class is experimental and may change.
+
+```csharp
+var a = new RegressionQValue(new List<(double x, double y)> { (1, 2), (2, 3), (3, 5), (4, 4), (5, 6) });
+var b = new RegressionQValue(new List<(double x, double y)> { (1, 5), (2, 1), (3, 4), (4, 2), (5, 3) });
+
+double qA = a.QValue(new List<RegressionPvalue> { a, b });   // or a.QValue(listOfPValues)
+```
+
+## API overview
+
+All statistics are read-only **properties** (no parentheses) since version 1.1.0. Operations that take
+arguments are methods.
+
+### `Regression` — running sums, no stored points
+
+| Member | Kind | Notes |
+|---|---|---|
+| `Regression()`, `Regression(x, y)`, `Regression(Regression clone)`, `Regression(IEnumerable<(double x, double y)>)` | constructors | |
+| `Add(x, y)` / `Add(x)` | methods | `Add(x)` uses y = sample number (1, 2, 3, ...) |
+| `Dec(x, y)` / `Dec(x)` | methods | remove a previously added point; min/max are not rolled back |
+| `Merge(Regression other)` | method | returns a new combined `Regression` |
+| `Add(Regression other)` | method | deprecated; use `Merge` |
+| `N`, `Sx`, `Sy`, `Sx2`, `Sy2`, `Sxy` | properties | count and running sums |
+| `MinX`, `MaxX`, `MinY`, `MaxY` | properties | |
+| `MeanX`, `MeanY` | properties | 0 when N = 0 |
+| `StdDevX`, `StdDevY` | properties | n − 1 weighting; NaN when N < 2 |
+| `VarianceX`, `VarianceY` | properties | n weighting; throw `DivideByZeroException` when N = 0 |
+| `Slope`, `YIntercept`, `Correlation`, `RSquared` | properties | NaN when undefined (N < 2, no variation in x, ...) |
+| `IsNaN` | property | true when any core statistic is NaN |
+| `ToString()` | method | one-line summary |
+
+### `RegressionPvalue : Regression` — keeps the points, tests the slope
+
+| Member | Kind | Notes |
+|---|---|---|
+| `RegressionPvalue()` | constructor | empty instance |
+| `RegressionPvalue(List<(double x, double y)>)` | constructor | |
+| `RegressionPvalue(List<(string id, double x, double y)>)` | constructor | ids line up with points; need not be unique |
+| `DataPoints`, `IdPoints` | properties | `IEnumerable<...>`; use `.ElementAt(i)` |
+| `DataPointsCount()` | method | |
+| `PValue` | property | two-tailed t-test of slope ≠ 0; cached after first read; throws `InvalidOperationException` when n < 3; NaN if any point is NaN; 1.0 when x has no variation |
+| `ConfidenceInterval(double confidenceLevel = 0.95)` | method | `(Lower, Upper)` for the slope; n ≥ 3 |
+| `ConfidenceIntervalPlus(double confidenceLevel = 0.95)` | method | `(Lower, Upper, Slope, StandardError, PValue)` |
+| `MarginOfError(bool useY = false, double confidenceLevel = 0.95)` | method | `(Mean, MarginOfError)` for mean of x or y; n ≥ 2 |
+
+### `RegressionQValue : RegressionPvalue` — experimental
+
+| Member | Kind | Notes |
+|---|---|---|
+| `QValue(IReadOnlyList<double> pValues)` | method | Benjamini-Hochberg q-value of this slope within the family |
+| `QValue(IReadOnlyList<RegressionPvalue> regressions)` | method | same, from a list of regressions |
+
+## Lineage
+
+- **1978** — algorithms first written for the TI-58 and TI-59 programmable calculators. The running-sum
+  design (Σx, Σy, Σx², Σy², Σxy, n) comes from there: it needs no stored data and allows points to be
+  removed again.
+- **1982** — ported to C.
+- **1987** — ported to Perl 3.
+- **2001 onward** — C# versions, revised in 2001, 2002, 2003, 2008, 2012, 2016, 2018, 2019, 2022 and 2025.
+- **2025** — p-values, confidence intervals, margin of error, optional point ids, properties instead of
+  methods, published on NuGet as `LinearRegression.Pvalues`.
+
+Some names are traditional rather than modern (for example `Sx2` for Σx²). Older versions used `Qx`/`Qy`
+(Q standing in for σ); these became `StdDevX`/`StdDevY` and `VarianceX`/`VarianceY` in 1.0.7.
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| `LinearRegression/` | the library (NuGet package `LinearRegression.Pvalues`) and its package README |
+| `StatTest/` | xUnit tests |
+| `CHANGELOG.md` | release notes |
+
 ## License
 
-This project is licensed under the [Affero General Public License (AGPL-3.0)](LICENSE). See the `LICENSE` file for full details.
+GNU Affero General Public License v3.0 (AGPL-3.0). See [`LICENSE`](LICENSE) for the full text.
 
 ## Contact
 
-Jillian England  
+Jillian England
 
 - Email: jill.england@comcast.net
-- X: @Firefox_XB9R
-- FB: Jillian England Seattle
-- Any omissions or errors in this software specification are unintentional and should be reported for correction. 
+- X: [@Firefox_XB9R](https://x.com/Firefox_XB9R)
+- Facebook: Jillian England Seattle
+- Issues and corrections: <https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/issues>
+
+Any omissions or errors in this software or its documentation are unintentional; please report them so they can be corrected.
+
+Copyright © Jillian England, 2001–2025.
