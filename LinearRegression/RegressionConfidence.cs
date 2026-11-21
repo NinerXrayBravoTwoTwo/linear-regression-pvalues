@@ -15,7 +15,7 @@ public partial class RegressionPvalue
             throw new InvalidOperationException(
                 "At least 3 data points are required to compute the confidence interval.");
 
-        if (_isDataContainsNan)
+        if (IsDataContainsNan)
             return (double.NaN, double.NaN); // Return NaN for invalid data
 
         // Calculate slope and standard error (same as in PValue)
@@ -60,7 +60,7 @@ public partial class RegressionPvalue
             throw new InvalidOperationException(
                 "At least 3 data points are required to compute the confidence interval.");
 
-        if (_isDataContainsNan)
+        if (IsDataContainsNan)
             return (double.NaN, double.NaN, double.NaN, double.NaN, double.NaN);
 
         // Calculate slope, p-value, and standard error (reuse existing logic)

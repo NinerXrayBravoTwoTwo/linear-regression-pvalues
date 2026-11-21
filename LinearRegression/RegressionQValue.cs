@@ -36,7 +36,7 @@
             if (DataPoints.Count() < 3)
                 throw new InvalidOperationException("At least 3 data points are required to compute the Q-value.");
 
-            if (_isDataContainsNan || pValues.Any(p => double.IsNaN(p) || p < 0 || p > 1))
+            if (IsDataContainsNan || pValues.Any(p => double.IsNaN(p) || p < 0 || p > 1))
                 return double.NaN;
 
             if (pValues.Count < 1)

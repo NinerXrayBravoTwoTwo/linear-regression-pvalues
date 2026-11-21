@@ -16,7 +16,7 @@ public partial class RegressionPvalue
         if (DataPoints.Count() < 2)
             throw new InvalidOperationException("At least 2 data points are required to compute the mean CI.");
 
-        if (_isDataContainsNan || confidenceLevel <= 0 || confidenceLevel >= 1)
+        if (IsDataContainsNan || confidenceLevel <= 0 || confidenceLevel >= 1)
             return (double.NaN, double.NaN);
 
         // Calculate mean and standard deviation

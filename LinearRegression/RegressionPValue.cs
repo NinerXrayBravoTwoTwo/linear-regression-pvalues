@@ -5,7 +5,8 @@ namespace LinearRegression;
 [Serializable]
 public partial class RegressionPvalue : Regression
 {
-    protected bool _isDataContainsNan;
+    protected bool IsDataContainsNan;
+    protected bool IsDataContainsInf;
     public IEnumerable<(double x, double y)> DataPoints { get; init; }
     public IEnumerable<string> IdPoints { get; init; }
 
@@ -26,7 +27,8 @@ public partial class RegressionPvalue : Regression
     {
         DataPoints = dataPoints.Select(tuple => (tuple.x, tuple.y));
         IdPoints = [];
-        _isDataContainsNan = dataPoints.Any(item => item.x is double.NaN || item.y is double.NaN);
+        IsDataContainsNan = dataPoints.Any(item => item.x is double.NaN || item.y is double.NaN);
+        IsDataContainsInf = dataPoints.Any(item => double.IsInfinity(item.x) || double.IsInfinity(item.y));
     }
 
     /// <summary>
@@ -41,7 +43,8 @@ public partial class RegressionPvalue : Regression
     {
         DataPoints = dataPoints.Select(tuple => (tuple.x, tuple.y));
         IdPoints = dataPoints.Select(tuple => tuple.id);
-        _isDataContainsNan = dataPoints.Any(item => item.x is double.NaN || item.y is double.NaN);
+        IsDataContainsNan = dataPoints.Any(item => item.x is double.NaN || item.y is double.NaN);
+        IsDataContainsInf = dataPoints.Any(item => double.IsInfinity(item.x) || double.IsInfinity(item.y));
     }
 
     public int DataPointsCount()
@@ -66,8 +69,12 @@ public partial class RegressionPvalue : Regression
             if (DataPoints.Count() < 3)
                 throw new InvalidOperationException("At least 3 data points are required to compute the p-value.");
 
-            if (_isDataContainsNan)
+            if (IsDataContainsNan)
                 return double.NaN; // If data contains NaN, return NaN for P-Value
+
+
+            if (IsDataContainsInf)
+                return double.PositiveInfinity; // If data contains Inf, return PositiveInf for P-Value
 
             // Calculate slope and standard error of the slope
             var slope = Slope;
