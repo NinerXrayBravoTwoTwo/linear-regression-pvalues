@@ -88,7 +88,6 @@ public class Regression
 
     public double N { get; private set; }
 
-
     /// <summary>
     ///     Sum y
     /// </summary>
