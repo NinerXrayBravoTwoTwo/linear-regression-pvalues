@@ -78,13 +78,12 @@ public partial class RegressionPvalue : Regression
 
             // Calculate slope and standard error of the slope
             var slope = Slope;
-            var varianceX = VarianceX;
-            if (varianceX == 0)
+            var sxx = SumOfSquaresX;
+            if (sxx <= 0)
                 return 1.0; // No variation in X, slope is undefined or always zero, so p-value is 1
 
-            var rss = ResidualSumOfSquares;
             var n = DataPoints.Count();
-            var seSlope = Math.Sqrt(rss / (n - 2) / varianceX);
+            var seSlope = SlopeStandardError(sxx, n);
 
             if (seSlope == 0)
                 return slope == 0 ? 1.0 : 0.0; // If standard error is zero, p-value is 1 if slope is zero, else 0
@@ -105,6 +104,17 @@ public partial class RegressionPvalue : Regression
             return pValue;
         }
     }
+
+    /// <summary>
+    ///     Corrected sum of squares of x: Sxx = sum((x - mean x)^2) = Sx2 - Sx^2 / N.
+    /// </summary>
+    private double SumOfSquaresX => N > 0 ? Sx2 - Sx * Sx / N : 0;
+
+    /// <summary>
+    ///     Standard error of the slope: sqrt( (RSS / (n - 2)) / Sxx ).
+    ///     (Previously divided by VarianceX = Sxx / n, which inflated the SE by sqrt(n).)
+    /// </summary>
+    private double SlopeStandardError(double sxx, int n) => Math.Sqrt(ResidualSumOfSquares / (n - 2) / sxx);
 
     private double ResidualSumOfSquares
     {
