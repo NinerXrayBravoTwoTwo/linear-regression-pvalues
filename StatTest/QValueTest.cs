@@ -11,7 +11,7 @@ public class QValueTest(ITestOutputHelper testOutputHelper)
         // Arrange
         var pValues = new[] { 0.01, 0.02, 0.05, 0.10, 0.20 };
         var expectedQValues = new[] { 0.05, 0.05, 0.0833, 0.125, 0.2 }; // Example expected values
-        var qValueCalculator = new QValueCalculator(); // Assuming a QValueCalculator class exists
+        var qValueCalculator = new QValueCalculator(); // test-only reference implementation, also used by RegressionQValueTests
 
         // Act
         var actualQValues = qValueCalculator.CalculateQValues(pValues);
