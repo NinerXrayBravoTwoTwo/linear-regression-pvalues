@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace RegressionTest;
 
-public class RegressionTest(ITestOutputHelper testOutputHelper)
+public class RegressionTest(Xunit.ITestOutputHelper testOutputHelper)
 {
     [Fact]
     public void StatTestAccessDataPoints()

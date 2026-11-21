@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace RegressionTest;
 
-public class PValueTest(ITestOutputHelper testOutputHelper)
+public class PValueTest(Xunit.ITestOutputHelper testOutputHelper)
 {
     [Fact]
     public void PValueToString()

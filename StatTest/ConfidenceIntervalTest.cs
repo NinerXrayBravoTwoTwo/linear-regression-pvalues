@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace RegressionTest;
 
-public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
+public class ConfidenceIntervalTest(Xunit.ITestOutputHelper testOutputHelper)
 {
     [Fact]
     public void TestConfidenceInterval()

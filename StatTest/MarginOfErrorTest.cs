@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace RegressionTest;
 
-public class MarginOfErrorTest(ITestOutputHelper testOutputHelper)
+public class MarginOfErrorTest(Xunit.ITestOutputHelper testOutputHelper)
 {
     [Fact]
     public void MeanConfidenceWithVerify()
