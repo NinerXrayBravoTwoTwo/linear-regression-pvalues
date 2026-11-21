@@ -25,7 +25,7 @@ public partial class RegressionPvalue : Regression
     /// a Y value.</param>
     public RegressionPvalue(List<(double x, double y)> dataPoints) : base(dataPoints.Select(tuple => (tuple.x, tuple.y)))
     {
-        DataPoints = dataPoints.Select(tuple => (tuple.x, tuple.y));
+        DataPoints = dataPoints.Select(tuple => (tuple.x, tuple.y)).ToArray(); // copy: caller may change the list later
         IdPoints = [];
         IsDataContainsNan = dataPoints.Any(item => item.x is double.NaN || item.y is double.NaN);
         IsDataContainsInf = dataPoints.Any(item => double.IsInfinity(item.x) || double.IsInfinity(item.y));
@@ -41,8 +41,8 @@ public partial class RegressionPvalue : Regression
     /// a Y value.</param>
     public RegressionPvalue(List<(string id, double x, double y)> dataPoints) : base(dataPoints.Select(tuple => (tuple.x, tuple.y)))
     {
-        DataPoints = dataPoints.Select(tuple => (tuple.x, tuple.y));
-        IdPoints = dataPoints.Select(tuple => tuple.id);
+        DataPoints = dataPoints.Select(tuple => (tuple.x, tuple.y)).ToArray(); // copy: caller may change the list later
+        IdPoints = dataPoints.Select(tuple => tuple.id).ToArray();
         IsDataContainsNan = dataPoints.Any(item => item.x is double.NaN || item.y is double.NaN);
         IsDataContainsInf = dataPoints.Any(item => double.IsInfinity(item.x) || double.IsInfinity(item.y));
     }

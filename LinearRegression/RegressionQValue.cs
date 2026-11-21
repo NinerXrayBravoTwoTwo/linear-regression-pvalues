@@ -57,15 +57,11 @@
             var rank = sortedPValues.IndexOf(currentPValue) + 1; // 1-based rank
             var m = sortedPValues.Count; // Total number of tests
 
-            // Calculate Q-value using Benjamini-Hochberg: q = p * m / rank
-            var qValue = currentPValue * m / rank;
-
-            // Ensure Q-value is between 0 and 1 (monotonicity correction)
-            if (rank < m)
-            {
-                var nextQValue = sortedPValues[rank] * m / (rank + 1); // Q-value for the next rank
-                qValue = Math.Min(qValue, nextQValue);
-            }
+            // Benjamini-Hochberg step-up: q(rank) = min over k >= rank of p(k) * m / k,
+            // i.e. a cumulative minimum taken from the top rank (m) down to this rank.
+            var qValue = double.PositiveInfinity;
+            for (var k = m; k >= rank; k--)
+                qValue = Math.Min(qValue, sortedPValues[k - 1] * m / k);
 
             qValue = Math.Min(1.0, Math.Max(0.0, qValue)); // Clamp to [0, 1]
 
