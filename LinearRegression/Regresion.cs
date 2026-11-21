@@ -32,7 +32,7 @@
 [Serializable]
 public class Regression
 {
-    public Regression(IEnumerable<(double x, double y)> dataPoints)
+    public Regression(IEnumerable<(double x, double y)> dataPoints) : this()
     {
         foreach (var (x, y) in dataPoints) Add(x, y);
     }
@@ -148,8 +148,7 @@ public class Regression
     /// <returns>A new Regression representing the combined data.</returns>
     public Regression Merge(Regression other)
     {
-        // if (other == null) throw new ArgumentNullException(nameof(other));
-        ArgumentException.ThrowIfNullOrEmpty(nameof(other));
+        ArgumentNullException.ThrowIfNull(other);
 
         return new Regression
         {
@@ -232,12 +231,12 @@ public class Regression
     }
 
     /// <summary>
-    ///     Only removes previous sample added without Y value.
+    ///     Only removes previous sample added without Y value (the last such sample, whose y was N).
     /// </summary>
     /// <param name="x">The previous data point.  Assumes y = "number of samples" -1.</param>
     public void Dec(double x)
     {
-        Dec(x, N - 1);
+        Dec(x, N);
     }
 
 
