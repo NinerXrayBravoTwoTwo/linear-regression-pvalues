@@ -126,3 +126,19 @@ $x = 1, 2, 3, 4, 5$ and $y = 2, 4, 5, 4, 5$, so $n = 5$ and $\mathrm{df} = 3$.
 | `VarianceX` $= 10/4$, `StdDevX` | 2.5, 1.581139 |
 
 These match Excel `LINEST`, `STEYX`, `T.DIST.2T` and `STDEV.S`, and statsmodels `OLS`.
+
+## Why Add and Dec exist
+
+`Add` and `Dec` were the main interface of the original calculator program: 1978 algorithms for the TI-58 and
+TI-59, later ported to C, then Perl, then C#. Data sets were entered by hand, one (x, y) pair at a time, much like
+a calculator's Σ+ and Σ− keys. A mistyped pair could be taken back out the same way.
+
+The calculator didn't have enough memory to store the pairs, so the interface was limited on purpose. It kept only
+running sums (n, Σx, Σy, Σx², Σy², Σxy) and computed every statistic from them. `Regression` keeps that design: it
+streams data and never stores the points. Only `RegressionPvalue` keeps them, because the residuals behind its
+p-values need them.
+
+Because the running sums are all there is, their precision matters. Each pair is folded in and can later be taken
+out again, and that must not wear away the digits of the points that stay. The library therefore keeps centred,
+numerically stable sums (see [Sums and means](#sums-and-means)). Issue #14 covers removing a point far from the
+rest of the data.
