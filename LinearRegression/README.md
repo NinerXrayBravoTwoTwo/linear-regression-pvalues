@@ -126,18 +126,19 @@ arguments are methods.
 | `RegressionPvalue(List<(string id, double x, double y)>)` | constructor | ids line up with points; need not be unique |
 | `DataPoints`, `IdPoints` | properties | `IEnumerable<...>`; use `.ElementAt(i)` |
 | `DataPointsCount()` | method | |
-| `PValue` | property | two-tailed t-test of slope ≠ 0; cached after first read; throws `InvalidOperationException` when n < 3; NaN if any point is NaN; 1.0 when x has no variation |
-| `ConfidenceInterval(double confidenceLevel = 0.95)` | method | `(Lower, Upper)` for the slope; n ≥ 3 |
-| `ConfidenceIntervalPlus(double confidenceLevel = 0.95)` | method | `(Lower, Upper, Slope, StandardError, PValue)` |
-| `MarginOfError(bool useY = false, double confidenceLevel = 0.95)` | method | `(Mean, MarginOfError)` for mean of x or y; n ≥ 2 |
-| `ToString()` | method | `Regression` summary plus ` PValue: …` (or `n/a` when n < 3) |
+| `PValue` | property | two-tailed t-test of slope ≠ 0, in [0, 1]; cached after first read; **NaN when invalid**: n < 3, any NaN or ±∞ point, no variation in x, or no variation in y. Never 1 or ∞ as a stand-in, never throws. A perfect fit with non-zero slope gives 0 |
+| `ConfidenceInterval(double confidenceLevel = 0.95)` | method | `(Lower, Upper)` for the slope; NaN in the same invalid cases as `PValue` (except constant y, which gives `(0, 0)`) or when the level is outside (0, 1) |
+| `ConfidenceIntervalPlus(double confidenceLevel = 0.95)` | method | `(Lower, Upper, Slope, StandardError, PValue)`; all NaN when the slope test is invalid |
+| `MarginOfError(bool useY = false, double confidenceLevel = 0.95)` | method | `(Mean, MarginOfError)` for mean of x or y; NaN when n < 2, any NaN or ±∞ point, or level outside (0, 1) |
+| `ToString()` | method | `Regression` summary plus ` PValue: …` (`n/a` when the p-value is NaN) |
 
 ### `RegressionQValue : RegressionPvalue` — experimental
 
 | Member | Kind | Notes |
 |---|---|---|
-| `QValue(IReadOnlyList<double> pValues)` | method | Benjamini-Hochberg q-value of this slope within the family |
+| `QValue(IReadOnlyList<double> pValues)` | method | Benjamini-Hochberg q-value of this slope within the family; NaN family entries are excluded from ranking and m; NaN when this `PValue` is NaN |
 | `QValue(IReadOnlyList<RegressionPvalue> regressions)` | method | same, from a list of regressions |
+| `BenjaminiHochberg(IReadOnlyList<double> pValues)` | static method | q-values for a whole family in one O(m log m) pass, same order as the input; NaN in → NaN out, excluded from m. Use this for large batches |
 
 ## Release notes
 - **Version 1.2.0:  November 21, 2026**:
