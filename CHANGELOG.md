@@ -5,6 +5,13 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
+### Added
+- Intercept inference on `RegressionPvalue`: `InterceptStandardError` (√(s²(1/n + x̄²/Sxx)), Excel `LINEST`
+  row 2, col 2), `InterceptPValue` (two-tailed, df = n − 2, small-p-safe 2·CDF(−|t|)) and
+  `InterceptConfidenceInterval(level)`. Invalid cases return NaN, as for the slope. Example (x = 1..5,
+  y = 2, 4, 5, 4, 5): a = 2.2, SE 0.938083, t 2.3452, p 0.100743, 95% CI [−0.785399, 5.185399].
+- `docs/MATH.md`: formulas for every statistic, the n − 1 and n − 2 conventions, and a worked example.
+
 ### Fixed
 - **Tiny p-values no longer round to 0.** `PValue` (and so `ConfidenceIntervalPlus().PValue`) is now
   2·CDF(−|t|) instead of 2·(1 − CDF(|t|)), which lost every digit below about 1e−16. Example (n = 30, t = 25.05):

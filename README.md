@@ -100,6 +100,8 @@ double qA = a.QValue(new List<RegressionPvalue> { a, b });   // or a.QValue(list
 
 ## API overview
 
+Formulas, conventions (n − 1 variance, n − 2 df, two-sided p) and a worked example: [docs/MATH.md](docs/MATH.md).
+
 All statistics are read-only **properties** (no parentheses) since version 1.1.0. Operations that take
 arguments are methods.
 
@@ -132,6 +134,9 @@ arguments are methods.
 | `PValue` | property | two-tailed t-test of slope ≠ 0, in [0, 1]; cached after first read; **NaN when invalid**: n < 3, any NaN or ±∞ point, no variation in x, or no variation in y. Never 1 or ∞ as a stand-in, never throws. A perfect fit with non-zero slope gives 0 |
 | `ConfidenceInterval(double confidenceLevel = 0.95)` | method | `(Lower, Upper)` for the slope; NaN in the same invalid cases as `PValue` (except constant y, which gives `(0, 0)`) or when the level is outside (0, 1) |
 | `ConfidenceIntervalPlus(double confidenceLevel = 0.95)` | method | `(Lower, Upper, Slope, StandardError, PValue)`; all NaN when the slope test is invalid |
+| `InterceptStandardError` | property | SE of the y-intercept, √(s²(1/n + x̄²/Sxx)) (Excel `LINEST` row 2, col 2); NaN when n < 3, any NaN or ±∞ point, or no variation in x |
+| `InterceptPValue` | property | two-tailed t-test of intercept ≠ 0 (df = n − 2), in [0, 1]; NaN in the same cases; a perfect fit with non-zero intercept gives 0 |
+| `InterceptConfidenceInterval(double confidenceLevel = 0.95)` | method | `(Lower, Upper)` for the intercept; NaN in the same cases or when the level is outside (0, 1) |
 | `MarginOfError(bool useY = false, double confidenceLevel = 0.95)` | method | `(Mean, MarginOfError)` for mean of x or y; NaN when n < 2, any NaN or ±∞ point, or level outside (0, 1) |
 | `ToString()` | method | `Regression` summary plus ` PValue: …` (`n/a` when the p-value is NaN) |
 
@@ -163,6 +168,7 @@ Some names are traditional rather than modern (for example `Sx2` for Σx²). Old
 |---|---|
 | `LinearRegression/` | the library (NuGet package `LinearRegression.Pvalues`) and its package README |
 | `StatTest/` | xUnit tests |
+| `docs/MATH.md` | formulas and a worked example |
 | `CHANGELOG.md` | release notes |
 | `.github/workflows/ci.yml` | build and test (Release, net8.0 + net10.0) on pull requests and pushes to `main` |
 | `.github/workflows/publish.yml` | publish to nuget.org with Trusted Publishing, then create the GitHub release |
