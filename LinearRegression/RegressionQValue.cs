@@ -6,7 +6,7 @@
         // passed in, so a cached value would be wrong for the next call with a different family.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegressionQvalue"/> class with the specified data points.
+        /// Initializes a new instance of the <see cref="RegressionQValue"/> class with the specified data points.
         /// Experimental class to compute Q-values for regression slopes.
         /// </summary>
         /// <param name="dataPoints">A list of tuples representing the data points for regression analysis.</param>
@@ -15,7 +15,7 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegressionQvalue"/> class with the specified data points including IDs.
+        /// Initializes a new instance of the <see cref="RegressionQValue"/> class with the specified data points including IDs.
         /// </summary>
         /// <param name="dataPoints">A list of tuples with an ID, X value, and Y value.</param>
         public RegressionQValue(List<(string id, double x, double y)> dataPoints) : base(dataPoints)
