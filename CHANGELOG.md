@@ -5,6 +5,31 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
+### Changed (behaviour)
+Invalid results are now always `double.NaN`: never 1, never ±∞, never an exception. With many regressions,
+filter invalid ones with `double.IsNaN(r.PValue)`; a real p = 1 is no longer mixed in with them.
+
+| Case | `PValue` before | `PValue` now |
+|---|---|---|
+| n < 3 | throws `InvalidOperationException` | NaN |
+| ±∞ in x or y | +∞ (b49b96d) | NaN |
+| All x equal | 1.0 (or a garbage value from rounding, e.g. x = 0.1 repeated) | NaN |
+| All y equal (slope 0, zero residual) | 1.0 | NaN |
+| Perfect fit, slope ≠ 0 | 0 | 0 (unchanged, valid) |
+
+- `Slope` is NaN when every x is equal (`MinX == MaxX`). Rounding used to give garbage, e.g. 5.96e−8.
+- `ConfidenceInterval`/`ConfidenceIntervalPlus` return NaN for n < 3 (it threw), ±∞ data, no x variation, or a
+  confidence level outside (0, 1) (it threw MathNet `NonConvergenceException`). A constant y still gives `(0, 0)`.
+- `MarginOfError` returns NaN for n < 2 (it threw) and for ±∞ data (it gave a finite or half-NaN result).
+- `RegressionPvalue.ToString()` shows `PValue: n/a` whenever the p-value is NaN (was `n/a (needs 3+ points)`).
+- `RegressionQValue.QValue`: NaN/out-of-range family entries are excluded from the ranking and from m (matches
+  statsmodels `fdr_bh` on the valid subset) instead of making the result NaN. It returns NaN when this regression's
+  own p-value is NaN (it threw for n < 3). An empty family means m = 1, so q = p (it threw).
+
+### Added
+- `RegressionQValue.BenjaminiHochberg(IReadOnlyList<double>)`: q-values for a whole family in one O(m log m)
+  pass. NaN p-values give NaN q-values. Calling `QValue` once per regression is O(m² log m) in total.
+
 ## [1.2.0] - 2026-11-21
 
 Numeric results change in this release: p-values, confidence intervals, standard deviations and
@@ -57,7 +82,7 @@ margins of error from 1.1.x were wrong (see Fixed). Re-run any analysis that rel
 
 ### Changed
 - `RegressionPvalue.PValue` returns `+∞` when the data contains an infinite value (b49b96d).
-  Under review: a p-value is normally in [0, 1], so this may become `NaN`.
+  Superseded in Unreleased: now `NaN`.
 
 ## [1.1.3] - 2025-08-20
 Version in the repository; not yet published to NuGet (latest published: 1.1.2).

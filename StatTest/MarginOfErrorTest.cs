@@ -50,7 +50,7 @@ public class MarginOfErrorTest(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine($"Mean and MarginOfError: [{moe.Mean}, {moe.MarginOfError:F4}]");
     }
     [Fact]
-    public void MeanConfidenceWithInsufficientData()
+    public void MeanConfidenceWithInsufficientDataReturnsNaN()
     {
         // Arrange
         var dataPoints = new List<(double x, double y)>
@@ -59,8 +59,8 @@ public class MarginOfErrorTest(ITestOutputHelper testOutputHelper)
         };
         var regression = new RegressionPvalue(dataPoints);
 
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => regression.MarginOfError());
+        // Act & Assert: NaN, no longer throws
+        Assert.Equal((double.NaN, double.NaN), regression.MarginOfError());
     }
 
     [Fact]

@@ -25,7 +25,7 @@ each item, so nothing disappears silently. Statistics did not change. Tests: 86 
 ## Left for Jill to decide (not changed)
 
 - `RegressionTest.StatTestAccessDataPoints` and `RegressionTest.KnownDatasetStat` are identical tests. Keep both, remove one, or turn one into a different check.
-- `PValueWithSingleDataPointReturnsNaN` and `PValueWithTwoDataPointsReturnsNaN` assert a throw, not NaN. The names are misleading.
+- ~~`PValueWithSingleDataPointReturnsNaN` and `PValueWithTwoDataPointsReturnsNaN` assert a throw, not NaN.~~ Resolved: `PValue` now returns NaN for n < 3, so the names are accurate.
 - `PValueWithMixedDataTypesReturnsNaN`: its comment mentions "string, null", but the data is only a NaN.
 - `TestConfidenceIntervalWithZeroData` uses random data for its first point. It only checks that `ConfidenceInterval` and `ConfidenceIntervalPlus` agree, so it can't fail on a value, but the name doesn't describe it.
 - `Regression.ToString()` throws `DivideByZeroException` on an empty instance (via `VarianceX`), so `new RegressionPvalue().ToString()` throws too. Found while finishing item 6. Not changed, because `VarianceX` behaviour for N = 0 is part of the open divisor and variance question.

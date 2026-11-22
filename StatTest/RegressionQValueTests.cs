@@ -85,22 +85,61 @@ public class RegressionQValueTests
     }
 
     [Fact]
-    public void QValue_InvalidPValues_ReturnNaN()
+    public void QValue_InvalidFamilyEntries_AreExcludedFromRankingAndM()
     {
         var r = Sample();
 
-        Assert.True(double.IsNaN(r.QValue([0.1, double.NaN])));
-        Assert.True(double.IsNaN(r.QValue([0.1, 1.5])));
-        Assert.True(double.IsNaN(r.QValue([-0.1])));
+        // NaN / out-of-range entries are dropped, so these equal the clean-family results above.
+        Assert.Equal(r.QValue([0.1]), r.QValue([0.1, double.NaN]), 12);
+        Assert.Equal(0.11215822040549586, r.QValue([0.5, 0.9, double.NaN, 1.5, -0.1]), 12);
+        Assert.Equal(ThisP, r.QValue([double.NaN, double.NaN]), 12);
     }
 
     [Fact]
-    public void QValue_Throws_WhenTooFewPointsOrEmptyFamily()
+    public void QValue_FamilyWithNaN_MatchesStatsmodelsOnValidSubset()
+    {
+        // statsmodels fdr_bh on the non-NaN subset [0.01, 0.04, p, 0.20, 0.5] -> q(p) = 0.06666666666666667
+        var r = Sample();
+        Assert.Equal(0.06666666666666667, r.QValue([0.01, double.NaN, 0.04, r.PValue, double.NaN, 0.20, 0.5]), 12);
+    }
+
+    [Fact]
+    public void BenjaminiHochberg_NaNEntriesGetNaN_RestMatchStatsmodels()
+    {
+        double[] family = [0.01, double.NaN, 0.04, 0.03, double.NaN, 0.20, 0.04, 0.5, double.NaN, 0.001];
+        // statsmodels multipletests(p[~isnan(p)], method="fdr_bh"), NaN where p is NaN
+        double[] expected = [0.035, double.NaN, 0.056, 0.056, double.NaN, 0.23333333333333336, 0.056, 0.5, double.NaN, 0.007];
+
+        var q = RegressionQValue.BenjaminiHochberg(family);
+
+        Assert.Equal(expected.Length, q.Length);
+        for (var i = 0; i < expected.Length; i++)
+            if (double.IsNaN(expected[i])) Assert.True(double.IsNaN(q[i]), $"index {i}");
+            else Assert.Equal(expected[i], q[i], 12);
+    }
+
+    [Fact]
+    public void BenjaminiHochberg_AgreesWithInstanceQValue()
+    {
+        var r = Sample();
+        double[] family = [0.01, 0.02, 0.05, 0.10, 0.20, 0.03, 0.5, r.PValue];
+
+        Assert.Equal(r.QValue(family), RegressionQValue.BenjaminiHochberg(family)[^1], 12);
+        Assert.Empty(RegressionQValue.BenjaminiHochberg([]));
+    }
+
+    [Fact]
+    public void QValue_TooFewPoints_ReturnsNaN()
     {
         var tooFew = new RegressionQValue([(1.0, 2.0), (2.0, 3.0)]);
-        Assert.Throws<InvalidOperationException>(() => tooFew.QValue([0.1]));
+        Assert.True(double.IsNaN(tooFew.QValue([0.1])));
+    }
 
-        Assert.Throws<InvalidOperationException>(() => Sample().QValue(Array.Empty<double>()));
+    [Fact]
+    public void QValue_EmptyFamily_EqualsPValue()
+    {
+        // m = 1 (only this regression), so q = p
+        Assert.Equal(ThisP, Sample().QValue(Array.Empty<double>()), 12);
     }
 
     [Fact]
@@ -108,6 +147,13 @@ public class RegressionQValueTests
     {
         var r = new RegressionQValue([(1.0, 2.0), (2.0, double.NaN), (3.0, 5.0)]);
         Assert.True(double.IsNaN(r.QValue([0.1])));
+    }
+
+    [Fact]
+    public void QValue_NoVariationInX_ReturnsNaN()
+    {
+        var r = new RegressionQValue([(2.0, 1.0), (2.0, 2.0), (2.0, 3.0)]);
+        Assert.True(double.IsNaN(r.QValue([0.01, 0.2])));
     }
 
     [Fact]

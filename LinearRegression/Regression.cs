@@ -295,13 +295,18 @@ public class Regression
     /// </summary>
     /// <returns>
     ///     The slope (m) of the regression line, calculated as (Sxy - Sx*Sy/N) / (Sx2 - Sx²/N). Returns double.NaN if N
-    ///     &lt; 2 or the denominator is zero.
+    ///     &lt; 2 or x has no variation (every x equal, <see cref="MinX" /> == <see cref="MaxX" />, or a zero
+    ///     denominator).
     /// </returns>
     public double Slope
     {
         get
         {
             if (N < 2) return double.NaN; // Insufficient data
+
+            // All x identical: the slope is undefined. Checked explicitly because rounding can leave
+            // Sx2 - Sx^2/N as a tiny non-zero number (e.g. x = 0.1 repeated) and yield a garbage slope.
+            if (MinX == MaxX) return double.NaN;
 
             var numerator = Sxy - Sx * Sy / N;
             var denominator = Sx2 - Sx * Sx / N;

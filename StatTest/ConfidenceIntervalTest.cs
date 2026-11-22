@@ -48,7 +48,7 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void TestConfidenceIntervalWithInsufficientData()
+    public void TestConfidenceIntervalWithInsufficientDataReturnsNaN()
     {
         // Arrange
         var dataPoints = new List<(double x, double y)>
@@ -58,8 +58,8 @@ public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
 
         var regression = new RegressionPvalue(dataPoints);
 
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => regression.ConfidenceInterval());
+        // Act & Assert: NaN, no longer throws
+        Assert.Equal((double.NaN, double.NaN), regression.ConfidenceInterval());
     }
 
     [Fact]

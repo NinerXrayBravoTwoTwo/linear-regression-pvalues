@@ -53,22 +53,30 @@ public partial class RegressionPvalue : Regression
     }
 
     /// <summary>
-    ///     The <see cref="Regression.ToString" /> summary followed by the slope p-value, or "n/a" when there are
-    ///     fewer than 3 data points (where <see cref="PValue" /> would throw).
+    ///     The <see cref="Regression.ToString" /> summary followed by the slope p-value, or "n/a" when the
+    ///     p-value is invalid (<see cref="double.NaN" />; see <see cref="PValue" />).
     /// </summary>
     public override string ToString()
     {
-        var pValue = DataPointsCount() < 3 ? "n/a (needs 3+ points)" : PValue.ToString("G4");
+        var p = PValue;
+        var pValue = double.IsNaN(p) ? "n/a" : p.ToString("G4");
         return $"{base.ToString()} PValue: {pValue}";
     }
 
     private double _savedPvalue = double.NaN;
     private bool _isSavedPvalue = false;
+
     /// <summary>
-    ///     P-Value for the linear regression slope.
+    ///     Two-tailed p-value for the null hypothesis slope = 0 (Student t, n - 2 degrees of freedom).
     /// </summary>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <value>
+    ///     <para>A value in [0, 1], or <see cref="double.NaN" /> when the test is invalid. NaN is the only
+    ///     "invalid" marker: this property never returns 1 or infinity as a stand-in, and never throws, so
+    ///     invalid results can be filtered with <see cref="double.IsNaN" /> in large batches.</para>
+    ///     <para>Invalid (NaN) when: fewer than 3 data points; any x or y is NaN or infinite; x has no
+    ///     variation (all x equal); y has no variation (all y equal: slope 0 with zero residual, t = 0/0).</para>
+    ///     <para>Valid edge case: a perfect fit with a non-zero slope (zero residual) returns 0.</para>
+    /// </value>
     public double PValue
     {
         get
@@ -76,44 +84,51 @@ public partial class RegressionPvalue : Regression
             if (_isSavedPvalue)
                 return _savedPvalue;
 
-            if (DataPoints.Count() < 3)
-                throw new InvalidOperationException("At least 3 data points are required to compute the p-value.");
-
-            if (IsDataContainsNan)
-                return double.NaN; // If data contains NaN, return NaN for P-Value
-
-
-            if (IsDataContainsInf)
-                return double.PositiveInfinity; // If data contains Inf, return PositiveInf for P-Value
-
-            // Calculate slope and standard error of the slope
-            var slope = Slope;
-            var sxx = SumOfSquaresX;
-            if (sxx <= 0)
-                return 1.0; // No variation in X, slope is undefined or always zero, so p-value is 1
-
-            var n = DataPoints.Count();
-            var seSlope = SlopeStandardError(sxx, n);
-
-            if (seSlope == 0)
-                return slope == 0 ? 1.0 : 0.0; // If standard error is zero, p-value is 1 if slope is zero, else 0
-
-            // Calculate t-statistic
-            var t = slope / seSlope;
-
-            // Calculate p-value from t-distribution (two-tailed test)
-            double degreesOfFreedom = n - 2;
-            var pValue = 2 * (1 - DistributionCdf(Math.Abs(t), degreesOfFreedom));
-
-            if (double.IsNaN(pValue) || pValue < 0 || pValue > 1 || double.IsInfinity(t))
-                return 1.0; // Defensive: return 1 for degenerate cases
-
-            _savedPvalue = pValue;
+            _savedPvalue = ComputePValue();
             _isSavedPvalue = true;
-
-            return pValue;
+            return _savedPvalue;
         }
     }
+
+    private double ComputePValue()
+    {
+        if (!IsSlopeTestDefined())
+            return double.NaN;
+
+        if (MinY == MaxY)
+            return double.NaN; // all y equal: slope 0, residual 0, t = 0/0
+
+        var slope = Slope;
+        var n = DataPoints.Count();
+        var seSlope = SlopeStandardError(SumOfSquaresX, n);
+
+        if (seSlope == 0)
+            return slope == 0 ? double.NaN : 0.0; // perfect fit with non-zero slope: p = 0 is valid
+
+        var t = slope / seSlope;
+        if (double.IsNaN(t) || double.IsInfinity(t))
+            return double.NaN;
+
+        // Two-tailed p-value from the t distribution
+        double degreesOfFreedom = n - 2;
+        var pValue = 2 * (1 - DistributionCdf(Math.Abs(t), degreesOfFreedom));
+
+        if (double.IsNaN(pValue))
+            return double.NaN;
+
+        return Math.Clamp(pValue, 0.0, 1.0); // only absorbs floating-point rounding
+    }
+
+    /// <summary>
+    ///     True when the slope t-test is defined: at least 3 points, all finite, and x varies.
+    ///     Shared by <see cref="PValue" />, <see cref="ConfidenceInterval" /> and <see cref="ConfidenceIntervalPlus" />.
+    /// </summary>
+    private bool IsSlopeTestDefined() =>
+        DataPoints.Count() >= 3
+        && !IsDataContainsNan
+        && !IsDataContainsInf
+        && MinX != MaxX
+        && SumOfSquaresX > 0;
 
     /// <summary>
     ///     Corrected sum of squares of x: Sxx = sum((x - mean x)^2) = Sx2 - Sx^2 / N.

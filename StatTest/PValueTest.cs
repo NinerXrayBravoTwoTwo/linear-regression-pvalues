@@ -26,10 +26,10 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void PValueToStringWithTooFewPointsDoesNotThrow()
+    public void PValueToStringWithTooFewPointsShowsNa()
     {
         var regression = new RegressionPvalue([(1.0, 2.0), (2.0, 3.0)]);
-        Assert.EndsWith(" PValue: n/a (needs 3+ points)", regression.ToString());
+        Assert.EndsWith(" PValue: n/a", regression.ToString());
         // Note: an empty instance still throws, from Regression.ToString (VarianceX with N = 0); not changed here.
     }
 
@@ -137,7 +137,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void PValueWithInsufficientDataThrowsException()
+    public void PValueWithInsufficientDataReturnsNaN()
     {
         // Create a PValueStat instance with insufficient data points
         var dataPoints = new List<(double x, double y)>
@@ -146,9 +146,8 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
             (2, 3)
         };
         var stat = new RegressionPvalue(dataPoints);
-        // Add only 2 data points
-        // Assert that calling PValue throws an InvalidOperationException
-        Assert.Throws<InvalidOperationException>(() => stat.PValue);
+        // Only 2 data points: the t-test has 0 degrees of freedom, so PValue is NaN (it used to throw)
+        Assert.True(double.IsNaN(stat.PValue));
     }
 
     [Fact]
@@ -206,7 +205,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void PValueWithNoVariationInXReturnsOne()
+    public void PValueWithNoVariationInXReturnsNaN()
     {
         var dataPoints = new List<(double x, double y)>
         {
@@ -220,9 +219,8 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
 
-        // Assert that PValue returns 1.0
-        var pValue = stat.PValue;
-        Assert.Equal(1.0, pValue);
+        // No variation in X: slope undefined, so PValue is NaN (it used to be 1.0)
+        Assert.True(double.IsNaN(stat.PValue));
     }
 
     [Fact]
@@ -280,8 +278,8 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var stat = new RegressionPvalue(dataPoints);
         // Add a single data point
         testOutputHelper.WriteLine(stat.ToString());
-        // Assert that PValue returns NaN
-        Assert.Throws<InvalidOperationException>(() => stat.PValue);
+        // Assert that PValue returns NaN (it used to throw, despite this test's name)
+        Assert.True(double.IsNaN(stat.PValue));
     }
 
     [Fact]
@@ -302,8 +300,8 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         // Add two data points
         testOutputHelper.WriteLine(stat.ToString());
 
-        // Assert that PValue returns NaN
-        Assert.Throws<InvalidOperationException>(() => stat.PValue);
+        // Assert that PValue returns NaN (it used to throw, despite this test's name)
+        Assert.True(double.IsNaN(stat.PValue));
     }
 
     [Fact]
@@ -382,7 +380,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void PValueWithLargeDatasetAndNoVariationInXReturnsOne()
+    public void PValueWithLargeDatasetAndNoVariationInXReturnsNaN()
     {
         // Create a PValueStat instance with no variation in X
         var dataPoints = new List<(double x, double y)>();
@@ -393,13 +391,12 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
 
-        // Assert that PValue returns 1.0
-        var pValue = stat.PValue;
-        Assert.Equal(1.0, pValue);
+        // No variation in X: PValue is NaN (it used to be 1.0)
+        Assert.True(double.IsNaN(stat.PValue));
     }
 
     [Fact]
-    public void PValueWithNegativeSlopeAndLargeDatasetReturnsValidValue()
+    public void PValueWithLargeDatasetAndNoVariationInXDescendingYReturnsNaN()
     {
         // Create a PValueStat instance with no variation in X
         var dataPoints = new List<(double x, double y)>();
@@ -409,13 +406,12 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var stat = new RegressionPvalue(dataPoints);
 
         testOutputHelper.WriteLine(stat.ToString());
-        // Assert that PValue returns a valid double value
-        var pValue = stat.PValue;
-        Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
+        // Degenerate (no variation in x): no valid t-test, so PValue is NaN (it used to be 1.0)
+        Assert.True(double.IsNaN(stat.PValue));
     }
 
     [Fact]
-    public void PValueWithZeroSlopeAndLargeDatasetReturnsValidValue()
+    public void PValueWithAllPointsIdenticalReturnsNaN()
     {
         // Create a PValueStat instance with a large dataset
 
@@ -426,9 +422,8 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var stat = new RegressionPvalue(dataPoints);
 
         testOutputHelper.WriteLine(stat.ToString());
-        // Assert that PValue returns a valid double value
-        var pValue = stat.PValue;
-        Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
+        // Degenerate (all points identical (no x or y variation)): no valid t-test, so PValue is NaN (it used to be 1.0)
+        Assert.True(double.IsNaN(stat.PValue));
     }
 
     [Fact]
@@ -551,7 +546,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void PValueWithLargeDatasetAndZeroValuesReturnsValidValue()
+    public void PValueWithLargeDatasetAndAllYZeroReturnsNaN()
     {
         // Create a PValueStat instance with a large dataset
         var dataPoints = new List<(double x, double y)>();
@@ -559,9 +554,8 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var stat = new RegressionPvalue(dataPoints);
 
         testOutputHelper.WriteLine(stat.ToString());
-        // Assert that PValue returns a valid double value
-        var pValue = stat.PValue;
-        Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
+        // Degenerate (constant y (all zero)): no valid t-test, so PValue is NaN (it used to be 1.0)
+        Assert.True(double.IsNaN(stat.PValue));
     }
 
     [Fact]
@@ -593,7 +587,7 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void PValueWithLargeDatasetAndZeroSlopeReturnsValidValue()
+    public void PValueWithLargeDatasetAndConstantYReturnsNaN()
     {
         // Create a PValueStat instance with a large dataset
         var dataPoints = new List<(double x, double y)>();
@@ -601,9 +595,8 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
         var stat = new RegressionPvalue(dataPoints);
 
         testOutputHelper.WriteLine(stat.ToString());
-        // Assert that PValue returns a valid double value
-        var pValue = stat.PValue;
-        Assert.True(pValue is >= 0 and <= 1, "P-value should be between 0 and 1.");
+        // Degenerate (constant y): no valid t-test, so PValue is NaN (it used to be 1.0)
+        Assert.True(double.IsNaN(stat.PValue));
     }
 
     [Fact]
