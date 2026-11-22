@@ -131,9 +131,10 @@ public partial class RegressionPvalue : Regression
         && SumOfSquaresX > 0;
 
     /// <summary>
-    ///     Corrected sum of squares of x: Sxx = sum((x - mean x)^2) = Sx2 - Sx^2 / N.
+    ///     Corrected sum of squares of x: Sxx = sum((x - mean x)^2), accumulated with Welford's update
+    ///     (see <see cref="Regression.CenteredSumSquaresX" />).
     /// </summary>
-    private double SumOfSquaresX => N > 0 ? Sx2 - Sx * Sx / N : 0;
+    private double SumOfSquaresX => CenteredSumSquaresX;
 
     /// <summary>
     ///     Standard error of the slope: sqrt( (RSS / (n - 2)) / Sxx ).
@@ -147,13 +148,13 @@ public partial class RegressionPvalue : Regression
         {
             double rss = 0;
             var slope = Slope;
-            var intercept = YIntercept;
 
-            // Calculate RSS: sum of (y - predicted_y)^2
-            foreach (var (x, y) in DataPoints) // Assume you have a collection of data points
+            // RSS = sum of (y - predicted y)^2, computed from centred values: residual = (y - mean y) - m (x - mean x).
+            // Same value as y - (m x + b), but without the cancellation of m x + b when x is far from zero.
+            foreach (var (x, y) in DataPoints)
             {
-                var predictedY = slope * x + intercept;
-                rss += Math.Pow(y - predictedY, 2);
+                var residual = DeviationY(y) - slope * DeviationX(x);
+                rss += residual * residual;
             }
 
             return rss;
