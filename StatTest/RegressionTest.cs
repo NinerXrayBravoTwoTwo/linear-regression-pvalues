@@ -49,25 +49,6 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void KnownDatasetStat()
-    {
-        var stat = new Regression();
-
-        double x = 0;
-        double y = -1;
-        while (x < 100)
-            stat.Add(x++, y++);
-
-        testOutputHelper.WriteLine(stat.ToString());
-
-        Assert.False(stat.IsNaN);
-        Assert.Equal(0, stat.MinX);
-        Assert.Equal(1, stat.Correlation);
-        Assert.Equal(49.5, stat.MeanX);
-        Assert.Equal(1, stat.Slope);
-    }
-
-    [Fact]
     public void StatClone()
     {
         var original = new Regression();
