@@ -1,9 +1,8 @@
 ﻿using LinearRegression;
-using Xunit.Abstractions;
 
 namespace RegressionTest;
 
-public class ConfidenceIntervalTest(Xunit.ITestOutputHelper testOutputHelper)
+public class ConfidenceIntervalTest(ITestOutputHelper testOutputHelper)
 {
     [Fact]
     public void TestConfidenceInterval()

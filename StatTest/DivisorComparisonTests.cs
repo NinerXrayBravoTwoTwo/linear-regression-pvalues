@@ -1,5 +1,4 @@
 using LinearRegression;
-using Xunit.Abstractions;
 
 namespace RegressionTest;
 
@@ -14,7 +13,7 @@ namespace RegressionTest;
 ///     {2, 4, 4, 4, 5, 5, 7, 9}, whose population standard deviation is exactly 2.
 ///     Current behaviour: StdDev uses n - 1, Variance uses n, so StdDevX² != VarianceX.
 /// </remarks>
-public class DivisorComparisonTests(Xunit.ITestOutputHelper output)
+public class DivisorComparisonTests(ITestOutputHelper output)
 {
     private static readonly List<(double x, double y)> Data =
     [

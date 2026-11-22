@@ -1,9 +1,8 @@
 using LinearRegression;
-using Xunit.Abstractions;
 
 namespace RegressionTest;
 
-public class PValueTest(Xunit.ITestOutputHelper testOutputHelper)
+public class PValueTest(ITestOutputHelper testOutputHelper)
 {
     [Fact]
     public void PValueToString()
