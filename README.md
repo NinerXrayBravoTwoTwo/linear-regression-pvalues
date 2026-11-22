@@ -32,7 +32,7 @@ dotnet add package LinearRegression.Pvalues
 
 Or from source: clone this repository and add a project reference to `LinearRegression/LinearRegression.csproj`.
 
-Requirements: .NET 8 or later. The only dependency is [MathNet.Numerics](https://numerics.mathdotnet.com/) 5.0
+Requirements: .NET 8 or later (the package targets `net8.0` and `net10.0`). Building from source needs the .NET 10 SDK (see `global.json`). The only dependency is [MathNet.Numerics](https://numerics.mathdotnet.com/) 5.0
 (for the Student t distribution), which NuGet installs for you.
 
 Build and test:
@@ -130,6 +130,7 @@ arguments are methods.
 | `ConfidenceInterval(double confidenceLevel = 0.95)` | method | `(Lower, Upper)` for the slope; n ≥ 3 |
 | `ConfidenceIntervalPlus(double confidenceLevel = 0.95)` | method | `(Lower, Upper, Slope, StandardError, PValue)` |
 | `MarginOfError(bool useY = false, double confidenceLevel = 0.95)` | method | `(Mean, MarginOfError)` for mean of x or y; n ≥ 2 |
+| `ToString()` | method | `Regression` summary plus ` PValue: …` (or `n/a` when n < 3) |
 
 ### `RegressionQValue : RegressionPvalue` — experimental
 
@@ -162,7 +163,7 @@ Some names are traditional rather than modern (for example `Sx2` for Σx²). Old
 
 ## License
 
-GNU Affero General Public License v3.0 (AGPL-3.0). See [`LICENSE`](LICENSE) for the full text.
+GNU Affero General Public License v3.0 or later (SPDX `AGPL-3.0-or-later`). See [`LICENSE`](LICENSE) for the full text.
 
 ## Contact
 

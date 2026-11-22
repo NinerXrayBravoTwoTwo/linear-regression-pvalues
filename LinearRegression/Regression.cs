@@ -57,7 +57,7 @@ public class Regression
     }
 
     /// <summary>
-    ///     Initialize a new regression with initial x & y
+    ///     Initialize a new regression with initial x and y
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>

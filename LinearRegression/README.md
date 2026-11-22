@@ -32,7 +32,7 @@ dotnet add package LinearRegression.Pvalues
 
 Or from source: clone this repository and add a project reference to `LinearRegression/LinearRegression.csproj`.
 
-Requirements: .NET 8 or later. The only dependency is [MathNet.Numerics](https://numerics.mathdotnet.com/) 5.0
+Requirements: .NET 8 or later (the package targets `net8.0` and `net10.0`). Building from source needs the .NET 10 SDK (see `global.json`). The only dependency is [MathNet.Numerics](https://numerics.mathdotnet.com/) 5.0
 (for the Student t distribution), which NuGet installs for you.
 
 Build and test:
@@ -130,6 +130,7 @@ arguments are methods.
 | `ConfidenceInterval(double confidenceLevel = 0.95)` | method | `(Lower, Upper)` for the slope; n ≥ 3 |
 | `ConfidenceIntervalPlus(double confidenceLevel = 0.95)` | method | `(Lower, Upper, Slope, StandardError, PValue)` |
 | `MarginOfError(bool useY = false, double confidenceLevel = 0.95)` | method | `(Mean, MarginOfError)` for mean of x or y; n ≥ 2 |
+| `ToString()` | method | `Regression` summary plus ` PValue: …` (or `n/a` when n < 3) |
 
 ### `RegressionQValue : RegressionPvalue` — experimental
 
@@ -139,6 +140,11 @@ arguments are methods.
 | `QValue(IReadOnlyList<RegressionPvalue> regressions)` | method | same, from a list of regressions |
 
 ## Release notes
+- **Version 1.2.0:  November 21, 2026**:
+- Corrected results: slope standard error (p-values and confidence intervals were too large/wide by √n), StdDev (n − 1) and MarginOfError. Re-run analyses that used 1.1.x.
+- Fixed min/max when constructed from a list, `Merge(null)`, `Dec(x)`, a live view of the caller's list, and Benjamini-Hochberg q-values.
+- Breaking: removed `Add(Regression)`; use `Merge`.
+- `RegressionPvalue.ToString()` includes the p-value. License expression corrected to AGPL-3.0-or-later. Targets net8.0 and net10.0; XML docs included.
 - **Version 1.1.3:  August 20, 2025**:
 - Buffer the p-value calculation to avoid unnecessary recalculations.
 - **Version 1.1.2:  August 08, 2025**:
@@ -182,7 +188,7 @@ Some names are traditional rather than modern (for example `Sx2` for Σx²). Old
 
 ## License
 
-GNU Affero General Public License v3.0 (AGPL-3.0). See [`LICENSE`](https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/blob/main/LICENSE) for the full text.
+GNU Affero General Public License v3.0 or later (SPDX `AGPL-3.0-or-later`). See [`LICENSE`](https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/blob/main/LICENSE) for the full text.
 
 ## Contact
 

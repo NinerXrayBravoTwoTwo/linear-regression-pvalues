@@ -1,9 +1,6 @@
-﻿using Xunit.Abstractions;
-using ITestOutputHelper = Xunit.ITestOutputHelper;
+﻿namespace RegressionTest;
 
-namespace RegressionTest;
-
-public class QValueTest(ITestOutputHelper testOutputHelper)
+public class QValueTest
 {
     [Fact]
     public void TestQValueCalculation()
