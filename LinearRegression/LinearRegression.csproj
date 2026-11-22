@@ -31,7 +31,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<!-- Matches LICENSE (GNU AGPL v3); "or later" per Jill, 2026-11-20. Was LGPL-3.0-or-later. -->
 		<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
-		<PackageReleaseNotes>1.2.0: corrected slope standard error (p-values and confidence intervals), StdDev (n - 1), min/max initialization, Merge(null), Dec(x), defensive copy of input points, Benjamini-Hochberg q-values. Breaking: Add(Regression) removed, use Merge. Full notes: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/blob/main/CHANGELOG.md</PackageReleaseNotes>
+		<PackageReleaseNotes>1.2.0 (follows 1.1.2 on NuGet; 1.1.3 was never published). Re-run analyses from 1.1.x: corrected slope standard error (p-values, CIs) and StdDev. Invalid results (n &lt; 3, NaN/infinite data, no x or y variation, bad confidence level) are now NaN, never 1, infinity or an exception. VarianceX/VarianceY are the sample (n - 1) variance. Numerically stable Welford accumulation (accurate for data far from zero, e.g. x = 1e9 + small). New RegressionQValue.BenjaminiHochberg batch q-values; NaN p-values are excluded. Fixes: min/max init, Merge(null), Dec(x), defensive copy of points, BH step-up. Breaking: Add(Regression) removed, use Merge. AGPL-3.0-or-later; net8.0 and net10.0. Full notes: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/blob/main/CHANGELOG.md</PackageReleaseNotes>
 		<IncludeSymbols>true</IncludeSymbols>
 		<!-- Modern symbol package format -->
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>

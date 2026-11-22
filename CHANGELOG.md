@@ -5,31 +5,41 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
-### Changed: numerically stable streaming accumulation (Welford)
-Sxx, Syy and the co-moment Cxy are now accumulated with Welford's streaming update, relative to the first point
-added ("shifted data"). `Dec` applies the exact reverse update; `Merge` uses the Chan–Golub–LeVeque pairwise combine.
-Slope, intercept, RSS (now computed from centred residuals), correlation, variances, slope SE, p-values and CIs
-no longer cancel catastrophically when the data are far from zero. Public API unchanged.
-- Before, x = 1e9 + small gave `VarianceX` = 0 and `Slope`/`PValue` = NaN; y = 1e9 + small gave `VarianceY` = 0 and a
-  p-value off by ~1e−6 relative. x = 1e6 + small gave p off by ~1e−9. Now the results match exact arithmetic to ~1e−14.
-- Ordinary data change only in the last digits (≈1e−15 relative), usually toward the exact value
-  (Anscombe I slope 0.5000909090909079 → 0.5000909090909091, exact 0.50009090909…).
-- `Sx`, `Sy`, `Sx2`, `Sy2`, `Sxy` still hold the raw sums (accumulated alongside). Setting one directly switches that
-  instance to the old raw-sum formulas. NaN/±∞ data also use the raw-sum formulas, so NaN propagation is unchanged.
-- Cost: `Add` ≈ 3.8 → 6.4 ns per point (10M points, .NET 10, Release).
+## [1.2.0] - 2026-11-21
 
-### Changed (breaking-ish): Variance uses the sample divisor n − 1
-`VarianceX`/`VarianceY` now return the sample variance (Sxx/(n − 1), numpy `var(ddof=1)`), the same divisor
-`StdDevX`/`StdDevY` already used, so `StdDev² == Variance`. Values grow by n/(n − 1). Examples: README 5-point
-2.0 → 2.5; Anscombe I x 10 → 11, y 3.752 → 4.127. Nothing else in the library read `VarianceX`/`VarianceY` (slope SE
-uses Sxx directly), so slope, p-values, confidence intervals, margin of error, correlation and q-values are
-unchanged for valid data.
-- `VarianceX`/`VarianceY` with N < 2 return NaN. N = 0 used to throw `DivideByZeroException`; N = 1 used to give 0.
-- `Regression.ToString()` (and so `RegressionPvalue.ToString()`) no longer throws on an empty instance; MinMax shows `n/a`.
-- When every x (or y) is equal, Variance and StdDev are exactly 0. Rounding used to leave noise, e.g. StdDevX 1.3e−9 for
-  x = 0.1 repeated, which also gave `MarginOfError` 1.6e−9 instead of 0.
+Numeric results change in this release: p-values, confidence intervals, standard deviations and
+margins of error from 1.1.x were wrong (see Fixed). Re-run any analysis that relied on them.
 
-### Changed (behaviour)
+1.2.0 also changes how invalid results are reported (always `NaN`), makes `VarianceX`/`VarianceY` the sample
+(n − 1) variance, and accumulates the sums in a numerically stable way.
+
+**NuGet note:** 1.1.3 was never published to NuGet. On nuget.org, 1.2.0 follows 1.1.2, so the 1.1.3 changes
+below ship for the first time in 1.2.0.
+
+### Breaking
+- Removed `Add(Regression)`; use `Merge`. `a.Add(b)` becomes `a = a.Merge(b)`; the sums, count and min/max
+  are the same, but `Merge` returns a new `Regression` instead of changing `a`.
+- Invalid results are now `double.NaN` instead of 1, +∞ or an exception (n < 3 used to throw). See
+  "Invalid results are NaN" below. (PR #7)
+- `VarianceX`/`VarianceY` are now the sample (n − 1) variance, so their values grow by n/(n − 1). (PR #8)
+
+### Fixed
+- **Slope standard error** was too large by √n (it divided by `VarianceX` = Sxx/n instead of Sxx). This
+  affected `PValue`, `ConfidenceInterval` and `ConfidenceIntervalPlus`. README 5-point example: p was 0.208,
+  now 0.0374 (matches SciPy); 95% CI was [−0.891, 2.691], now [0.0991, 1.7009]. (PR #2)
+- **`StdDevX`/`StdDevY`** computed √Sxx/(n−1) instead of √(Sxx/(n−1)), the n−1 sample standard deviation.
+  This also fixes `MarginOfError`. Example: 0.7906 → 1.5811. `Correlation` was unaffected. (PR #2)
+- `Regression(IEnumerable)` (and so `RegressionPvalue`) started `MinX`/`MinY`/`MaxX`/`MaxY` at 0
+  instead of ±`double.MaxValue`. (PR #3)
+- `Merge(null)` now throws `ArgumentNullException`. The old check tested a constant string. (PR #3)
+- `Dec(x)` removed y = N−1; it now removes y = N, the value `Add(x)` stored. (PR #3)
+- `RegressionPvalue` now copies the caller's list (`DataPoints`, `IdPoints`) instead of holding a live
+  view of it, so later changes to that list no longer desynchronize the points and the sums. (PR #3)
+- `RegressionQValue.QValue` (experimental): the Benjamini-Hochberg step-up is now a cumulative minimum
+  from the top rank. It only compared with the next rank, which could overstate q (e.g. 0.10 instead of
+  0.0625). Matches statsmodels `fdr_bh` / R `p.adjust("BH")`. (PR #3)
+
+### Changed: invalid results are NaN (PR #7)
 Invalid results are now always `double.NaN`: never 1, never ±∞, never an exception. With many regressions,
 filter invalid ones with `double.IsNaN(r.PValue)`; a real p = 1 is no longer mixed in with them.
 
@@ -49,41 +59,41 @@ filter invalid ones with `double.IsNaN(r.PValue)`; a real p = 1 is no longer mix
 - `RegressionQValue.QValue`: NaN/out-of-range family entries are excluded from the ranking and from m (matches
   statsmodels `fdr_bh` on the valid subset) instead of making the result NaN. It returns NaN when this regression's
   own p-value is NaN (it threw for n < 3). An empty family means m = 1, so q = p (it threw).
+- The +∞ p-value for infinite data came from b49b96d, which was never in a published package. It is
+  now `NaN`, as shown in the table above.
+
+### Changed: Variance uses the sample divisor n − 1 (PR #8)
+`VarianceX`/`VarianceY` now return the sample variance (Sxx/(n − 1), numpy `var(ddof=1)`), the same divisor
+`StdDevX`/`StdDevY` already used, so `StdDev² == Variance`. Values grow by n/(n − 1). Examples: README 5-point
+2.0 → 2.5; Anscombe I x 10 → 11, y 3.752 → 4.127. Nothing else in the library read `VarianceX`/`VarianceY` (slope SE
+uses Sxx directly), so slope, p-values, confidence intervals, margin of error, correlation and q-values are
+unchanged for valid data.
+- `VarianceX`/`VarianceY` with N < 2 return NaN. N = 0 used to throw `DivideByZeroException`; N = 1 used to give 0.
+- `Regression.ToString()` (and so `RegressionPvalue.ToString()`) no longer throws on an empty instance; MinMax shows `n/a`.
+- When every x (or y) is equal, Variance and StdDev are exactly 0. Rounding used to leave noise, e.g. StdDevX 1.3e−9 for
+  x = 0.1 repeated, which also gave `MarginOfError` 1.6e−9 instead of 0.
+
+### Changed: numerically stable streaming accumulation (PR #9)
+Sxx, Syy and the co-moment Cxy are now accumulated with Welford's streaming update, relative to the first point
+added ("shifted data"). `Dec` applies the exact reverse update; `Merge` uses the Chan–Golub–LeVeque pairwise combine.
+Slope, intercept, RSS (now computed from centred residuals), correlation, variances, slope SE, p-values and CIs
+no longer cancel catastrophically when the data are far from zero. Public API unchanged.
+- Before, x = 1e9 + small gave `VarianceX` = 0 and `Slope`/`PValue` = NaN; y = 1e9 + small gave `VarianceY` = 0 and a
+  p-value off by ~1e−6 relative. x = 1e6 + small gave p off by ~1e−9. Now the results match exact arithmetic to ~1e−14.
+- Ordinary data change only in the last digits (≈1e−15 relative), usually toward the exact value
+  (Anscombe I slope 0.5000909090909079 → 0.5000909090909091, exact 0.50009090909…).
+- `Sx`, `Sy`, `Sx2`, `Sy2`, `Sxy` still hold the raw sums (accumulated alongside). Setting one directly switches that
+  instance to the old raw-sum formulas. NaN/±∞ data also use the raw-sum formulas, so NaN propagation is unchanged.
+- Cost: `Add` ≈ 3.8 → 6.4 ns per point (10M points, .NET 10, Release).
 
 ### Added
-- `RegressionQValue.BenjaminiHochberg(IReadOnlyList<double>)`: q-values for a whole family in one O(m log m)
-  pass. NaN p-values give NaN q-values. Calling `QValue` once per regression is O(m² log m) in total.
-
-## [1.2.0] - 2026-11-21
-
-Numeric results change in this release: p-values, confidence intervals, standard deviations and
-margins of error from 1.1.x were wrong (see Fixed). Re-run any analysis that relied on them.
-
-### Breaking
-- Removed `Add(Regression)`; use `Merge`. `a.Add(b)` becomes `a = a.Merge(b)`; the sums, count and min/max
-  are the same, but `Merge` returns a new `Regression` instead of changing `a`.
-
-### Fixed
-- **Slope standard error** was too large by √n (it divided by `VarianceX` = Sxx/n instead of Sxx). This
-  affected `PValue`, `ConfidenceInterval` and `ConfidenceIntervalPlus`. README 5-point example: p was 0.208,
-  now 0.0374 (matches SciPy); 95% CI was [−0.891, 2.691], now [0.0991, 1.7009]. (PR #2)
-- **`StdDevX`/`StdDevY`** computed √Sxx/(n−1) instead of √(Sxx/(n−1)), the n−1 sample standard deviation.
-  This also fixes `MarginOfError`. Example: 0.7906 → 1.5811. `Correlation` was unaffected. (PR #2)
-- `Regression(IEnumerable)` (and so `RegressionPvalue`) started `MinX`/`MinY`/`MaxX`/`MaxY` at 0
-  instead of ±`double.MaxValue`. (PR #3)
-- `Merge(null)` now throws `ArgumentNullException`. The old check tested a constant string. (PR #3)
-- `Dec(x)` removed y = N−1; it now removes y = N, the value `Add(x)` stored. (PR #3)
-- `RegressionPvalue` now copies the caller's list (`DataPoints`, `IdPoints`) instead of holding a live
-  view of it, so later changes to that list no longer desynchronize the points and the sums. (PR #3)
-- `RegressionQValue.QValue` (experimental): the Benjamini-Hochberg step-up is now a cumulative minimum
-  from the top rank. It only compared with the next rank, which could overstate q (e.g. 0.10 instead of
-  0.0625). Matches statsmodels `fdr_bh` / R `p.adjust("BH")`. (PR #3)
-
-### Added
-- `RegressionPvalue.ToString()` appends ` PValue: <value>`, or `n/a (needs 3+ points)` when there are
-  fewer than 3 points. (PR #4)
+- `RegressionPvalue.ToString()` appends ` PValue: <value>`, or ` PValue: n/a` when the p-value is NaN. (PRs #4, #7)
 - Reference-value tests against SciPy/numpy/statsmodels (README dataset, Anscombe's quartet I), edge-case
-  tests, and a StdDev/Variance divisor comparison. 56 → 87 tests. (PRs #2–#4)
+  tests, and a StdDev/Variance divisor comparison. (PRs #2–#4)
+- `RegressionQValue.BenjaminiHochberg(IReadOnlyList<double>)`: q-values for a whole family in one O(m log m)
+  pass. NaN p-values give NaN q-values. Calling `QValue` once per regression is O(m² log m) in total. (PR #7)
+- Numerical-stability tests: shifted-data invariance, catastrophic cancellation, Dec/Merge round trips. (PR #9)
+- 56 → 146 tests in total (PRs #2–#9).
 
 ### Packaging
 - License expression corrected to `AGPL-3.0-or-later` to match `LICENSE` (it said `LGPL-3.0-or-later`).
@@ -104,12 +114,8 @@ margins of error from 1.1.x were wrong (see Fixed). Re-run any analysis that rel
 - Scaffolding review: each item and decision recorded in [docs/SCAFFOLDING.md](docs/SCAFFOLDING.md);
   `Regresion.cs` renamed to `Regression.cs`; commented-out code removed. (PR #4)
 
-### Changed
-- `RegressionPvalue.PValue` returns `+∞` when the data contains an infinite value (b49b96d).
-  Superseded in Unreleased: now `NaN`.
-
 ## [1.1.3] - 2025-08-20
-Version in the repository; not yet published to NuGet (latest published: 1.1.2).
+Never published to NuGet; these changes first ship in 1.2.0, which follows 1.1.2 on nuget.org.
 - Cache the p-value after the first calculation so repeated reads of `PValue` are cheap.
 - Removed an obsolete `RegressionPvalue` constructor.
 
