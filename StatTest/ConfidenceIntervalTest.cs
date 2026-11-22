@@ -109,17 +109,11 @@ public class ConfidenceIntervalTest(Xunit.ITestOutputHelper testOutputHelper)
         // Arrange
         var dataPoints = new List<(double x, double y)>
         {
-        //    (-1.0, -2.0),
-        //    (-2.0, -3.0),
-        //    (-3.0, -5.0),
-        //    (-4.0, -4.0),
-        //    (-5.0, -6.0)
-            (1.0, 2.0),
-            (2.0, 3.0),
-            (3.0, 5.0),
-            (4.0, 4.0),
-            (5.0, 6.0)
-
+            (-1.0, -2.0),
+            (-2.0, -3.0),
+            (-3.0, -5.0),
+            (-4.0, -4.0),
+            (-5.0, -6.0)
         };
 
         var regression = new RegressionPvalue(dataPoints);
@@ -127,7 +121,11 @@ public class ConfidenceIntervalTest(Xunit.ITestOutputHelper testOutputHelper)
         // Act
         var confidenceInterval = regression.ConfidenceInterval();
 
-        // Assert
+        // Assert: negating both x and y keeps slope 0.9, so the 95% CI matches the positive
+        // data set (SciPy linregress + t(0.975, 3): [0.09910190986563006, 1.70089809013437]).
+        Assert.Equal(0.9, regression.Slope, 12);
+        Assert.Equal(0.09910190986563006, confidenceInterval.Lower, 9);
+        Assert.Equal(1.70089809013437, confidenceInterval.Upper, 9);
 
         testOutputHelper.WriteLine($"Confidence Interval: [{confidenceInterval.Lower}, {confidenceInterval.Upper}]");
     }

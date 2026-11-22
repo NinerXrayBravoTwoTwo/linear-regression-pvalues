@@ -239,10 +239,7 @@ public class Regression
     {
         get
         {
-            if (!(N > 1)) return double.NaN;
-
-            // throw new InvalidOperationException(
-            //"There must be more than one sample to find the Standard Deviation.");
+            if (!(N > 1)) return double.NaN; // fewer than 2 samples: undefined, NaN rather than a throw
 
             return Math.Sqrt((Sx2 - Sx * Sx / N) / (N - 1));
         }
@@ -256,9 +253,7 @@ public class Regression
     {
         get
         {
-            if (!(N > 1)) return double.NaN;
-            //throw new InvalidOperationException(
-            //    "There must be more than one sample to find the Standard Deviation.");
+            if (!(N > 1)) return double.NaN; // fewer than 2 samples: undefined, NaN rather than a throw
 
             return Math.Sqrt((Sy2 - Sy * Sy / N) / (N - 1));
         }
@@ -302,15 +297,6 @@ public class Regression
     ///     The slope (m) of the regression line, calculated as (Sxy - Sx*Sy/N) / (Sx2 - Sx²/N). Returns double.NaN if N
     ///     &lt; 2 or the denominator is zero.
     /// </returns>
-    //public double SlopeI()
-    //{
-    //    if (N < 2) return double.NaN; // Insufficient data
-
-    //    var numerator = Sxy - Sx * Sy / N;
-    //    var denominator = Sx2 - Sx * Sx / N;
-    //    return denominator != 0 ? numerator / denominator : double.NaN;
-    //}
-
     public double Slope
     {
         get
@@ -328,8 +314,7 @@ public class Regression
     /// </summary>
     /// <returns>The y-intercept (b) of the regression line, calculated as (Sy - m*Sx) / N.</returns>
     public double YIntercept =>
-        // If something needs to be thrown it will happen
-        // in Slope().
+        // Slope is NaN when N < 2 or x has no variation; that NaN propagates here.
         (Sy - Slope * Sx) / N;
 
     /// <summary>

@@ -108,7 +108,6 @@ arguments are methods.
 | `Add(x, y)` / `Add(x)` | methods | `Add(x)` uses y = sample number (1, 2, 3, ...) |
 | `Dec(x, y)` / `Dec(x)` | methods | remove a previously added point; min/max are not rolled back |
 | `Merge(Regression other)` | method | returns a new combined `Regression` |
-| `Add(Regression other)` | method | deprecated; use `Merge` |
 | `N`, `Sx`, `Sy`, `Sx2`, `Sy2`, `Sxy` | properties | count and running sums |
 | `MinX`, `MaxX`, `MinY`, `MaxY` | properties | |
 | `MeanX`, `MeanY` | properties | 0 when N = 0 |

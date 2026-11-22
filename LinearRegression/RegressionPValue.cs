@@ -52,6 +52,16 @@ public partial class RegressionPvalue : Regression
         return DataPoints.Count();
     }
 
+    /// <summary>
+    ///     The <see cref="Regression.ToString" /> summary followed by the slope p-value, or "n/a" when there are
+    ///     fewer than 3 data points (where <see cref="PValue" /> would throw).
+    /// </summary>
+    public override string ToString()
+    {
+        var pValue = DataPointsCount() < 3 ? "n/a (needs 3+ points)" : PValue.ToString("G4");
+        return $"{base.ToString()} PValue: {pValue}";
+    }
+
     private double _savedPvalue = double.NaN;
     private bool _isSavedPvalue = false;
     /// <summary>

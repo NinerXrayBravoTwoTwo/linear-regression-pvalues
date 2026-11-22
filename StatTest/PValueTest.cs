@@ -18,7 +18,20 @@ public class PValueTest(Xunit.ITestOutputHelper testOutputHelper)
             dataPoints.Add((x++, y++)); // Changed to AddDataPoint to match the method in PValueStat
         //
         var regression = new RegressionPvalue(dataPoints);
-        testOutputHelper.WriteLine(regression.ToString()); //ToDo: create a more detailed ToString method in RegressionPvalue
+        var text = regression.ToString();
+        testOutputHelper.WriteLine(text);
+
+        // RegressionPvalue.ToString = Regression.ToString + the slope p-value.
+        Assert.StartsWith(new Regression(dataPoints).ToString(), text);
+        Assert.EndsWith($" PValue: {regression.PValue:G4}", text);
+    }
+
+    [Fact]
+    public void PValueToStringWithTooFewPointsDoesNotThrow()
+    {
+        var regression = new RegressionPvalue([(1.0, 2.0), (2.0, 3.0)]);
+        Assert.EndsWith(" PValue: n/a (needs 3+ points)", regression.ToString());
+        // Note: an empty instance still throws, from Regression.ToString (VarianceX with N = 0); not changed here.
     }
 
     [Fact]
@@ -622,8 +635,6 @@ public class PValueTest(Xunit.ITestOutputHelper testOutputHelper)
         // Create a PValueStat instance with sufficient data points
         // Create a PValueStat instance with a large dataset.
         var stat = new RegressionPvalue(dataPoints);
-
-        //testOutputHelper.WriteLine(stat.ToString());
 
         testOutputHelper.WriteLine(stat.ToString());
         // Assert that PValue returns a valid double value

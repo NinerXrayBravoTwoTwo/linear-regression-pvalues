@@ -1,8 +1,6 @@
 ﻿using LinearRegression;
 using Xunit.Abstractions;
 
-// Ensure this namespace is correct and contains the 'Statistic' class.
-
 namespace RegressionTest;
 
 public class RegressionTest(Xunit.ITestOutputHelper testOutputHelper)
@@ -22,8 +20,6 @@ public class RegressionTest(Xunit.ITestOutputHelper testOutputHelper)
         Assert.Equal(1, stat.Correlation);
         Assert.Equal(49.5, stat.MeanX);
         Assert.Equal(1, stat.Slope);
-
-        // Assert.Equal(100, stat.DataPoints.Count);
     }
 
     [Fact]
@@ -45,15 +41,12 @@ public class RegressionTest(Xunit.ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine(stat.ToString());
 
-        //        Assert.Equal(102, stat.DataPointsCount());  
         Assert.Equal(102, stat.N);
         Assert.False(stat.IsNaN);
         Assert.Equal(0, stat.MinX);
         Assert.Equal(1, stat.Correlation);
         Assert.Equal(50.5, stat.MeanX);
         Assert.Equal(1, stat.Slope);
-
-        //      Assert.Equal(100, stat.DataPoints.Count);
     }
 
     [Fact]
@@ -118,13 +111,15 @@ public class RegressionTest(Xunit.ITestOutputHelper testOutputHelper)
         Assert.False(original.IsNaN);
 
         // test - 
-        var clone = original.Merge(original); // Adding the original statistic to its clone, 
-                                              // a> should only affect the clone.
+        var originalN = original.N;
+        var clone = original.Merge(original); // Merging the original statistic with itself into a new instance,
+                                              // a> should only affect the clone (Merge leaves its inputs unchanged).
                                               // b> number of samples should double
                                               // c> variance should remain the same 
                                               // d> other sum attributes should all be doubled.
                                               // e> Mean should remain the same.
 
+        Assert.Equal(originalN, original.N);
         Assert.False(clone.IsNaN);
         Assert.Equal(original.N * 2, clone.N);
         Assert.Equal(original.VarianceX, clone.VarianceX);
@@ -187,35 +182,28 @@ public class RegressionTest(Xunit.ITestOutputHelper testOutputHelper)
     [Fact]
     public void StatAddStatWithNaN()
     {
-        // set up
+        // set up: a regression that contains one NaN y value
         var original = new Regression();
         double x = 0, y = -1;
         while (x < 500)
             original.Add(x++, y++);
+        original.Add(500, double.NaN);
 
         testOutputHelper.WriteLine(original.ToString());
-        Assert.False(original.IsNaN);
+        Assert.True(original.IsNaN);
 
-        // test - 
-        Regression clone = original.Merge(original); // Adding the original statistic to its clone, 
+        // test - merging a NaN-containing regression keeps the counts and x sums right,
+        // and the NaN propagates into the y sums and IsNaN.
+        Regression clone = original.Merge(original);
 
-        // a> should only affect the clone.
-        // b> number of samples should double
-        // c> variance should remain the same 
-        // d> other sum attributes should all be doubled.
-        // e> Mean should remain the same.
-        Assert.False(clone.IsNaN);
         Assert.Equal(original.N * 2, clone.N);
-        Assert.Equal(original.VarianceX, clone.VarianceX);
-        Assert.Equal(original.VarianceY, clone.VarianceY);
         Assert.Equal(original.Sx * 2, clone.Sx);
-        Assert.Equal(original.Sy * 2, clone.Sy);
-        Assert.Equal(original.Sy2 * 2, clone.Sy2);
-        Assert.Equal(original.Sxy * 2, clone.Sxy);
+        Assert.Equal(original.Sx2 * 2, clone.Sx2);
         Assert.Equal(original.MeanX, clone.MeanX);
-        Assert.Equal(original.MeanY, clone.MeanY);
-        Assert.False(clone.IsNaN);
-        // Assert
+        Assert.True(double.IsNaN(clone.Sy));
+        Assert.True(double.IsNaN(clone.Sxy));
+        Assert.True(double.IsNaN(clone.MeanY));
+        Assert.True(clone.IsNaN);
         testOutputHelper.WriteLine(clone.ToString());
     }
 }
