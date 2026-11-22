@@ -43,6 +43,10 @@ margins of error from 1.1.x were wrong (see Fixed). Re-run any analysis that rel
 - `dotnet pack` works with multi-targeting (removed `GeneratePackageOnBuild`, NU5026).
 - `global.json`: .NET 10 SDK and the Microsoft.Testing.Platform test runner (xunit v3), so `dotnet test`
   works on the .NET 10 SDK.
+- Test project runs on Microsoft.Testing.Platform only: removed `xunit.abstractions` (tests use xunit v3's
+  `Xunit.ITestOutputHelper`), and the VSTest-only `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`
+  and `coverlet.collector`. Coverage now comes from `Microsoft.Testing.Extensions.CodeCoverage`
+  (`dotnet test --coverage`). Test Explorer needs Visual Studio 2022 17.14+ (or another MTP-aware IDE).
 
 ### Documentation
 - Rewrote the root and package READMEs to match the current API, with installation, compiling usage

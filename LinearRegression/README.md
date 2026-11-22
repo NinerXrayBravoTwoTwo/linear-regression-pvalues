@@ -39,7 +39,8 @@ Build and test:
 
 ```bash
 dotnet build
-dotnet test
+dotnet test                      # net8.0 and net10.0, via Microsoft.Testing.Platform (global.json)
+dotnet test --coverage --coverage-output-format cobertura   # code coverage, written under TestResults/
 ```
 
 ## Quick start

@@ -1,6 +1,4 @@
 ﻿using LinearRegression;
-using Xunit.Abstractions;
-using ITestOutputHelper = Xunit.ITestOutputHelper;
 
 namespace RegressionTest;
 

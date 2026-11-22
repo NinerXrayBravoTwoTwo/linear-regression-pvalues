@@ -1,9 +1,8 @@
 ﻿using LinearRegression;
-using Xunit.Abstractions;
 
 namespace RegressionTest;
 
-public class RegressionTest(Xunit.ITestOutputHelper testOutputHelper)
+public class RegressionTest(ITestOutputHelper testOutputHelper)
 {
     [Fact]
     public void StatTestAccessDataPoints()

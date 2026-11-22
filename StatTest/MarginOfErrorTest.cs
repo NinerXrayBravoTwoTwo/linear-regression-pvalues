@@ -1,9 +1,8 @@
 ﻿using LinearRegression;
-using Xunit.Abstractions;
 
 namespace RegressionTest;
 
-public class MarginOfErrorTest(Xunit.ITestOutputHelper testOutputHelper)
+public class MarginOfErrorTest(ITestOutputHelper testOutputHelper)
 {
     [Fact]
     public void MeanConfidenceWithVerify()
