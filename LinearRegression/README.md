@@ -144,12 +144,16 @@ arguments are methods.
 | `BenjaminiHochberg(IReadOnlyList<double> pValues)` | static method | q-values for a whole family in one O(m log m) pass, same order as the input; NaN in → NaN out, excluded from m. Use this for large batches |
 
 ## Release notes
-- **Version 1.2.0:  November 21, 2026**:
+- **Version 1.2.0:  November 21, 2026** (follows 1.1.2 on NuGet; 1.1.3 was never published, and its changes are included here):
 - Corrected results: slope standard error (p-values and confidence intervals were too large/wide by √n), StdDev (n − 1) and MarginOfError. Re-run analyses that used 1.1.x.
-- Fixed min/max when constructed from a list, `Merge(null)`, `Dec(x)`, a live view of the caller's list, and Benjamini-Hochberg q-values.
+- Invalid results are now `double.NaN`, never 1, ∞ or an exception: n < 3, NaN or infinite data, no variation in x or y, or a confidence level outside (0, 1). Filter them with `double.IsNaN`.
+- Breaking-ish: `VarianceX`/`VarianceY` are now the sample (n − 1) variance, consistent with `StdDevX`/`StdDevY` (values grow by n/(n − 1)); NaN when N < 2.
+- Numerically stable Welford accumulation (with reverse updates for `Dec` and a pairwise combine for `Merge`): results stay accurate for data far from zero, e.g. x = 1e9 + small, where 1.1.x returned variance 0 and slope/p-value NaN.
+- New `RegressionQValue.BenjaminiHochberg(pValues)`: Benjamini-Hochberg q-values for a whole family in one pass; NaN p-values get NaN q-values and are excluded from the count.
+- Fixed min/max when constructed from a list, `Merge(null)`, `Dec(x)`, a live view of the caller's list, and the Benjamini-Hochberg step-up.
 - Breaking: removed `Add(Regression)`; use `Merge`.
-- `RegressionPvalue.ToString()` includes the p-value. License expression corrected to AGPL-3.0-or-later. Targets net8.0 and net10.0; XML docs included.
-- **Version 1.1.3:  August 20, 2025**:
+- `ToString()` includes the p-value and no longer throws on an empty instance. License expression corrected to AGPL-3.0-or-later. Targets net8.0 and net10.0; XML docs included.
+- **Version 1.1.3:  August 20, 2025** (never published to NuGet):
 - Buffer the p-value calculation to avoid unnecessary recalculations.
 - **Version 1.1.2:  August 08, 2025**:
 - Fix the signature of the parameterless constructor so empty `RegressionPvalue` instances are reliable.
