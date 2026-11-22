@@ -164,6 +164,36 @@ Some names are traditional rather than modern (for example `Sx2` for Σx²). Old
 | `LinearRegression/` | the library (NuGet package `LinearRegression.Pvalues`) and its package README |
 | `StatTest/` | xUnit tests |
 | `CHANGELOG.md` | release notes |
+| `.github/workflows/ci.yml` | build and test (Release, net8.0 + net10.0) on pull requests and pushes to `main` |
+| `.github/workflows/publish.yml` | publish to nuget.org with Trusted Publishing, then create the GitHub release |
+
+## Releasing
+
+Packages are published by GitHub Actions with nuget.org [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing)
+(OIDC). No long-lived NuGet API key is stored anywhere: the `NuGet/login` action swaps a GitHub OIDC token for a
+NuGet API key that is valid for one hour.
+
+One-time setup (already done for this repository):
+- nuget.org **Trusted Publishing** policy:
+  - package owner `Firefox_xb9r`, scope "Push new packages and package versions", package `LinearRegression.Pvalues`;
+  - Repository Owner `NinerXrayBravoTwoTwo`, Repository `linear-regression-pvalues`;
+  - Workflow File `publish.yml` (file name only), Environment `publish`.
+- The publish job runs in the GitHub environment `publish`. GitHub creates it automatically on the first run. You can
+  add protection rules to it later (Settings → Environments), such as required reviewers.
+- The workflow logs in as nuget.org user `Firefox_xb9r`, which is not secret. To use another account, set the
+  repository variable `NUGET_USER` (Settings → Secrets and variables → Actions → Variables).
+
+To release a version:
+1. Set `<Version>` in `LinearRegression/LinearRegression.csproj`, and move the CHANGELOG `[Unreleased]` notes to a new
+   `## [X.Y.Z] - date` section (plus `PackageReleaseNotes` and the package README notes). Merge to `main`.
+2. Tag the merge commit on `main` and push the tag: `git tag -a vX.Y.Z -m "…" && git push origin vX.Y.Z`.
+   The **Publish** workflow then:
+   - checks the tag is on `main` and matches the csproj version;
+   - tests and packs in Release;
+   - pushes the `.nupkg` and `.snupkg` (`--skip-duplicate`);
+   - creates the GitHub release from the CHANGELOG section.
+3. To publish a tag that already exists (for example `v1.2.0`), use **Actions → Publish → Run workflow**, keep the
+   branch at `main`, and enter the tag.
 
 ## License
 

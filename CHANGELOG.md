@@ -5,6 +5,12 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
+### Build and release
+- GitHub Actions: `ci.yml` builds and tests (Release, net8.0 + net10.0) on pull requests and on pushes to `main`.
+  `publish.yml` publishes to nuget.org with Trusted Publishing (OIDC, `NuGet/login@v1`, no stored API key) when a
+  `vX.Y.Z` tag is pushed, or on demand for an existing tag. It then creates the GitHub release from the CHANGELOG
+  section. Setup and steps are in the README under "Releasing".
+
 ## [1.2.0] - 2026-11-21
 
 Numeric results change in this release: p-values, confidence intervals, standard deviations and

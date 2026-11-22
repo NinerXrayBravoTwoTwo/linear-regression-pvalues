@@ -1,0 +1,122 @@
+# Publish LinearRegression.Pvalues to nuget.org with Trusted Publishing (OIDC): no long-lived API key.
+#
+# nuget.org Trusted Publishing policy (see README "Releasing"): package owner Firefox_xb9r,
+# repository owner NinerXrayBravoTwoTwo, repository linear-regression-pvalues, workflow publish.yml,
+# environment publish. GitHub creates the "publish" environment automatically on the first run.
+# The nuget.org user defaults to Firefox_xb9r; set the repository variable NUGET_USER to override it.
+#
+# Runs on a pushed tag vX.Y.Z, or manually (Actions > Publish > Run workflow) for an existing tag.
+name: Publish
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to publish, e.g. v1.2.0"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: publish  # must match the Environment in the nuget.org Trusted Publishing policy
+    permissions:
+      contents: write  # create the GitHub release
+      id-token: write  # GitHub OIDC token for NuGet/login
+    env:
+      TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+      DOTNET_NOLOGO: "1"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+    steps:
+      - name: Validate tag name
+        run: |
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag '$TAG' is not of the form vX.Y.Z"
+            exit 1
+          fi
+          echo "VERSION=${TAG#v}" >> "$GITHUB_ENV"
+
+      - name: Check out the tag
+        uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          fetch-depth: 0  # full history, to check the tag is on main
+
+      - name: Check the tag is on main
+        run: |
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "$(git rev-parse HEAD)" origin/main; then
+            echo "::error::$TAG ($(git rev-parse --short HEAD)) is not on main"
+            exit 1
+          fi
+
+      - name: Set up .NET 8 and 10
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Check the csproj version matches the tag
+        run: |
+          csproj_version="$(dotnet msbuild LinearRegression/LinearRegression.csproj -getProperty:Version)"
+          if [[ "$csproj_version" != "$VERSION" ]]; then
+            echo "::error::csproj Version is $csproj_version but the tag is $TAG"
+            exit 1
+          fi
+
+      - name: Test (Release, net8.0 and net10.0)
+        run: dotnet test -c Release
+
+      - name: Pack (Release)
+        run: dotnet pack LinearRegression/LinearRegression.csproj -c Release -o artifacts -p:ContinuousIntegrationBuild=true
+
+      - name: Upload packages as a workflow artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: packages-${{ env.TAG }}
+          path: artifacts/*
+
+      # The short-lived key is valid for 1 hour, so log in right before pushing.
+      - name: NuGet login (OIDC to temporary API key)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER || 'Firefox_xb9r' }}  # nuget.org username (not secret)
+
+      - name: Push to nuget.org (.nupkg; the .snupkg next to it is pushed automatically)
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: >
+          dotnet nuget push "artifacts/*.nupkg"
+          --api-key "$NUGET_API_KEY"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+
+      - name: Create the GitHub release from the CHANGELOG section
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release $TAG already exists; skipping."
+            exit 0
+          fi
+          awk -v v="$VERSION" '
+            index($0, "## [" v "]") == 1 { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          if [[ ! -s release-notes.md ]]; then
+            echo "No CHANGELOG section for $VERSION" > release-notes.md
+          fi
+          gh release create "$TAG" artifacts/* --verify-tag --title "$TAG" --notes-file release-notes.md
