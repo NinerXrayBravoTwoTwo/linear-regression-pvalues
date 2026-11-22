@@ -49,25 +49,6 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void KnownDatasetStat()
-    {
-        var stat = new Regression();
-
-        double x = 0;
-        double y = -1;
-        while (x < 100)
-            stat.Add(x++, y++);
-
-        testOutputHelper.WriteLine(stat.ToString());
-
-        Assert.False(stat.IsNaN);
-        Assert.Equal(0, stat.MinX);
-        Assert.Equal(1, stat.Correlation);
-        Assert.Equal(49.5, stat.MeanX);
-        Assert.Equal(1, stat.Slope);
-    }
-
-    [Fact]
     public void StatClone()
     {
         var original = new Regression();
@@ -114,15 +95,16 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         var clone = original.Merge(original); // Merging the original statistic with itself into a new instance,
                                               // a> should only affect the clone (Merge leaves its inputs unchanged).
                                               // b> number of samples should double
-                                              // c> variance should remain the same 
+                                              // c> population variance stays the same, so the sample (n-1)
+                                              //    variance changes by 2(n-1)/(2n-1)
                                               // d> other sum attributes should all be doubled.
                                               // e> Mean should remain the same.
 
         Assert.Equal(originalN, original.N);
         Assert.False(clone.IsNaN);
         Assert.Equal(original.N * 2, clone.N);
-        Assert.Equal(original.VarianceX, clone.VarianceX);
-        Assert.Equal(original.VarianceY, clone.VarianceY);
+        Assert.Equal(original.VarianceX * DuplicateFactor(original.N), clone.VarianceX, 8);
+        Assert.Equal(original.VarianceY * DuplicateFactor(original.N), clone.VarianceY, 8);
 
         Assert.Equal(original.Sx * 2, clone.Sx);
         Assert.Equal(original.Sy * 2, clone.Sy);
@@ -159,13 +141,13 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
 
         // a> should only affect the clone.
         // b> number of samples should double
-        // c> variance should remain the same 
+        // c> population variance stays the same, so the sample (n-1) variance changes by 2(n-1)/(2n-1)
         // d> other sum attributes should all be doubled.
         // e> Mean should remain the same.
 
         Assert.Equal(original.N * 2, clone.N);
-        Assert.Equal(original.VarianceX, clone.VarianceX);
-        Assert.Equal(original.VarianceY, clone.VarianceY);
+        Assert.Equal(original.VarianceX * DuplicateFactor(original.N), clone.VarianceX, 8);
+        Assert.Equal(original.VarianceY * DuplicateFactor(original.N), clone.VarianceY, 8);
         Assert.Equal(original.Sx * 2, clone.Sx);
         Assert.Equal(original.Sy * 2, clone.Sy);
         Assert.Equal(original.Sy2 * 2, clone.Sy2);
@@ -177,6 +159,10 @@ public class RegressionTest(ITestOutputHelper testOutputHelper)
         // Assert
         testOutputHelper.WriteLine(clone.ToString());
     }
+
+    // Sample variance of a data set merged with itself: n points become 2n with the same population variance,
+    // so s'^2 = s^2 * (n - 1) / n * 2n / (2n - 1) = s^2 * 2(n - 1) / (2n - 1).
+    private static double DuplicateFactor(double n) => 2.0 * (n - 1) / (2.0 * n - 1);
 
     [Fact]
     public void StatAddStatWithNaN()

@@ -30,7 +30,13 @@ public class PValueTest(ITestOutputHelper testOutputHelper)
     {
         var regression = new RegressionPvalue([(1.0, 2.0), (2.0, 3.0)]);
         Assert.EndsWith(" PValue: n/a", regression.ToString());
-        // Note: an empty instance still throws, from Regression.ToString (VarianceX with N = 0); not changed here.
+    }
+
+    [Fact]
+    public void PValueToStringEmptyAndOnePointDoNotThrow()
+    {
+        Assert.EndsWith(" PValue: n/a", new RegressionPvalue().ToString());
+        Assert.EndsWith(" PValue: n/a", new RegressionPvalue([(1.0, 2.0)]).ToString());
     }
 
     [Fact]

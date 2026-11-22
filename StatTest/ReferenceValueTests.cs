@@ -48,13 +48,13 @@ public class ReferenceValueTests
     }
 
     [Fact]
-    public void SmallDataset_PopulationVariance()
+    public void SmallDataset_SampleVariance()
     {
         var r = new RegressionPvalue(Small);
 
-        // numpy.var(x, ddof=0)
-        Assert.Equal(2.0, r.VarianceX, Precision);
-        Assert.Equal(2.0, r.VarianceY, Precision);
+        // numpy.var(x, ddof=1); was 2.0 (ddof=0) before the switch to n - 1
+        Assert.Equal(2.5, r.VarianceX, Precision);
+        Assert.Equal(2.5, r.VarianceY, Precision);
     }
 
     [Fact]
@@ -120,6 +120,8 @@ public class ReferenceValueTests
         Assert.Equal(0.8164205163448398, r.Correlation, Precision);
         Assert.Equal(3.3166247903554, r.StdDevX, Precision);
         Assert.Equal(2.031568135925815, r.StdDevY, Precision);
+        Assert.Equal(11.0, r.VarianceX, Precision);              // numpy.var(x, ddof=1)
+        Assert.Equal(4.127269090909091, r.VarianceY, Precision); // numpy.var(y, ddof=1)
         Assert.Equal(0.002169628873078799, r.PValue, Precision);
 
         var plus = r.ConfidenceIntervalPlus();

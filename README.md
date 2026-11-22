@@ -112,8 +112,8 @@ arguments are methods.
 | `N`, `Sx`, `Sy`, `Sx2`, `Sy2`, `Sxy` | properties | count and running sums |
 | `MinX`, `MaxX`, `MinY`, `MaxY` | properties | |
 | `MeanX`, `MeanY` | properties | 0 when N = 0 |
-| `StdDevX`, `StdDevY` | properties | n − 1 weighting; NaN when N < 2 |
-| `VarianceX`, `VarianceY` | properties | n weighting; throw `DivideByZeroException` when N = 0 |
+| `StdDevX`, `StdDevY` | properties | sample (n − 1), = √Variance, numpy `std(ddof=1)`; NaN when N < 2 |
+| `VarianceX`, `VarianceY` | properties | sample (n − 1), numpy `var(ddof=1)`; exactly 0 when all values are equal; NaN when N < 2 |
 | `Slope`, `YIntercept`, `Correlation`, `RSquared` | properties | NaN when undefined (N < 2, no variation in x, ...) |
 | `IsNaN` | property | true when any core statistic is NaN |
 | `ToString()` | method | one-line summary |

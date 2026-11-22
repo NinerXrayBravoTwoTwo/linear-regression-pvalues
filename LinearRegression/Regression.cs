@@ -232,62 +232,43 @@ public class Regression
     public double MeanY => N > 0 ? Sy / N : 0;
 
     /// <summary>
-    ///     Standard Deviation of X (requires at least 2 samples)
+    ///     Sample (n−1) standard deviation of X: √<see cref="VarianceX" />, the same as numpy <c>std(x, ddof=1)</c>.
     /// </summary>
-    /// <returns>Standard Deviation of X</returns>
-    public double StdDevX
-    {
-        get
-        {
-            if (!(N > 1)) return double.NaN; // fewer than 2 samples: undefined, NaN rather than a throw
-
-            return Math.Sqrt((Sx2 - Sx * Sx / N) / (N - 1));
-        }
-    }
+    /// <returns>The sample standard deviation of X, or <see cref="double.NaN" /> when N &lt; 2. Never throws.</returns>
+    public double StdDevX => Math.Sqrt(VarianceX);
 
     /// <summary>
-    ///     Standard Deviation of Y (requires at least 2 samples)
+    ///     Sample (n−1) standard deviation of Y: √<see cref="VarianceY" />, the same as numpy <c>std(y, ddof=1)</c>.
     /// </summary>
-    /// <returns>Standard Deviation of Y</returns>
-    public double StdDevY
-    {
-        get
-        {
-            if (!(N > 1)) return double.NaN; // fewer than 2 samples: undefined, NaN rather than a throw
-
-            return Math.Sqrt((Sy2 - Sy * Sy / N) / (N - 1));
-        }
-    }
+    /// <returns>The sample standard deviation of Y, or <see cref="double.NaN" /> when N &lt; 2. Never throws.</returns>
+    public double StdDevY => Math.Sqrt(VarianceY);
 
     /// <summary>
-    ///     Calculates the variance of X.
+    ///     Sample (n−1) variance of X: (Sx2 − Sx²/N) / (N − 1), the same as numpy <c>var(x, ddof=1)</c>.
     /// </summary>
-    /// <returns>The unweighted variance of X, calculated as Sx2 / N - (MeanX)².</returns>
-    /// <exception cref="DivideByZeroException">Thrown when the number of samples (N) is less than or equal to 0.</exception>
-    public double VarianceX
-    {
-        get
-        {
-            if (!(N > 0)) throw new DivideByZeroException("Number of samples needs to be greater than 0.");
-
-            return Sx2 / N - MeanX * MeanX;
-        }
-    }
+    /// <returns>
+    ///     The sample variance of X; exactly 0 when every x is equal; <see cref="double.NaN" /> when N &lt; 2 or the
+    ///     data contains NaN or infinity. Never throws.
+    /// </returns>
+    public double VarianceX => SampleVariance(Sx2, Sx, MinX, MaxX);
 
     /// <summary>
-    ///     Calculates the variance of Y.
+    ///     Sample (n−1) variance of Y: (Sy2 − Sy²/N) / (N − 1), the same as numpy <c>var(y, ddof=1)</c>.
     /// </summary>
-    /// <returns>The unweighted variance of Y, calculated as Sy2 / N - (MeanY)².</returns>
-    /// <exception cref="DivideByZeroException">Thrown when the number of samples (N) is less than or equal to 0.</exception>
-    public double VarianceY
-    {
-        get
-        {
-            if (N > 0)
-                return Sy2 / N - MeanY * MeanY;
+    /// <returns>
+    ///     The sample variance of Y; exactly 0 when every y is equal; <see cref="double.NaN" /> when N &lt; 2 or the
+    ///     data contains NaN or infinity. Never throws.
+    /// </returns>
+    public double VarianceY => SampleVariance(Sy2, Sy, MinY, MaxY);
 
-            throw new DivideByZeroException("Number of samples needs to be greater than 0.");
-        }
+    private double SampleVariance(double sumOfSquares, double sum, double min, double max)
+    {
+        if (N < 2) return double.NaN; // undefined for fewer than 2 samples
+
+        if (min == max) return 0.0; // all values equal; avoids rounding noise such as 1.7e-18 for x = 0.1 repeated
+
+        var variance = (sumOfSquares - sum * sum / N) / (N - 1);
+        return variance < 0 ? 0.0 : variance; // a tiny negative can only come from rounding; NaN passes through
     }
 
     /// <summary>
@@ -356,13 +337,20 @@ public class Regression
         }
     }
 
+    /// <summary>
+    ///     One-line summary of the regression. Never throws: statistics that are undefined for the current N
+    ///     print as NaN, and MinMax prints "n/a" for an empty instance.
+    /// </summary>
     public override string ToString()
     {
         var isInfinity = double.IsPositiveInfinity(Slope);
+        var minMax = N == 0
+            ? "x(n/a) y(n/a)"
+            : $"x({MinX:0.##} <-> {MaxX:0.##}) y({MinY:0.####} <-> {MaxY:0.####})";
         var result = isInfinity
             ? $"NaN - {N}"
             : $"Slope: {Slope:F2} R^2: {RSquared:f3} N={N} StdDev: (x{StdDevX:F3} y{StdDevY:F3}) Variance: (x{VarianceX:F3} y{VarianceY:F3}) Y-intercept: {YIntercept:F3}  Cor: {Correlation:F4} " +
-              $"Mean: (x{MeanX:F2} y{MeanY:F2}) MinMax: x({MinX:0.##} <-> {MaxX:0.##}) y({MinY:0.####} <-> {MaxY:0.####}) isNaN:{IsNaN}";
+              $"Mean: (x{MeanX:F2} y{MeanY:F2}) MinMax: {minMax} isNaN:{IsNaN}";
 
         return result;
     }

@@ -7,7 +7,7 @@ each item, so nothing disappears silently. Statistics did not change. Tests: 86 
 |---|---|---|---|---|
 | 1 | `LinearRegression/Regresion.cs` | Misspelled file name | **Renamed** to `Regression.cs` with `git mv` (`git log --follow` keeps history) | `05a8c56` |
 | 2 | `//public double SlopeI()` in `Regression` | Commented-out verbatim copy of `Slope`. It sat between Slope's XML doc and `Slope`, so the doc had no member to attach to | **Removed**. The doc now attaches to `Slope` | `a994f52` |
-| 3 | Commented-out `throw new InvalidOperationException(...)` in `StdDevX`/`StdDevY` | An older choice to throw when N < 2 | **Removed**. The current behaviour (return NaN when N < 2) is kept and noted in a comment. The n vs n−1 divisor question is untouched | `a994f52` |
+| 3 | Commented-out `throw new InvalidOperationException(...)` in `StdDevX`/`StdDevY` | An older choice to throw when N < 2 | **Removed**. The current behaviour (return NaN when N < 2) is kept and noted in a comment. The n vs n−1 divisor question was later decided: n − 1 everywhere (Unreleased) | `a994f52` |
 | 4 | Comment in `YIntercept`: "If something needs to be thrown it will happen in Slope()" | Stale: `Slope` returns NaN and never throws | **Replaced** with an accurate one-line comment | `a994f52` |
 | 5 | `RegressionQValue`: commented-out `_isSavedQvalue`/`_savedQvalue` cache | An unfinished cache copied from `PValue` | **Removed**. A comment explains why there's no cache: a q-value depends on the family of p-values passed in | `a994f52` |
 | 6 | `//ToDo: create a more detailed ToString method in RegressionPvalue` (`PValueTest`) | Unfinished feature | **Finished**. `RegressionPvalue.ToString()` is `Regression.ToString()` + ` PValue: <G4>`, or `n/a (needs 3+ points)` when n < 3. Two tests added | `e166e47` |
@@ -24,10 +24,10 @@ each item, so nothing disappears silently. Statistics did not change. Tests: 86 
 
 ## Left for Jill to decide (not changed)
 
-- `RegressionTest.StatTestAccessDataPoints` and `RegressionTest.KnownDatasetStat` are identical tests. Keep both, remove one, or turn one into a different check.
+- ~~`RegressionTest.StatTestAccessDataPoints` and `RegressionTest.KnownDatasetStat` are identical tests.~~ Resolved: `KnownDatasetStat` (still identical apart from a blank line) was removed.
 - ~~`PValueWithSingleDataPointReturnsNaN` and `PValueWithTwoDataPointsReturnsNaN` assert a throw, not NaN.~~ Resolved: `PValue` now returns NaN for n < 3, so the names are accurate.
 - `PValueWithMixedDataTypesReturnsNaN`: its comment mentions "string, null", but the data is only a NaN.
 - `TestConfidenceIntervalWithZeroData` uses random data for its first point. It only checks that `ConfidenceInterval` and `ConfidenceIntervalPlus` agree, so it can't fail on a value, but the name doesn't describe it.
-- `Regression.ToString()` throws `DivideByZeroException` on an empty instance (via `VarianceX`), so `new RegressionPvalue().ToString()` throws too. Found while finishing item 6. Not changed, because `VarianceX` behaviour for N = 0 is part of the open divisor and variance question.
+- ~~`Regression.ToString()` throws `DivideByZeroException` on an empty instance (via `VarianceX`).~~ Resolved: `VarianceX`/`VarianceY` use n − 1 and return NaN for N < 2, and `ToString()` prints `MinMax: x(n/a) y(n/a)` when empty.
 - `QValueTest` has an unused `testOutputHelper` parameter (warning CS9113).
 - XML `cref="RegressionQvalue"` (wrong case) in `RegressionQValue` constructors. Fix in the XML-docs PR.
