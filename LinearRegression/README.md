@@ -17,6 +17,8 @@ Source: <https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues>
 - **Inference** (`RegressionPvalue`) — slope p-value (Student t, n − 2 degrees of freedom), confidence
   interval at any level, standard error, margin of error for the mean of x or y.
 - **Point ids** — optionally tag each (x, y) with a string id that stays aligned with the data.
+- **Numerically stable streaming** — Welford updates (with Dec and Merge support) keep results accurate for data
+  far from zero, e.g. x = 1e9 + small, where raw sums of squares cancel.
 - **Experimental q-values** (`RegressionQValue`) — Benjamini-Hochberg false-discovery-rate adjustment.
 - **No exceptions for ordinary bad data** — undefined results come back as `double.NaN`; the few
   exceptions are listed in the API overview.

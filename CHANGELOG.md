@@ -5,6 +5,19 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
+### Changed: numerically stable streaming accumulation (Welford)
+Sxx, Syy and the co-moment Cxy are now accumulated with Welford's streaming update, relative to the first point
+added ("shifted data"). `Dec` applies the exact reverse update; `Merge` uses the Chan–Golub–LeVeque pairwise combine.
+Slope, intercept, RSS (now computed from centred residuals), correlation, variances, slope SE, p-values and CIs
+no longer cancel catastrophically when the data are far from zero. Public API unchanged.
+- Before, x = 1e9 + small gave `VarianceX` = 0 and `Slope`/`PValue` = NaN; y = 1e9 + small gave `VarianceY` = 0 and a
+  p-value off by ~1e−6 relative. x = 1e6 + small gave p off by ~1e−9. Now the results match exact arithmetic to ~1e−14.
+- Ordinary data change only in the last digits (≈1e−15 relative), usually toward the exact value
+  (Anscombe I slope 0.5000909090909079 → 0.5000909090909091, exact 0.50009090909…).
+- `Sx`, `Sy`, `Sx2`, `Sy2`, `Sxy` still hold the raw sums (accumulated alongside). Setting one directly switches that
+  instance to the old raw-sum formulas. NaN/±∞ data also use the raw-sum formulas, so NaN propagation is unchanged.
+- Cost: `Add` ≈ 3.8 → 6.4 ns per point (10M points, .NET 10, Release).
+
 ### Changed (breaking-ish): Variance uses the sample divisor n − 1
 `VarianceX`/`VarianceY` now return the sample variance (Sxx/(n − 1), numpy `var(ddof=1)`), the same divisor
 `StdDevX`/`StdDevY` already used, so `StdDev² == Variance`. Values grow by n/(n − 1). Examples: README 5-point
