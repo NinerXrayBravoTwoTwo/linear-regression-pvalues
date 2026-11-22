@@ -5,6 +5,17 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
+### Changed (breaking-ish): Variance uses the sample divisor n − 1
+`VarianceX`/`VarianceY` now return the sample variance (Sxx/(n − 1), numpy `var(ddof=1)`), the same divisor
+`StdDevX`/`StdDevY` already used, so `StdDev² == Variance`. Values grow by n/(n − 1). Examples: README 5-point
+2.0 → 2.5; Anscombe I x 10 → 11, y 3.752 → 4.127. Nothing else in the library read `VarianceX`/`VarianceY` (slope SE
+uses Sxx directly), so slope, p-values, confidence intervals, margin of error, correlation and q-values are
+unchanged for valid data.
+- `VarianceX`/`VarianceY` with N < 2 return NaN. N = 0 used to throw `DivideByZeroException`; N = 1 used to give 0.
+- `Regression.ToString()` (and so `RegressionPvalue.ToString()`) no longer throws on an empty instance; MinMax shows `n/a`.
+- When every x (or y) is equal, Variance and StdDev are exactly 0. Rounding used to leave noise, e.g. StdDevX 1.3e−9 for
+  x = 0.1 repeated, which also gave `MarginOfError` 1.6e−9 instead of 0.
+
 ### Changed (behaviour)
 Invalid results are now always `double.NaN`: never 1, never ±∞, never an exception. With many regressions,
 filter invalid ones with `double.IsNaN(r.PValue)`; a real p = 1 is no longer mixed in with them.
