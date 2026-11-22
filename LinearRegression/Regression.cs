@@ -28,7 +28,9 @@
 ///     correlation coefficient = R = (m StdDevX) / StdDevY
 ///     Numerics: the centred sums Sxx = sum((x - mean x)^2), Syy and the co-moment Cxy = sum((x - mean x)(y - mean y))
 ///     are accumulated with Welford's streaming update (reverse update in Dec, Chan et al. pairwise combine in Merge),
-///     so results stay accurate for data far from zero (e.g. x = 1e9 + small). The raw sums Sx, Sy, Sx2, Sy2, Sxy are
+///     so results stay accurate for data far from zero (e.g. x = 1e9 + small).
+///     The streaming moments are double-double (about 32 digits), so Dec can remove a point that dominated the sums
+///     (e.g. one far from the rest of the data) without losing the remaining ones (issue #14). The raw sums Sx, Sy, Sx2, Sy2, Sxy are
 ///     still accumulated alongside for the public properties; the textbook raw-sum formulas are used only as a
 ///     fallback (see <see cref="IsStreamingValid" />).
 /// </remarks>
@@ -88,8 +90,10 @@ public class Regression
     // Streaming (Welford) state, kept relative to a reference point (_kx, _ky) = the first point added
     // ("shifted data"), so the running means stay small and do not lose digits when the data are far from zero:
     // means of (x - _kx) and (y - _ky), centred sums of squares and the centred co-moment.
+    // The moments are double-double (about 32 digits) so Dec can remove a point that dominated them (for example
+    // one far from the rest of the data) without cancelling away the remaining sums; see docs/MATH.md.
     private double _kx, _ky;
-    private double _meanX, _meanY, _m2X, _m2Y, _cXY;
+    private DoubleDouble _meanX, _meanY, _m2X, _m2Y, _cXY;
     private bool _streamingValid;
 
     /// <summary>
@@ -130,39 +134,39 @@ public class Regression
     ///     Centred sum of squares of x, Sxx = sum((x - mean x)^2). Streaming (Welford) when valid, else Sx2 - Sx^2/N.
     /// </summary>
     protected double CenteredSumSquaresX =>
-        _streamingValid ? _m2X : N > 0 ? _sx2 - _sx * _sx / N : 0;
+        _streamingValid ? _m2X.Value : N > 0 ? _sx2 - _sx * _sx / N : 0;
 
     /// <summary>
     ///     Centred sum of squares of y, Syy = sum((y - mean y)^2). Streaming when valid, else Sy2 - Sy^2/N.
     /// </summary>
     protected double CenteredSumSquaresY =>
-        _streamingValid ? _m2Y : N > 0 ? _sy2 - _sy * _sy / N : 0;
+        _streamingValid ? _m2Y.Value : N > 0 ? _sy2 - _sy * _sy / N : 0;
 
     /// <summary>
     ///     Centred co-moment, Cxy = sum((x - mean x)(y - mean y)). Streaming when valid, else Sxy - Sx*Sy/N.
     /// </summary>
     protected double CenteredCoMoment =>
-        _streamingValid ? _cXY : N > 0 ? _sxy - _sx * _sy / N : 0;
+        _streamingValid ? _cXY.Value : N > 0 ? _sxy - _sx * _sy / N : 0;
 
     /// <summary>
     ///     Mean of x used for centring: the streaming mean when valid, else Sx/N.
     /// </summary>
-    protected double CenterX => _streamingValid ? _kx + _meanX : N > 0 ? _sx / N : 0;
+    protected double CenterX => _streamingValid ? (_kx + _meanX).Value : N > 0 ? _sx / N : 0;
 
     /// <summary>
     ///     Mean of y used for centring: the streaming mean when valid, else Sy/N.
     /// </summary>
-    protected double CenterY => _streamingValid ? _ky + _meanY : N > 0 ? _sy / N : 0;
+    protected double CenterY => _streamingValid ? (_ky + _meanY).Value : N > 0 ? _sy / N : 0;
 
     /// <summary>
     ///     x minus the mean of x, computed as (x - reference) - shifted mean to avoid cancellation.
     /// </summary>
-    protected double DeviationX(double x) => _streamingValid ? (x - _kx) - _meanX : x - CenterX;
+    protected double DeviationX(double x) => _streamingValid ? (DoubleDouble.Difference(x, _kx) - _meanX).Value : x - CenterX;
 
     /// <summary>
     ///     y minus the mean of y, computed as (y - reference) - shifted mean to avoid cancellation.
     /// </summary>
-    protected double DeviationY(double y) => _streamingValid ? (y - _ky) - _meanY : y - CenterY;
+    protected double DeviationY(double y) => _streamingValid ? (DoubleDouble.Difference(y, _ky) - _meanY).Value : y - CenterY;
 
     private void CopyStateFrom(Regression o)
     {
@@ -176,7 +180,8 @@ public class Regression
 
     private void ResetStreaming()
     {
-        _kx = _ky = _meanX = _meanY = _m2X = _m2Y = _cXY = 0;
+        _kx = _ky = 0;
+        _meanX = _meanY = _m2X = _m2Y = _cXY = DoubleDouble.Zero;
     }
 
     /// <summary>
@@ -252,11 +257,11 @@ public class Regression
         var n = r.N;
         r._kx = a._kx;
         r._ky = a._ky;
-        var dx = (b._kx - a._kx) + (b._meanX - a._meanX);
-        var dy = (b._ky - a._ky) + (b._meanY - a._meanY);
-        var w = a.N * b.N / n;
-        r._meanX = a._meanX + dx * (b.N / n);
-        r._meanY = a._meanY + dy * (b.N / n);
+        var dx = DoubleDouble.Difference(b._kx, a._kx) + (b._meanX - a._meanX);
+        var dy = DoubleDouble.Difference(b._ky, a._ky) + (b._meanY - a._meanY);
+        var w = new DoubleDouble(a.N) * b.N / n;
+        r._meanX = a._meanX + dx * b.N / n;
+        r._meanY = a._meanY + dy * b.N / n;
         r._m2X = a._m2X + b._m2X + dx * dx * w;
         r._m2Y = a._m2Y + b._m2Y + dy * dy * w;
         r._cXY = a._cXY + b._cXY + dx * dy * w;
@@ -291,8 +296,8 @@ public class Regression
                 {
                     // Welford on the shifted values: update means, then the centred sums with the
                     // deviations from the old and the new mean.
-                    var sx = x - _kx;
-                    var sy = y - _ky;
+                    var sx = DoubleDouble.Difference(x, _kx);
+                    var sy = DoubleDouble.Difference(y, _ky);
                     var dx = sx - _meanX;
                     var dy = sy - _meanY;
                     _meanX += dx / N;
@@ -357,8 +362,8 @@ public class Regression
         }
 
         // Reverse Welford on the shifted values: recover the previous means, then remove this point's contribution.
-        var sx = x - _kx;
-        var sy = y - _ky;
+        var sx = DoubleDouble.Difference(x, _kx);
+        var sy = DoubleDouble.Difference(y, _ky);
         var dxNew = sx - _meanX; // deviation from the mean that included the point
         var dyNew = sy - _meanY;
         _meanX -= dxNew / N;

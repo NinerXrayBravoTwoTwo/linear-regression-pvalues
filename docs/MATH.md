@@ -21,6 +21,16 @@ The library accumulates these centred sums with Welford's streaming update, meas
 (Chan's pairwise combine is used in `Merge`, and the exact reverse update in `Dec`), so they stay accurate when the data
 are far from zero. The raw sums `Sx`, `Sx2` and so on are still kept for the public properties.
 
+**Downdate precision (`Dec`).** Removing a point reverses the Welford update by subtraction. If the removed point
+dominated the sums (for example $x = 0$ added to data near $10^6$, where it adds about $10^{12}$ to $S_{xx}$
+against a true $S_{xx}$ of about $10^{-3}$), plain doubles keep only about 16 digits of that $10^{12}$, and the
+subtraction leaves mostly rounding error (issue #14). The streaming means, $S_{xx}$, $S_{yy}$ and $S_{xy}$ are therefore
+held as double-double values (an unevaluated sum of two doubles, about 32 digits) and updated with error-free
+TwoSum/FMA products, so an `Add` followed by `Dec` of the same point restores the statistics to full double
+precision. The remaining limit: removing a point whose contribution exceeds the remaining $S_{xx}$ by more than
+about $10^{16}$ loses digits in proportion. For example, a point at $x = 10^{12}$ against $S_{xx} = 10^{-3}$ keeps about 6 digits.
+Add and Dec cost about 3 times as much as with plain doubles (about 70 ns instead of 25 ns per point).
+
 ## Descriptive statistics (sample, n − 1)
 
 `VarianceX`, `VarianceY`, `StdDevX` and `StdDevY` use the sample divisor $n - 1$ (Excel `VAR.S` / `STDEV.S`):
