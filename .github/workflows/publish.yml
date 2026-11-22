@@ -1,10 +1,9 @@
 # Publish LinearRegression.Pvalues to nuget.org with Trusted Publishing (OIDC): no long-lived API key.
 #
-# One-time setup (see README "Releasing"):
-#   - nuget.org > your username > Trusted Publishing > policy: owner NinerXrayBravoTwoTwo,
-#     repository linear-regression-pvalues, workflow file publish.yml, environment empty.
-#   - GitHub repo > Settings > Secrets and variables > Actions > Variables: NUGET_USER = nuget.org
-#     username (profile name, not the email address).
+# nuget.org Trusted Publishing policy (see README "Releasing"): package owner Firefox_xb9r,
+# repository owner NinerXrayBravoTwoTwo, repository linear-regression-pvalues, workflow publish.yml,
+# environment publish. GitHub creates the "publish" environment automatically on the first run.
+# The nuget.org user defaults to Firefox_xb9r; set the repository variable NUGET_USER to override it.
 #
 # Runs on a pushed tag vX.Y.Z, or manually (Actions > Publish > Run workflow) for an existing tag.
 name: Publish
@@ -30,6 +29,7 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: publish  # must match the Environment in the nuget.org Trusted Publishing policy
     permissions:
       contents: write  # create the GitHub release
       id-token: write  # GitHub OIDC token for NuGet/login
@@ -92,7 +92,7 @@ jobs:
         id: login
         uses: NuGet/login@v1
         with:
-          user: ${{ vars.NUGET_USER }}
+          user: ${{ vars.NUGET_USER || 'Firefox_xb9r' }}  # nuget.org username (not secret)
 
       - name: Push to nuget.org (.nupkg; the .snupkg next to it is pushed automatically)
         env:

@@ -173,11 +173,15 @@ Packages are published by GitHub Actions with nuget.org [Trusted Publishing](htt
 (OIDC). No long-lived NuGet API key is stored anywhere: the `NuGet/login` action swaps a GitHub OIDC token for a
 NuGet API key that is valid for one hour.
 
-One-time setup:
-1. On nuget.org: your username → **Trusted Publishing** → add a policy with Repository Owner `NinerXrayBravoTwoTwo`,
-   Repository `linear-regression-pvalues`, Workflow File `publish.yml` (file name only) and Environment left empty.
-2. On GitHub: repository **Settings → Secrets and variables → Actions → Variables** → add `NUGET_USER` = your
-   nuget.org username (profile name, not your email address).
+One-time setup (already done for this repository):
+- nuget.org **Trusted Publishing** policy:
+  - package owner `Firefox_xb9r`, scope "Push new packages and package versions", package `LinearRegression.Pvalues`;
+  - Repository Owner `NinerXrayBravoTwoTwo`, Repository `linear-regression-pvalues`;
+  - Workflow File `publish.yml` (file name only), Environment `publish`.
+- The publish job runs in the GitHub environment `publish`. GitHub creates it automatically on the first run. You can
+  add protection rules to it later (Settings → Environments), such as required reviewers.
+- The workflow logs in as nuget.org user `Firefox_xb9r`, which is not secret. To use another account, set the
+  repository variable `NUGET_USER` (Settings → Secrets and variables → Actions → Variables).
 
 To release a version:
 1. Set `<Version>` in `LinearRegression/LinearRegression.csproj`, and move the CHANGELOG `[Unreleased]` notes to a new
