@@ -5,6 +5,12 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
+### Fixed
+- **Tiny p-values no longer round to 0.** `PValue` (and so `ConfidenceIntervalPlus().PValue`) is now
+  2·CDF(−|t|) instead of 2·(1 − CDF(|t|)), which lost every digit below about 1e−16. Example (n = 30, t = 25.05):
+  p was 0, now 1.0294e−20 (SciPy 1.0294e−20). Small p-values also gain digits, e.g. 2.0625857e−10 →
+  2.0625847e−10 (SciPy 2.0625847e−10). p-values near 1 and NaN for invalid results are unchanged.
+
 ### Build and release
 - GitHub Actions: `ci.yml` builds and tests (Release, net8.0 + net10.0) on pull requests and on pushes to `main`.
   `publish.yml` publishes to nuget.org with Trusted Publishing (OIDC, `NuGet/login@v1`, no stored API key) when a

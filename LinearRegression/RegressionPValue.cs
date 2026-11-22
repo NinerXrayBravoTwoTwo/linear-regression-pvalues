@@ -109,9 +109,10 @@ public partial class RegressionPvalue : Regression
         if (double.IsNaN(t) || double.IsInfinity(t))
             return double.NaN;
 
-        // Two-tailed p-value from the t distribution
+        // Two-tailed p-value from the t distribution: p = 2 * CDF(-|t|), the lower tail.
+        // (2 * (1 - CDF(|t|)) loses every digit below about 1e-16 and rounds tiny p-values to 0.)
         double degreesOfFreedom = n - 2;
-        var pValue = 2 * (1 - DistributionCdf(Math.Abs(t), degreesOfFreedom));
+        var pValue = 2 * DistributionCdf(-Math.Abs(t), degreesOfFreedom);
 
         if (double.IsNaN(pValue))
             return double.NaN;
