@@ -25,48 +25,69 @@
         /// <summary>
         /// Calculates the Q-value (FDR-adjusted P-value) for the regression slope using the Benjamini-Hochberg procedure.
         /// </summary>
-        /// <param name="pValues">A list of P-values from multiple regression tests, including this regression's P-value.</param>
-        /// <returns>The Q-value for this regression's slope, or double.NaN if invalid.</returns>
-        /// <exception cref="InvalidOperationException">Thrown if there are insufficient data points or P-values.</exception>
+        /// <param name="pValues">
+        /// P-values of the whole family of tests, normally including this regression's own <see cref="RegressionPvalue.PValue" />
+        /// (it is added if missing). Invalid entries (NaN, or outside [0, 1]) are excluded from the ranking and from m,
+        /// as in statsmodels <c>fdr_bh</c> applied to the valid subset.
+        /// </param>
+        /// <returns>
+        /// The q-value in [0, 1], or <see cref="double.NaN" /> when this regression's own p-value is NaN (see
+        /// <see cref="RegressionPvalue.PValue" />). Never throws.
+        /// </returns>
         public double QValue(IReadOnlyList<double> pValues)
         {
-            if (DataPoints.Count() < 3)
-                throw new InvalidOperationException("At least 3 data points are required to compute the Q-value.");
-
-            if (IsDataContainsNan || pValues.Any(p => double.IsNaN(p) || p < 0 || p > 1))
-                return double.NaN;
-
-            if (pValues.Count < 1)
-                throw new InvalidOperationException("At least one P-value is required to compute the Q-value.");
-
-            // Get the P-value for this regression
             var currentPValue = PValue;
-            if (double.IsNaN(currentPValue))
+            if (!IsValidPValue(currentPValue))
                 return double.NaN;
 
-            // Ensure the current P-value is included in the list
-            var pValueList = pValues.Where(p => !double.IsNaN(p)).ToList();
-            if (!pValueList.Contains(currentPValue))
-                pValueList.Add(currentPValue);
+            var family = pValues.Where(IsValidPValue).ToList();
+            if (!family.Contains(currentPValue))
+                family.Add(currentPValue);
 
-            // Sort P-values in ascending order and assign ranks
-            var sortedPValues = pValueList.OrderBy(p => p).ToList();
-            var rank = sortedPValues.IndexOf(currentPValue) + 1; // 1-based rank
-            var m = sortedPValues.Count; // Total number of tests
+            family.Sort();
+            var rank = family.IndexOf(currentPValue) + 1; // 1-based; first of any ties
+            var m = family.Count;
 
             // Benjamini-Hochberg step-up: q(rank) = min over k >= rank of p(k) * m / k,
             // i.e. a cumulative minimum taken from the top rank (m) down to this rank.
             var qValue = double.PositiveInfinity;
             for (var k = m; k >= rank; k--)
-                qValue = Math.Min(qValue, sortedPValues[k - 1] * m / k);
+                qValue = Math.Min(qValue, family[k - 1] * m / k);
 
-            qValue = Math.Min(1.0, Math.Max(0.0, qValue)); // Clamp to [0, 1]
-
-            if (double.IsNaN(qValue) || double.IsInfinity(qValue))
-                qValue = 1.0; // Defensive: return 1 for degenerate cases
-
-            return qValue;
+            return Math.Min(1.0, qValue);
         }
+
+        /// <summary>
+        /// Benjamini-Hochberg q-values for a whole family in one pass (O(m log m)), aligned with the input.
+        /// Use this rather than calling <see cref="QValue(IReadOnlyList{double})" /> once per regression when the
+        /// family is large. Invalid entries (NaN, or outside [0, 1]) get a NaN q-value and are excluded from the
+        /// ranking and from m.
+        /// </summary>
+        /// <param name="pValues">The family of p-values.</param>
+        /// <returns>An array of q-values, one per input p-value, in the same order.</returns>
+        public static double[] BenjaminiHochberg(IReadOnlyList<double> pValues)
+        {
+            var q = new double[pValues.Count];
+            Array.Fill(q, double.NaN);
+
+            var valid = Enumerable.Range(0, pValues.Count)
+                .Where(i => IsValidPValue(pValues[i]))
+                .OrderBy(i => pValues[i])
+                .ToArray();
+            var m = valid.Length;
+
+            var running = double.PositiveInfinity;
+            for (var k = m; k >= 1; k--)
+            {
+                var index = valid[k - 1];
+                running = Math.Min(running, pValues[index] * m / k);
+                q[index] = Math.Min(1.0, running);
+            }
+
+            return q;
+        }
+
+        private static bool IsValidPValue(double p) => p >= 0 && p <= 1; // false for NaN
 
         /// <summary>
         /// Calculates the Q-value using a list of RegressionPvalue instances.
