@@ -18,7 +18,7 @@
 	<PropertyGroup>
 		<!-- NuGet metadata -->
 		<PackageId>LinearRegression.Pvalues</PackageId>
-		<Version>1.2.0</Version>
+		<Version>1.3.0</Version>
 		<Authors>Jillian England</Authors>
 		<Company>Hyperfaceted</Company>
 		<Copyright>Copyright © Jillian England 2001–2026</Copyright>
@@ -31,7 +31,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<!-- Matches LICENSE (GNU AGPL v3); "or later" per Jill, 2026-11-20. Was LGPL-3.0-or-later. -->
 		<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
-		<PackageReleaseNotes>1.2.0 (follows 1.1.2 on NuGet; 1.1.3 was never published). Re-run analyses from 1.1.x: corrected slope standard error (p-values, CIs) and StdDev. Invalid results (n &lt; 3, NaN/infinite data, no x or y variation, bad confidence level) are now NaN, never 1, infinity or an exception. VarianceX/VarianceY are the sample (n - 1) variance. Numerically stable Welford accumulation (accurate for data far from zero, e.g. x = 1e9 + small). New RegressionQValue.BenjaminiHochberg batch q-values; NaN p-values are excluded. Fixes: min/max init, Merge(null), Dec(x), defensive copy of points, BH step-up. Breaking: Add(Regression) removed, use Merge. AGPL-3.0-or-later; net8.0 and net10.0. Full notes: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/blob/main/CHANGELOG.md</PackageReleaseNotes>
+		<PackageReleaseNotes>1.3.0: new API, no breaking changes. Intercept inference: InterceptStandardError, InterceptPValue, InterceptConfidenceInterval (df = n - 2, Excel LINEST). Opt-in population (N) variance and standard deviation: VarianceXPopulation, VarianceYPopulation, StdDevXPopulation, StdDevYPopulation (Excel VAR.P/STDEV.P); defaults stay n - 1. Fixed: tiny p-values no longer round to 0 (2*CDF(-|t|)); Dec after removing a far-away point now restores the statistics (double-double streaming sums). XML docs for every public member. Full notes: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/blob/main/CHANGELOG.md</PackageReleaseNotes>
 		<IncludeSymbols>true</IncludeSymbols>
 		<!-- Modern symbol package format -->
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>

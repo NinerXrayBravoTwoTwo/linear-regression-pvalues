@@ -150,6 +150,11 @@ arguments are methods.
 | `BenjaminiHochberg(IReadOnlyList<double> pValues)` | static method | q-values for a whole family in one O(m log m) pass, same order as the input; NaN in → NaN out, excluded from m. Use this for large batches |
 
 ## Release notes
+- **Version 1.3.0:  November 22, 2026** (new API, no breaking changes):
+- New intercept inference: `InterceptStandardError`, `InterceptPValue` and `InterceptConfidenceInterval` (df = n − 2; matches Excel `LINEST`).
+- New opt-in population (N) variance and standard deviation: `VarianceXPopulation`, `VarianceYPopulation`, `StdDevXPopulation`, `StdDevYPopulation` (Excel `VAR.P` / `STDEV.P`). The defaults stay n − 1.
+- Fixed: tiny p-values no longer round to 0 (p is now 2·CDF(−|t|)); `Dec` after removing a far-away point now restores the statistics.
+- XML docs for every public member, shown by IntelliSense. Formulas and history in [docs/MATH.md](https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/blob/main/docs/MATH.md).
 - **Version 1.2.0:  November 21, 2026** (follows 1.1.2 on NuGet; 1.1.3 was never published, and its changes are included here):
 - Corrected results: slope standard error (p-values and confidence intervals were too large/wide by √n), StdDev (n − 1) and MarginOfError. Re-run analyses that used 1.1.x.
 - Invalid results are now `double.NaN`, never 1, ∞ or an exception: n < 3, NaN or infinite data, no variation in x or y, or a confidence level outside (0, 1). Filter them with `double.IsNaN`.
