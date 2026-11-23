@@ -37,6 +37,12 @@
 [Serializable]
 public class Regression
 {
+    /// <summary>
+    ///     Initialize a new regression from a sequence of (x, y) points, adding each one in order with
+    ///     <see cref="Add(double, double)" />. The points themselves are not stored; only the running sums are.
+    /// </summary>
+    /// <param name="dataPoints">The (x, y) pairs to add. NaN or infinite values are allowed and make the
+    ///     affected statistics NaN.</param>
     public Regression(IEnumerable<(double x, double y)> dataPoints) : this()
     {
         foreach (var (x, y) in dataPoints) Add(x, y);
@@ -82,6 +88,10 @@ public class Regression
         CopyStateFrom(cloneMe);
     }
 
+    /// <summary>
+    ///     Number of points n: incremented by <see cref="Add(double, double)" />, decremented by
+    ///     <see cref="Dec(double, double)" />, summed by <see cref="Merge" />. A double, like the other running sums.
+    /// </summary>
     public double N { get; private set; }
 
     // Raw sums, kept for the public Sx/Sy/Sx2/Sy2/Sxy properties (and the fallback formulas).
@@ -204,6 +214,12 @@ public class Regression
     /// </summary>
     public double MinY { get; set; }
 
+    /// <summary>
+    ///     True when any core statistic is undefined: <see cref="StdDevX" />, <see cref="StdDevY" />,
+    ///     <see cref="Sx" />, <see cref="Sy" /> or <see cref="YIntercept" /> is NaN, or <see cref="Slope" /> is +∞.
+    ///     Because the sample standard deviations are NaN when N &lt; 2, this is also true for fewer than 2 points,
+    ///     and when every x is equal (the slope and intercept are NaN then).
+    /// </summary>
     public bool IsNaN => double.IsNaN(StdDevX)
                          || double.IsNaN(StdDevY)
                          || double.IsNaN(Sx)

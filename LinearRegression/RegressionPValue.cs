@@ -2,14 +2,51 @@
 
 namespace LinearRegression;
 
+/// <summary>
+///     A <see cref="Regression" /> that also keeps a copy of its points, so it can test the fit: slope p-value and
+///     confidence interval (<see cref="PValue" />, <see cref="ConfidenceInterval" />,
+///     <see cref="ConfidenceIntervalPlus" />), intercept standard error, p-value and interval, and the margin of
+///     error of a mean. All tests use the Student t distribution with n − 2 degrees of freedom (n − 1 for
+///     <see cref="MarginOfError" />), and every invalid result is <see cref="double.NaN" />. The formulas are in
+///     docs/MATH.md.
+/// </summary>
+/// <remarks>
+///     The points are copied once, at construction. <see cref="Regression.Add(double, double)" /> and
+///     <see cref="Regression.Dec(double, double)" /> change the running sums but not <see cref="DataPoints" />,
+///     so the residual-based results (p-values, standard errors, intervals) assume the points are unchanged.
+/// </remarks>
 [Serializable]
 public partial class RegressionPvalue : Regression
 {
+    /// <summary>
+    ///     True when any x or y passed to the constructor was NaN. Set once at construction; the tests then
+    ///     return <see cref="double.NaN" />.
+    /// </summary>
     protected bool IsDataContainsNan;
+
+    /// <summary>
+    ///     True when any x or y passed to the constructor was +∞ or −∞. Set once at construction; the tests then
+    ///     return <see cref="double.NaN" />.
+    /// </summary>
     protected bool IsDataContainsInf;
+
+    /// <summary>
+    ///     The (x, y) points, copied from the constructor argument (later changes to the caller's list do not
+    ///     affect it). Used for the residual sum of squares behind the p-values, standard errors and intervals.
+    ///     Use <c>.ElementAt(i)</c> for one point.
+    /// </summary>
     public IEnumerable<(double x, double y)> DataPoints { get; init; }
+
+    /// <summary>
+    ///     Optional ids, one per point and in the same order as <see cref="DataPoints" />; empty when the instance
+    ///     was built without ids. Ids need not be unique.
+    /// </summary>
     public IEnumerable<string> IdPoints { get; init; }
 
+    /// <summary>
+    ///     Initialize an empty instance with no points. Every test result (<see cref="PValue" />, intervals,
+    ///     standard errors) is <see cref="double.NaN" /> until there are at least 3 points.
+    /// </summary>
     public RegressionPvalue()
     {
         DataPoints = [];
@@ -47,6 +84,12 @@ public partial class RegressionPvalue : Regression
         IsDataContainsInf = dataPoints.Any(item => double.IsInfinity(item.x) || double.IsInfinity(item.y));
     }
 
+    /// <summary>
+    ///     Number of stored points in <see cref="DataPoints" />. Equals <see cref="Regression.N" /> unless
+    ///     <see cref="Regression.Add(double, double)" /> or <see cref="Regression.Dec(double, double)" /> was called
+    ///     after construction.
+    /// </summary>
+    /// <returns>The number of stored (x, y) points.</returns>
     public int DataPointsCount()
     {
         return DataPoints.Count();

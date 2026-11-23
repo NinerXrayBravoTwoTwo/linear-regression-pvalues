@@ -1,5 +1,11 @@
 ﻿namespace LinearRegression
 {
+    /// <summary>
+    ///     Experimental. A <see cref="RegressionPvalue" /> that can also report the Benjamini-Hochberg q-value
+    ///     (false discovery rate adjusted p-value) of its slope within a family of tests, for example many regressions
+    ///     from one data dredge. For a whole batch, the static <see cref="BenjaminiHochberg" /> method returns every q-value
+    ///     at once. Invalid (NaN) p-values are left out of the ranking and of m.
+    /// </summary>
     public class RegressionQValue : RegressionPvalue
     {
         // Q-values are not cached (unlike PValue): a q-value depends on the family of p-values

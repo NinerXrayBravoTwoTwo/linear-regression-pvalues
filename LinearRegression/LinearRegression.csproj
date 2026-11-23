@@ -7,6 +7,8 @@
 		<Nullable>enable</Nullable>
 		<!-- Ship XML docs in the package (IntelliSense). -->
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<!-- Every public member must have an XML doc comment. -->
+		<WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
 		<!-- GeneratePackageOnBuild removed: with multi-targeting it makes 'dotnet pack' fail (NU5026).
 		     Build the package with: dotnet pack -c Release -->
 	</PropertyGroup>
