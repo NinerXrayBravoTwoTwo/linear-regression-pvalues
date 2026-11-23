@@ -423,6 +423,51 @@ public class Regression
     /// </returns>
     public double VarianceY => SampleVariance(CenteredSumSquaresY, MinY, MaxY);
 
+    /// <summary>
+    ///     Population (N) variance of X: Sxx / N, the same as Excel <c>VAR.P</c> and numpy <c>var(x, ddof=0)</c>.
+    ///     Use it when the data are the whole population rather than a sample; <see cref="VarianceX" /> (n − 1) is
+    ///     the default. Regression standard errors, p-values and intervals always use n − 2 and are not affected.
+    /// </summary>
+    /// <returns>
+    ///     The population variance of X; exactly 0 when every x is equal (including N = 1); <see cref="double.NaN" />
+    ///     when N &lt; 1 or the data contains NaN or infinity. Never throws.
+    /// </returns>
+    public double VarianceXPopulation => PopulationVariance(CenteredSumSquaresX, MinX, MaxX);
+
+    /// <summary>
+    ///     Population (N) variance of Y: Syy / N, the same as Excel <c>VAR.P</c> and numpy <c>var(y, ddof=0)</c>.
+    ///     See <see cref="VarianceXPopulation" />.
+    /// </summary>
+    /// <returns>
+    ///     The population variance of Y; exactly 0 when every y is equal (including N = 1); <see cref="double.NaN" />
+    ///     when N &lt; 1 or the data contains NaN or infinity. Never throws.
+    /// </returns>
+    public double VarianceYPopulation => PopulationVariance(CenteredSumSquaresY, MinY, MaxY);
+
+    /// <summary>
+    ///     Population (N) standard deviation of X: √<see cref="VarianceXPopulation" />, the same as Excel
+    ///     <c>STDEV.P</c> and numpy <c>std(x, ddof=0)</c>.
+    /// </summary>
+    /// <returns>The population standard deviation of X, or <see cref="double.NaN" /> when N &lt; 1. Never throws.</returns>
+    public double StdDevXPopulation => Math.Sqrt(VarianceXPopulation);
+
+    /// <summary>
+    ///     Population (N) standard deviation of Y: √<see cref="VarianceYPopulation" />, the same as Excel
+    ///     <c>STDEV.P</c> and numpy <c>std(y, ddof=0)</c>.
+    /// </summary>
+    /// <returns>The population standard deviation of Y, or <see cref="double.NaN" /> when N &lt; 1. Never throws.</returns>
+    public double StdDevYPopulation => Math.Sqrt(VarianceYPopulation);
+
+    private double PopulationVariance(double centeredSumSquares, double min, double max)
+    {
+        if (N < 1) return double.NaN; // undefined with no data
+
+        if (min == max) return 0.0; // all values equal (or N = 1)
+
+        var variance = centeredSumSquares / N;
+        return variance < 0 ? 0.0 : variance; // a tiny negative can only come from rounding; NaN passes through
+    }
+
     private double SampleVariance(double centeredSumSquares, double min, double max)
     {
         if (N < 2) return double.NaN; // undefined for fewer than 2 samples

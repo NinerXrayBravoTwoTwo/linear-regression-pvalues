@@ -118,6 +118,7 @@ arguments are methods.
 | `MeanX`, `MeanY` | properties | 0 when N = 0 |
 | `StdDevX`, `StdDevY` | properties | sample (n − 1), = √Variance, numpy `std(ddof=1)`; NaN when N < 2 |
 | `VarianceX`, `VarianceY` | properties | sample (n − 1), numpy `var(ddof=1)`; exactly 0 when all values are equal; NaN when N < 2 |
+| `VarianceXPopulation`, `VarianceYPopulation`, `StdDevXPopulation`, `StdDevYPopulation` | properties | population (N), Excel `VAR.P` / `STDEV.P`, numpy `ddof=0`; 0 for one point; NaN when N < 1 |
 | `Slope`, `YIntercept`, `Correlation`, `RSquared` | properties | NaN when undefined (N < 2, no variation in x, ...) |
 | `IsNaN` | property | true when any core statistic is NaN |
 | `ToString()` | method | one-line summary |

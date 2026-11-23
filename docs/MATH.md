@@ -30,7 +30,11 @@ s_x^2 = \frac{S_{xx}}{n-1}, \qquad s_x = \sqrt{\frac{S_{xx}}{n-1}}
 $$
 
 The data are treated as a sample from a larger population (for example patients in a study), not as the whole
-population. For the population version (Excel `VAR.P` / `STDEV.P`), multiply the variance by $(n-1)/n$.
+population. When the data are the whole population, use `VarianceXPopulation`, `VarianceYPopulation`,
+`StdDevXPopulation` and `StdDevYPopulation` (divisor $n$; Excel `VAR.P` / `STDEV.P`, numpy `ddof=0`). They are 0
+for a single point and NaN with no data. The TI-58/59 manual offered the same choice between N and N − 1 weighting
+(Texas Instruments, *Personal Programming*, 1977, section V). The regression standard errors, p-values and
+confidence intervals have no such option: they always use $\mathrm{df} = n - 2$.
 
 ## Fit
 

@@ -11,6 +11,9 @@ The NuGet package carries the same notes in its README. The git history has note
   `InterceptConfidenceInterval(level)`. Invalid cases return NaN, as for the slope. Example (x = 1..5,
   y = 2, 4, 5, 4, 5): a = 2.2, SE 0.938083, t 2.3452, p 0.100743, 95% CI [−0.785399, 5.185399].
 - `docs/MATH.md`: formulas for every statistic, the n − 1 and n − 2 conventions, and a worked example.
+- Population (N) variance and standard deviation, opt-in: `VarianceXPopulation`, `VarianceYPopulation`,
+  `StdDevXPopulation`, `StdDevYPopulation` (Excel `VAR.P` / `STDEV.P`). The defaults stay n − 1, and regression
+  SE, p-values and CIs keep df = n − 2.
 
 ### Fixed
 - **Tiny p-values no longer round to 0.** `PValue` (and so `ConfidenceIntervalPlus().PValue`) is now
