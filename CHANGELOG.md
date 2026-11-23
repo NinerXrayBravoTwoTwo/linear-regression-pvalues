@@ -17,6 +17,10 @@ The NuGet package carries the same notes in its README. The git history has note
   2·CDF(−|t|) instead of 2·(1 − CDF(|t|)), which lost every digit below about 1e−16. Example (n = 30, t = 25.05):
   p was 0, now 1.0294e−20 (SciPy 1.0294e−20). Small p-values also gain digits, e.g. 2.0625857e−10 →
   2.0625847e−10 (SciPy 2.0625847e−10). p-values near 1 and NaN for invalid results are unchanged.
+- **`Dec` after removing a far-away point** (#14): with data far from zero, `Add` then `Dec` of a point far from
+  the rest no longer leaves wrong statistics. Example (x = 1e6 + 0.00..0.04, Add/Dec (0, 0)): slope was
+  4.8 → 4.9152 and `VarianceX` 2.5e−4 → 2.441e−4; now both restore exactly. The streaming moments are kept in
+  double-double (about 32 digits). Add/Dec cost about 3× more (about 70 ns per point instead of 25 ns). See docs/MATH.md.
 
 ### Build and release
 - GitHub Actions: `ci.yml` builds and tests (Release, net8.0 + net10.0) on pull requests and on pushes to `main`.

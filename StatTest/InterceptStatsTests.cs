@@ -73,7 +73,7 @@ public class InterceptStatsTests
     ];
 
     // x = 1e6 + 0.01 * noise, y = 5(x - 1e6) + 100 + 0.05 * noise, n = 50 (System.Random seed 3).
-    private static readonly List<(double x, double y)> Offset50 =
+    internal static readonly List<(double x, double y)> Offset50 =
     [
         (999999.9973037917, 100.0183405193206),
         (1000000.0054174113, 100.06296422438186),
