@@ -130,15 +130,28 @@ These match Excel `LINEST`, `STEYX`, `T.DIST.2T` and `STDEV.S`, and statsmodels 
 ## Why Add and Dec exist
 
 `Add` and `Dec` were the main interface of the original calculator program: 1978 algorithms for the TI-58 and
-TI-59, later ported to C, then Perl, then C#. Data sets were entered by hand, one (x, y) pair at a time, much like
-a calculator's Σ+ and Σ− keys. A mistyped pair could be taken back out the same way.
+TI-59, later ported to C, then Perl, then C#. Basic linear regression was built into the 58/59, so no extra module
+was needed. Data sets were entered by hand, one (x, y) pair at a time:
 
-The calculator didn't have enough memory to store the pairs, so the interface was limited on purpose. It kept only
-running sums (n, Σx, Σy, Σx², Σy², Σxy) and computed every statistic from them. `Regression` keeps that design: it
-streams data and never stores the points. Only `RegressionPvalue` keeps them, because the residuals behind its
-p-values need them.
+| Calculator keys | What the manual says | Library |
+|---|---|---|
+| `x:t` | puts the independent value x in the T-register | the `x` argument |
+| `2nd Σ+` | "assimilates each variable pair (xi, yi) into data registers 01-06" | `Add(x, y)` |
+| `INV 2nd Σ+` | "removes unwanted data point (pair of values)" | `Dec(x, y)` |
+| `2nd Pgm 1 SBR CLR` | zeroes registers 01-06 and the T-register (with a library module) | `new Regression()` |
+
+After each entry or removal, the calculator displayed the running count.
+
+The calculator didn't have enough memory to store the pairs, so the interface was limited on purpose. The whole
+state was six data registers (01–06) of running sums (n, Σx, Σy, Σx², Σy², Σxy), and every statistic was computed
+from them. `Regression` keeps that design: it streams data and never stores the points. Only `RegressionPvalue`
+keeps them, because the residuals behind its p-values need them.
 
 Because the running sums are all there is, their precision matters. Each pair is folded in and can later be taken
 out again, and that must not wear away the digits of the points that stay. The library therefore keeps centred,
 numerically stable sums (see [Sums and means](#sums-and-means)). Issue #14 covers removing a point far from the
 rest of the data.
+
+Sources: Texas Instruments, *Personal Programming* (1977), the owner's guide for the TI-58 and TI-59, Statistics
+section, "Data Entry"; Texas Instruments, *Applied Statistics* (1977), the manual for the Statistics library
+module, which covers regression in more depth.
