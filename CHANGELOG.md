@@ -5,6 +5,13 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-22
+
+Minor version (semantic versioning): adds new public API (intercept inference, population variance and standard
+deviation) with no breaking changes. Results from 1.2.0 are unchanged except where listed under Fixed: tiny
+p-values now keep their digits instead of rounding to 0, and `Dec` of a far-away point now restores the statistics
+(other results may differ only in the last digit or so).
+
 ### Added
 - Intercept inference on `RegressionPvalue`: `InterceptStandardError` (√(s²(1/n + x̄²/Sxx)), Excel `LINEST`
   row 2, col 2), `InterceptPValue` (two-tailed, df = n − 2, small-p-safe 2·CDF(−|t|)) and
@@ -14,6 +21,12 @@ The NuGet package carries the same notes in its README. The git history has note
 - Population (N) variance and standard deviation, opt-in: `VarianceXPopulation`, `VarianceYPopulation`,
   `StdDevXPopulation`, `StdDevYPopulation` (Excel `VAR.P` / `STDEV.P`). The defaults stay n − 1, and regression
   SE, p-values and CIs keep df = n − 2.
+
+### Documentation
+- XML doc comments for every public member (summary, parameters, returns, NaN behavior). The XML file ships in the
+  NuGet package, so IntelliSense shows them. (PR #18)
+- `docs/MATH.md` "Why Add and Dec exist": the TI-58/59 calculator history behind `Add`/`Dec` (`2nd Σ+` and
+  `INV 2nd Σ+`) and the six running-sum registers, from TI's *Personal Programming* (1977). (PR #16)
 
 ### Fixed
 - **Tiny p-values no longer round to 0.** `PValue` (and so `ConfidenceIntervalPlus().PValue`) is now
