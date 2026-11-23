@@ -136,3 +136,38 @@ $x = 1, 2, 3, 4, 5$ and $y = 2, 4, 5, 4, 5$, so $n = 5$ and $\mathrm{df} = 3$.
 | `VarianceX` $= 10/4$, `StdDevX` | 2.5, 1.581139 |
 
 These match Excel `LINEST`, `STEYX`, `T.DIST.2T` and `STDEV.S`, and statsmodels `OLS`.
+
+## Why Add and Dec exist
+
+`Add` and `Dec` were the main interface of the original calculator program: 1978 algorithms for the TI-58 and
+TI-59, later ported to C, then Perl, then C#. Basic linear regression was built into the 58/59, so no extra module
+was needed. Data sets were entered by hand, one (x, y) pair at a time:
+
+| Calculator keys | What the manual says | Library |
+|---|---|---|
+| `xᵢ x:t yᵢ 2nd Σ+` | enters one point (x goes to the T-register); the point number i is displayed | `Add(x, y)` |
+| `xᵢ x:t yᵢ INV 2nd Σ+` | "reenter both the undesired x and y values again, but press INV immediately before 2nd Σ+"; N drops by 1 | `Dec(x, y)` |
+| `2nd Pgm 1 SBR CLR` | zeroes registers 01-06 and the T-register (with a library module) | `new Regression()` |
+
+The calculator didn't have enough memory to store the pairs, so the interface was limited on purpose. Its whole
+state was six data registers of running sums:
+
+| Register | 01 | 02 | 03 | 04 | 05 | 06 |
+|---|---|---|---|---|---|---|
+| Holds | Σy | Σy² | N | Σx | Σx² | Σxy |
+| Library | `Sy` | `Sy2` | `N` | `Sx` | `Sx2` | `Sxy` |
+
+Every statistic was computed from these registers. The same page covers the mean (`2nd x̄`), standard deviation
+(`INV 2nd x̄`) and variance (`2nd Op 11`). The manual also notes that "data that has already been so grouped can be
+entered directly into these registers"; the library's settable `Sx`, `Sy`, `Sx2`, `Sy2` and `Sxy` do the same.
+`Regression` keeps that design: it streams data and never stores the points. Only `RegressionPvalue` keeps them,
+because the residuals behind its p-values need them.
+
+Because the running sums are all there is, their precision matters. Each pair is folded in and can later be taken
+out again, and that must not wear away the digits of the points that stay. The library therefore keeps centred,
+numerically stable sums (see [Sums and means](#sums-and-means)). Issue #14 covers removing a point far from the
+rest of the data.
+
+Sources: Texas Instruments, *Personal Programming* (1977), the owner's guide for the TI-58 and TI-59, p. V-33
+(section V, "The Details"), and its Statistics section, "Data Entry"; Texas Instruments, *Applied Statistics*
+(1977), the manual for the Statistics library module, which covers regression in more depth.

@@ -190,6 +190,7 @@ Full history: [CHANGELOG.md](https://github.com/NinerXrayBravoTwoTwo/linear-regr
 - **1978** — algorithms first written for the TI-58 and TI-59 programmable calculators. The running-sum
   design (Σx, Σy, Σx², Σy², Σxy, n) comes from there: it needs no stored data and allows points to be
   removed again.
+  Pairs were keyed in one at a time; that is why `Add` and `Dec` exist (see [docs/MATH.md](https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/blob/main/docs/MATH.md#why-add-and-dec-exist)).
 - **1982** — ported to C.
 - **1987** — ported to Perl 3.
 - **2001 onward** — C# versions, revised in 2001, 2002, 2003, 2008, 2012, 2016, 2018, 2019, 2022 and 2025.
