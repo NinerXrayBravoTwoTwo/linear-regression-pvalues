@@ -2,11 +2,9 @@ using MathNet.Numerics.Distributions;
 
 namespace LinearRegression;
 
-/// <summary>
-///     Inference for the y-intercept: standard error, two-tailed p-value and confidence interval.
-///     Same assumptions, degrees of freedom (n - 2) and invalid cases as the slope members
-///     (<see cref="PValue" />, <see cref="ConfidenceInterval" />). The formulas are in docs/MATH.md.
-/// </summary>
+// Inference for the y-intercept: standard error, two-tailed p-value and confidence interval.
+// Same assumptions, degrees of freedom (n - 2) and invalid cases as the slope members
+// (PValue, ConfidenceInterval). The formulas are in docs/MATH.md.
 public partial class RegressionPvalue
 {
     /// <summary>
