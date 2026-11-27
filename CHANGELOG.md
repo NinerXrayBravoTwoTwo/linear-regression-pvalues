@@ -5,7 +5,10 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
-New non-breaking API. This will be a minor bump to 1.4.0 when released.
+## [1.4.0] - 2026-11-27
+
+Minor version (semantic versioning): adds new public API (`MeanResponseInterval`/`PredictionInterval` and
+curve fits after TI ST-12) with no breaking changes.
 
 ### Added
 - Mean-response and prediction intervals on `RegressionPvalue`: `MeanResponseInterval(x, level)` and
@@ -208,4 +211,5 @@ Never published to NuGet; these changes first ship in 1.2.0, which follows 1.1.2
 ## [1.0.0] - 2025-06-02
 - First NuGet releases.
 
-[Unreleased]: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/compare/v1.3.0...v1.4.0
