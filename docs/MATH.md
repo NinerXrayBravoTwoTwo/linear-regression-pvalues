@@ -131,6 +131,69 @@ They match statsmodels `OLS.get_prediction(x).summary_frame` (`mean_ci_*` and `o
 
 In the tiny5 example, at $\bar x = 3$ the fitted value is $4$. The 95% mean-response interval is $[2.727021, 5.272979]$ and the 95% prediction interval is $[0.881852, 7.118148]$. At $x = 0$ the mean-response interval is the intercept interval, $[−0.785399, 5.185399]$.
 
+## Curve fits (exponential, power, logarithmic)
+
+Three common curves become straight lines after a log transform, so the same least-squares line can fit them:
+
+| `CurveFit` | Curve | Points fitted | b in original form | Domain |
+|---|---|---|---|---|
+| `Linear` | $y = b + m x$ | $(x, y)$ | $b = a$ | any |
+| `Exponential` | $y = b\,e^{m x}$ | $(x, \ln y)$ | $b = e^{a}$ | $y > 0$ |
+| `Power` | $y = b\,x^{m}$ | $(\ln x, \ln y)$ | $b = e^{a}$ | $x > 0,\ y > 0$ |
+| `Logarithmic` | $y = b + m \ln x$ | $(\ln x, y)$ | $b = a$ | $x > 0$ |
+
+Here $a$ and $m$ are the intercept and slope of the line fitted to the transformed points ($a$ is `YIntercept`,
+$m$ is `Slope`). With $x' = f(x)$ and $y' = g(y)$, the predictions in original units are
+
+$$
+\hat y(x) = g^{-1}\!\left(\bar y' + m\,(f(x) - \bar x')\right), \qquad
+\hat x(y) = f^{-1}\!\left(\bar x' + \frac{g(y) - \bar y'}{m}\right).
+$$
+
+Members: `Curve`, `Transform`, `CurveB`, `CurveM`, `PredictY(x)` and `PredictX(y)` on `Regression`, and on
+`RegressionPvalue` the constructors that take a curve plus `CurveMeanResponseInterval` and `CurvePredictionInterval`.
+A `CurveTransform` built with its constructor holds your own $f$ and $g$ and, optionally, $f^{-1}$ and $g^{-1}$;
+without an inverse, the predictions that need it are NaN.
+
+**What the statistics describe.** With a curve, `DataPoints` holds the transformed points, and every existing
+statistic (sums, means, min/max, `Slope`, `YIntercept`, `Correlation`, `RSquared`, `PValue`, the standard errors
+and all the intervals) describes the **linearized** fit, with $\mathrm{df} = n - 2$ as before. For example, $r$ for an
+exponential fit is the correlation of $x$ with $\ln y$, and `PValue` tests $m = 0$ on those points.
+
+**Log-space least squares.** Fitting $\ln y$ minimizes $\sum(\ln y_i - \ln \hat y_i)^2$, the squared *relative*
+(multiplicative) error, not $\sum (y_i - \hat y_i)^2$. The back-transformed exponential or power curve is therefore
+not the least-squares curve in $y$: it gives small values as much weight as large ones, and a different (non-linear)
+fit in $y$ would give a somewhat different $b$ and $m$. This is the right model when the scatter grows with $y$; it is
+the wrong one when the errors in $y$ are additive and constant.
+
+**Intervals in original units.** $g^{-1}$ is monotone (exp, identity), so a probability statement about $y'$ carries
+over to $y$ unchanged: `CurveMeanResponseInterval` and `CurvePredictionInterval` compute `MeanResponseInterval` or
+`PredictionInterval` at $f(x)$ and pass Fit, Lower and Upper through $g^{-1}$. They are not symmetric around Fit. For
+the exponential and power fits, $e^{\text{mean of } \ln y}$ is the median (geometric mean) of $y$ at $x$, not its
+mean, so the back-transformed mean-response band is a band for the median. A decreasing custom inverse swaps the
+bounds, and the library reorders them; a non-monotone inverse gives meaningless intervals.
+
+**Domain.** $\ln$ of a value $\le 0$ is undefined, so that transformed value is NaN (not $-\infty$). The point is
+still counted, and the affected statistics become NaN exactly as for NaN in the data (see below). Nothing throws. The
+same holds for `PredictY` or `PredictX` at a value outside the domain.
+
+**Add and Dec.** `Add` and `Dec` take raw values and apply the transform, so removing a point re-applies the same
+mapping, as on the calculator. As before, `Add` and `Dec` on a `RegressionPvalue` change the sums but not
+`DataPoints`.
+
+**Census example** (*Applied Statistics*, p. 5-11): US population 1890–1970, exponential fit. $m = 0.0141183064$,
+$a = \ln b = -8.67008371$, $b = 0.000171644735$, $r = 0.99572387$, $\hat y(2000) = 314{,}510{,}829$ and
+$\hat x(300{,}000{,}000) = 1996.654$. The 95% band at 2000 is about 288.2 to 343.2 million. The 2000 census counted
+about 281 million, which is the manual's own warning about extrapolating.
+
+**Lineage.** This follows TI's ST-12 Bivariate Data Transforms program (*Applied Statistics*, 1977, p. 3-16, with
+ST-11 Univariate Data Transforms on p. 3-15 and curve fitting on pp. 5-8 to 5-11). ST-12 transformed each pair as it
+was entered, before it reached the same sum registers, so one regression engine fitted all three curves. For the
+built-in curves it displayed $b$ rather than $\ln b$ and offered $x \to y'$ and $y \to x'$ in original units. User
+transforms $f(x)$ and $g(y)$ went under labels A′ and B′ and applied to input only (p. 5-9: you convert the outputs
+yourself); the library also accepts their inverses. Deletion followed the Bivariate Data rules: re-enter the raw pair
+and the transform runs again.
+
 ## Invalid results
 
 
