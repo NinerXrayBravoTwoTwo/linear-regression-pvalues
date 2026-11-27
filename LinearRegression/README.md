@@ -2,7 +2,7 @@
 
 A small, dependency-light C# library for bivariate (x, y) linear regression. It computes slope,
 y-intercept, correlation, R², means, standard deviations and variances from running sums, and adds a
-two-tailed p-value for the slope, slope confidence intervals, and a margin of error for the means.
+two-tailed p-value for the slope, slope and intercept confidence intervals, a mean-response band and prediction interval at a given x, and a margin of error for the means.
 It is aimed at developers, analysts and statisticians who want these numbers without a large
 statistics package.
 
@@ -15,7 +15,8 @@ Source: <https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues>
 - **Descriptive statistics** — N, sums, min/max, means, standard deviation (n − 1), variance (n).
 - **Fit** — slope, y-intercept, Pearson correlation, R².
 - **Inference** (`RegressionPvalue`) — slope p-value (Student t, n − 2 degrees of freedom), confidence
-  interval at any level, standard error, margin of error for the mean of x or y.
+  interval at any level, standard error, intercept inference, a mean-response band around the fitted
+  line (`MeanResponseInterval`) and a prediction interval for a new observation, margin of error for the mean of x or y.
 - **Point ids** — optionally tag each (x, y) with a string id that stays aligned with the data.
 - **Numerically stable streaming** — Welford updates (with Dec and Merge support) keep results accurate for data
   far from zero, e.g. x = 1e9 + small, where raw sums of squares cancel.
@@ -68,9 +69,12 @@ var pr = new RegressionPvalue(data);
 double p = pr.PValue;                                  // two-tailed p-value for slope != 0 (needs n >= 3)
 var (lower, upper) = pr.ConfidenceInterval();          // 95% CI for the slope
 var plus = pr.ConfidenceIntervalPlus(0.90);            // (Lower, Upper, Slope, StandardError, PValue)
+var band = pr.MeanResponseInterval(3.0);               // 95% band for the fitted mean at x
+var pred = pr.PredictionInterval(3.0);                 // 95% interval for a new observation at x
 var (mean, moe) = pr.MarginOfError(useY: true);        // mean of y ± margin of error (95%)
 
 Console.WriteLine($"p = {p}, 95% CI [{lower}, {upper}], 90% SE {plus.StandardError}, y = {mean} ± {moe}");
+Console.WriteLine($"fitted band [{band.Lower}, {band.Upper}], prediction [{pred.Lower}, {pred.Upper}]");
 
 // 3. Optional ids that line up with the points.
 var tagged = new RegressionPvalue(new List<(string id, double x, double y)>
@@ -138,6 +142,8 @@ arguments are methods.
 | `InterceptStandardError` | property | SE of the y-intercept, √(s²(1/n + x̄²/Sxx)) (Excel `LINEST` row 2, col 2); NaN when n < 3, any NaN or ±∞ point, or no variation in x |
 | `InterceptPValue` | property | two-tailed t-test of intercept ≠ 0 (df = n − 2), in [0, 1]; NaN in the same cases; a perfect fit with non-zero intercept gives 0 |
 | `InterceptConfidenceInterval(double confidenceLevel = 0.95)` | method | `(Lower, Upper)` for the intercept; NaN in the same cases or when the level is outside (0, 1) |
+| `MeanResponseInterval(double x, double confidenceLevel = 0.95)` | method | `(Fit, Lower, Upper)` confidence band for the fitted mean at x (Excel-style trend-line band); NaN in the same cases as the slope test, or when x is non-finite, or when the level is outside (0, 1); collapses to Fit when the residual is zero |
+| `PredictionInterval(double x, double confidenceLevel = 0.95)` | method | `(Fit, Lower, Upper)` interval for a single new observation at x (wider than `MeanResponseInterval`); same NaN and collapse rules |
 | `MarginOfError(bool useY = false, double confidenceLevel = 0.95)` | method | `(Mean, MarginOfError)` for mean of x or y; NaN when n < 2, any NaN or ±∞ point, or level outside (0, 1) |
 | `ToString()` | method | `Regression` summary plus ` PValue: …` (`n/a` when the p-value is NaN) |
 

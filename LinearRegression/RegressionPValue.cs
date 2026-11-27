@@ -5,10 +5,11 @@ namespace LinearRegression;
 /// <summary>
 ///     A <see cref="Regression" /> that also keeps a copy of its points, so it can test the fit: slope p-value and
 ///     confidence interval (<see cref="PValue" />, <see cref="ConfidenceInterval" />,
-///     <see cref="ConfidenceIntervalPlus" />), intercept standard error, p-value and interval, and the margin of
-///     error of a mean. All tests use the Student t distribution with n − 2 degrees of freedom (n − 1 for
-///     <see cref="MarginOfError" />), and every invalid result is <see cref="double.NaN" />. The formulas are in
-///     docs/MATH.md.
+///     <see cref="ConfidenceIntervalPlus" />), intercept standard error, p-value and interval, a mean-response
+///     band and prediction interval at a given x (<see cref="MeanResponseInterval" />,
+///     <see cref="PredictionInterval" />), and the margin of error of a mean. All tests use the Student t
+///     distribution with n − 2 degrees of freedom (n − 1 for <see cref="MarginOfError" />), and every invalid
+///     result is <see cref="double.NaN" />. The formulas are in docs/MATH.md.
 /// </summary>
 /// <remarks>
 ///     The points are copied once, at construction. <see cref="Regression.Add(double, double)" /> and
@@ -165,7 +166,9 @@ public partial class RegressionPvalue : Regression
 
     /// <summary>
     ///     True when the slope t-test is defined: at least 3 points, all finite, and x varies.
-    ///     Shared by <see cref="PValue" />, <see cref="ConfidenceInterval" /> and <see cref="ConfidenceIntervalPlus" />.
+    ///     Shared by <see cref="PValue" />, <see cref="ConfidenceInterval" />,
+    ///     <see cref="ConfidenceIntervalPlus" />, <see cref="MeanResponseInterval" /> and
+    ///     <see cref="PredictionInterval" />.
     /// </summary>
     private bool IsSlopeTestDefined() =>
         DataPoints.Count() >= 3
