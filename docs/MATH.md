@@ -108,7 +108,31 @@ ill-conditioned there: a tiny change in the slope moves it a lot, so expect fewe
 at a meaningful $x_0$ matters, shift the data ($x - x_0$) before fitting. With $\bar x = 0$, $a = \bar y$ and
 $\mathrm{SE}_a = s/\sqrt{n}$.
 
+## Mean-response band and prediction interval
+
+At a chosen $x$, the fitted value is $\hat y = a + b\,x$. Two intervals sit around it, both with $\mathrm{df} = n-2$.
+
+The **mean-response interval** (the band around the fitted line, as on an Excel chart trend line) is the confidence interval for the mean of $y$ at that $x$:
+
+$$
+\hat y \pm t_{1-\alpha/2,\,n-2}\; s\sqrt{\frac{1}{n} + \frac{(x-\bar x)^2}{S_{xx}}}
+$$
+
+It is narrowest at $x = \bar x$, where the standard error is $s/\sqrt{n}$, and widens as $x$ moves away from the data. At $x = 0$ it is the same as the intercept interval.
+
+The **prediction interval** is the interval for a single new observation at that $x$. It is wider because it also includes the scatter of a new $y$ around the line (the extra $1$ under the square root):
+
+$$
+\hat y \pm t_{1-\alpha/2,\,n-2}\; s\sqrt{1 + \frac{1}{n} + \frac{(x-\bar x)^2}{S_{xx}}}
+$$
+
+Members: `MeanResponseInterval(x, level)` and `PredictionInterval(x, level)`, each returning `(Fit, Lower, Upper)`.
+They match statsmodels `OLS.get_prediction(x).summary_frame` (`mean_ci_*` and `obs_ci_*`).
+
+In the tiny5 example, at $\bar x = 3$ the fitted value is $4$. The 95% mean-response interval is $[2.727021, 5.272979]$ and the 95% prediction interval is $[0.881852, 7.118148]$. At $x = 0$ the mean-response interval is the intercept interval, $[−0.785399, 5.185399]$.
+
 ## Invalid results
+
 
 Every p-value, standard error and interval is `double.NaN` (never 1, never ∞, never an exception) when:
 $n < 3$; any $x$ or $y$ is NaN or ±∞; or all $x$ are equal ($S_{xx} = 0$). A confidence level outside $(0, 1)$

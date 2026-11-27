@@ -5,6 +5,16 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
+New non-breaking API. This will be a minor bump to 1.4.0 when released.
+
+### Added
+- Mean-response and prediction intervals on `RegressionPvalue`: `MeanResponseInterval(x, level)` and
+  `PredictionInterval(x, level)` return `(Fit, Lower, Upper)`. The mean-response interval is the band
+  around the fitted line (Excel-style trend-line band): ŷ ± t·s·√(1/n + (x − x̄)²/Sxx). The prediction
+  interval is the wider interval for a single new observation (an extra 1 under the square root). Same
+  NaN cases as the slope tests, plus a non-finite x or a level outside (0, 1). A perfect fit (zero
+  residual) collapses the interval to Fit. Matches statsmodels `OLS.get_prediction`.
+
 ## [1.3.0] - 2026-11-22
 
 Minor version (semantic versioning): adds new public API (intercept inference, population variance and standard
