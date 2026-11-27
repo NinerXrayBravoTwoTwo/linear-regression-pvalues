@@ -187,6 +187,9 @@ arguments are methods.
 | `BenjaminiHochberg(IReadOnlyList<double> pValues)` | static method | q-values for a whole family in one O(m log m) pass, same order as the input; NaN in → NaN out, excluded from m. Use this for large batches |
 
 ## Release notes
+- **Version 1.4.0:  November 27, 2026** (new API, no breaking changes):
+- New mean-response and prediction intervals: `MeanResponseInterval(x, level)` and `PredictionInterval(x, level)` return `(Fit, Lower, Upper)`. The mean-response interval is the band around the fitted line; the prediction interval is the wider interval for a single new observation.
+- New curve fits after the TI-59 *Applied Statistics* ST-12 program: exponential, power and logarithmic (or your own transforms). Enter raw (x, y); `CurveB`, `CurveM`, `PredictY` and `PredictX` are in original units. On `RegressionPvalue`, `CurveMeanResponseInterval` and `CurvePredictionInterval` give back-transformed bounds. Existing statistics describe the linearized fit.
 - **Version 1.3.0:  November 22, 2026** (new API, no breaking changes):
 - New intercept inference: `InterceptStandardError`, `InterceptPValue` and `InterceptConfidenceInterval` (df = n − 2; matches Excel `LINEST`).
 - New opt-in population (N) variance and standard deviation: `VarianceXPopulation`, `VarianceYPopulation`, `StdDevXPopulation`, `StdDevYPopulation` (Excel `VAR.P` / `STDEV.P`). The defaults stay n − 1.
