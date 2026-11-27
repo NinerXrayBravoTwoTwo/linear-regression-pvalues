@@ -17,6 +17,8 @@ NuGet package: [`LinearRegression.Pvalues`](https://www.nuget.org/packages/Linea
 - **Inference** (`RegressionPvalue`) — slope p-value (Student t, n − 2 degrees of freedom), confidence
   interval at any level, standard error, intercept inference, a mean-response band around the fitted
   line (`MeanResponseInterval`) and a prediction interval for a new observation, margin of error for the mean of x or y.
+- **Curve fits** — exponential (y = b·e^(mx)), power (y = b·x^m) and logarithmic (y = b + m·ln x), or your own
+  transforms, after the TI-59 ST-12 program: enter raw (x, y), get b, m and predictions back in original units.
 - **Point ids** — optionally tag each (x, y) with a string id that stays aligned with the data.
 - **Numerically stable streaming** — Welford updates (with Dec and Merge support) keep results accurate for data
   far from zero, e.g. x = 1e9 + small, where raw sums of squares cancel.
@@ -88,6 +90,28 @@ var left = new Regression(new List<(double x, double y)> { (1, 2), (2, 3) });
 var right = new Regression(new List<(double x, double y)> { (3, 5), (4, 4), (5, 6) });
 Regression combined = left.Merge(right);
 Console.WriteLine(combined);
+
+// 5. Curve fits: pass raw (x, y); the transform (here ln y) is applied for you. Slope, PValue, intervals and
+//    DataPoints describe the linearized fit (x, ln y); CurveB, PredictY, PredictX and Curve*Interval are in
+//    original units. US census 1890-1970, TI Applied Statistics (1977) p. 5-11.
+var census = new List<(double x, double y)>
+{
+    (1890, 62947714), (1900, 75994575), (1910, 91972266), (1920, 105710620), (1930, 122775046),
+    (1940, 131669275), (1950, 150697361), (1960, 179323175), (1970, 203235298)
+};
+var growth = new RegressionPvalue(census, CurveFit.Exponential);   // y = b·e^(m·x)
+double b = growth.CurveB;                         // 0.000171644735...
+double rate = growth.CurveM;                      // 0.0141183... per year
+double pop2000 = growth.PredictY(2000);           // ≈ 314.5 million (the 2000 census counted ≈ 281 million)
+double year300M = growth.PredictX(300e6);         // ≈ 1996.65
+var curveBand = growth.CurveMeanResponseInterval(2000);   // (Fit, Lower, Upper) in people
+
+var stream = new Regression(CurveFit.Power);      // streaming works too: Add/Dec take raw values
+stream.Add(1, 2.1); stream.Add(2, 3.9); stream.Add(3, 6.2);
+stream.Dec(3, 6.2);                               // re-enter the raw pair to remove it, as on the TI-59
+
+var custom = new CurveTransform(x: null, y: v => 1 / v, inverseY: v => 1 / v);   // your own g(y) and its inverse
+var recip = new Regression(census, custom);
 ```
 
 ### Experimental: q-values (false discovery rate)
@@ -125,6 +149,10 @@ arguments are methods.
 | `VarianceXPopulation`, `VarianceYPopulation`, `StdDevXPopulation`, `StdDevYPopulation` | properties | population (N), Excel `VAR.P` / `STDEV.P`, numpy `ddof=0`; 0 for one point; NaN when N < 1 |
 | `Slope`, `YIntercept`, `Correlation`, `RSquared` | properties | NaN when undefined (N < 2, no variation in x, ...) |
 | `IsNaN` | property | true when any core statistic is NaN |
+| `Regression(CurveFit)`, `Regression(CurveTransform)`, `Regression(IEnumerable<(double x, double y)>, CurveFit)`, `Regression(IEnumerable<(double x, double y)>, CurveTransform)` | constructors | curve fit on raw points; `Add`/`Dec` then take raw x, y and apply the transform. `CurveFit.Custom` throws `ArgumentOutOfRangeException` (use a `CurveTransform`) |
+| `Curve`, `Transform` | properties | the `CurveFit` (Linear unless chosen) and its `CurveTransform`. With a curve, every other statistic (sums, means, min/max, `Slope`, `YIntercept`, `Correlation`, `RSquared`) describes the **linearized** fit, e.g. on (x, ln y) |
+| `CurveB`, `CurveM` | properties | b and m of the curve in original form: `CurveB` = e^`YIntercept` for Exponential and Power, else `YIntercept`; `CurveM` = `Slope` |
+| `PredictY(double x)`, `PredictX(double y)` | methods | prediction in original units (TI's x→y′ and y→x′). NaN when the fit is undefined, the value is outside the transform's domain, a custom transform has no inverse, the slope is 0 (`PredictX`) or the result is not finite. Also work with no curve (plain line) |
 | `ToString()` | method | one-line summary |
 
 ### `RegressionPvalue : Regression` — keeps the points, tests the slope
@@ -144,6 +172,9 @@ arguments are methods.
 | `InterceptConfidenceInterval(double confidenceLevel = 0.95)` | method | `(Lower, Upper)` for the intercept; NaN in the same cases or when the level is outside (0, 1) |
 | `MeanResponseInterval(double x, double confidenceLevel = 0.95)` | method | `(Fit, Lower, Upper)` confidence band for the fitted mean at x (Excel-style trend-line band); NaN in the same cases as the slope test, or when x is non-finite, or when the level is outside (0, 1); collapses to Fit when the residual is zero |
 | `PredictionInterval(double x, double confidenceLevel = 0.95)` | method | `(Fit, Lower, Upper)` interval for a single new observation at x (wider than `MeanResponseInterval`); same NaN and collapse rules |
+| `RegressionPvalue(CurveFit)`, `RegressionPvalue(CurveTransform)` | constructors | empty curve-fit instance; `Add` updates only the sums, so the tests stay NaN (as for `RegressionPvalue()`) |
+| `RegressionPvalue(List<(double x, double y)>, CurveFit)`, `RegressionPvalue(List<(double x, double y)>, CurveTransform)`, and the same with `(string id, double x, double y)` | constructors | raw points in, **transformed** points stored in `DataPoints`, so p-values, SEs and intervals all describe the linearized fit. A point outside the domain (ln of a value ≤ 0) becomes NaN, so the tests are NaN |
+| `CurveMeanResponseInterval(double x, double confidenceLevel = 0.95)`, `CurvePredictionInterval(double x, double confidenceLevel = 0.95)` | methods | `MeanResponseInterval` / `PredictionInterval` computed at f(x) on the linearized fit, then back-transformed to original units; for Exponential and Power the band is for the median of y and is not symmetric. NaN when the linear interval is NaN, x is outside the domain, or a custom y transform has no inverse |
 | `MarginOfError(bool useY = false, double confidenceLevel = 0.95)` | method | `(Mean, MarginOfError)` for mean of x or y; NaN when n < 2, any NaN or ±∞ point, or level outside (0, 1) |
 | `ToString()` | method | `Regression` summary plus ` PValue: …` (`n/a` when the p-value is NaN) |
 

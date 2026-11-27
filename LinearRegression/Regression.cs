@@ -35,7 +35,7 @@
 ///     fallback (see <see cref="IsStreamingValid" />).
 /// </remarks>
 [Serializable]
-public class Regression
+public partial class Regression
 {
     /// <summary>
     ///     Initialize a new regression from a sequence of (x, y) points, adding each one in order with
@@ -185,6 +185,7 @@ public class Regression
         _kx = o._kx; _ky = o._ky;
         _meanX = o._meanX; _meanY = o._meanY; _m2X = o._m2X; _m2Y = o._m2Y; _cXY = o._cXY;
         _streamingValid = o._streamingValid;
+        _transform = o._transform;
         MinX = o.MinX; MinY = o.MinY; MaxX = o.MaxX; MaxY = o.MaxY;
     }
 
@@ -234,7 +235,8 @@ public class Regression
     /// <returns>A new Regression representing the combined data.</returns>
     /// <remarks>
     ///     The streaming state is combined with the pairwise update of Chan, Golub and LeVeque (1979), so the
-    ///     result equals (to rounding) a single pass over both data sets.
+    ///     result equals (to rounding) a single pass over both data sets. The result keeps this instance's
+    ///     <see cref="Transform" />; merging regressions with different curves gives meaningless results.
     /// </remarks>
     public Regression Merge(Regression other)
     {
@@ -254,7 +256,8 @@ public class Regression
             MinX = Math.Min(a.MinX, b.MinX),
             MaxY = Math.Max(a.MaxY, b.MaxY),
             MinY = Math.Min(a.MinY, b.MinY),
-            _streamingValid = a._streamingValid && b._streamingValid && a.N >= 0 && b.N >= 0
+            _streamingValid = a._streamingValid && b._streamingValid && a.N >= 0 && b.N >= 0,
+            _transform = a._transform
         };
 
         if (!r._streamingValid) return r;
@@ -289,8 +292,14 @@ public class Regression
     /// </summary>
     /// <param name="x">X value of data.</param>
     /// <param name="y">Y value of data.</param>
+    /// <remarks>
+    ///     With a curve fit (<see cref="Curve" /> is not <see cref="CurveFit.Linear" />), pass the raw x and y;
+    ///     the transform (for example ln y) is applied here before the sums are updated.
+    /// </remarks>
     public void Add(double x, double y)
     {
+        if (!_transform.IsIdentity) (x, y) = _transform.Apply(x, y);
+
         _sy += y;
         _sy2 += y * y;
         N++;
@@ -352,10 +361,13 @@ public class Regression
     /// <param name="y">Previous Y value of data.</param>
     /// <remarks>
     ///     The streaming state is reversed exactly as Welford's update was applied. Removing a pair that was never
-    ///     added gives meaningless results, as before.
+    ///     added gives meaningless results, as before. With a curve fit, pass the same raw x and y that were
+    ///     added; the transform is applied again, as on the TI-59 ("reenter both the undesired x and y values").
     /// </remarks>
     public void Dec(double x, double y)
     {
+        if (!_transform.IsIdentity) (x, y) = _transform.Apply(x, y);
+
         _sy -= y;
         _sy2 -= y * y;
         N--;

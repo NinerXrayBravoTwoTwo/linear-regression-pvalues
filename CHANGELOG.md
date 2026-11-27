@@ -14,6 +14,16 @@ New non-breaking API. This will be a minor bump to 1.4.0 when released.
   interval is the wider interval for a single new observation (an extra 1 under the square root). Same
   NaN cases as the slope tests, plus a non-finite x or a level outside (0, 1). A perfect fit (zero
   residual) collapses the interval to Fit. Matches statsmodels `OLS.get_prediction`.
+- Curve fits after the TI-59 *Applied Statistics* ST-12 program (issue #20): `enum CurveFit { Linear,
+  Exponential, Power, Logarithmic, Custom }` and `CurveTransform` (built-ins, or your own `Func<double, double>`
+  for x and y with optional inverses). New constructors on `Regression` and `RegressionPvalue` take the raw (x, y)
+  table plus a curve, and empty constructors take a curve for streaming; `Add`/`Dec` then take raw values and
+  apply the transform. New members: `Curve`, `Transform`, `CurveB` (b in original form, e.g. e^intercept for
+  exponential and power), `CurveM`, `PredictY(x)` and `PredictX(y)` in original units, and on `RegressionPvalue`
+  `CurveMeanResponseInterval` and `CurvePredictionInterval` (back-transformed bounds). Existing statistics,
+  `DataPoints` and the p-values describe the linearized fit. A value outside the transform's domain (ln of a
+  value ≤ 0) becomes NaN, so the affected statistics are NaN; nothing throws for bad data. Results without a curve
+  are unchanged. Census example (manual p. 5-11) and statsmodels checks in the tests.
 
 ## [1.3.0] - 2026-11-22
 
