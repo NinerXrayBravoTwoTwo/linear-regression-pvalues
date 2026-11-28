@@ -5,6 +5,18 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
+### Added
+- Residuals and regression diagnostics on `RegressionPvalue`: `Residuals()` returns one `ResidualPoint` per stored point,
+  in `DataPoints` order, with `X`, `Y`, `Fit`, `Residual`, `Standardized` (residual / s), `Studentized`
+  (residual / (s·√(1 − h))), `Leverage` (h = 1/n + (x − x̄)²/Sxx) and `CooksDistance`. For a residual-versus-x plot
+  and for flagging outliers and influential points. `ResidualPoint` is a `readonly record struct`. Same NaN cases as
+  the slope tests (fewer than 3 points, NaN or infinity in the data, all x equal: every field but X and Y is NaN);
+  a perfect fit gives residual 0 with NaN scaled fields; leverage 1 gives NaN studentized residual and Cook's
+  distance. `CurveResiduals()` is the curve-fit version: X, Y, Fit and Residual in original units, with the
+  scaled fields from the linearized fit. Matches statsmodels `OLS.resid` and `get_influence()`
+  (`resid_studentized_internal`, `hat_matrix_diag`, `cooks_distance`). Like the intervals, it reads `DataPoints`.
+  Formulas in `docs/MATH.md`.
+
 ## [1.4.0] - 2026-11-27
 
 Minor version (semantic versioning): adds new public API (`MeanResponseInterval`/`PredictionInterval` and
