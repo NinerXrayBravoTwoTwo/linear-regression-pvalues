@@ -131,6 +131,63 @@ They match statsmodels `OLS.get_prediction(x).summary_frame` (`mean_ci_*` and `o
 
 In the tiny5 example, at $\bar x = 3$ the fitted value is $4$. The 95% mean-response interval is $[2.727021, 5.272979]$ and the 95% prediction interval is $[0.881852, 7.118148]$. At $x = 0$ the mean-response interval is the intercept interval, $[−0.785399, 5.185399]$.
 
+## Residuals, leverage and Cook's distance
+
+For each point $(x_i, y_i)$ the fitted value is $\hat y_i = \bar y + b\,(x_i - \bar x)$ and the **residual** is
+$e_i = y_i - \hat y_i$. The residuals sum to 0, and $\sum e_i^2 = \mathrm{RSS}$, the same sum behind
+$s^2 = \mathrm{RSS}/(n-2)$ in the p-values. The residual is computed from centred values
+($e_i = (y_i - \bar y) - b\,(x_i - \bar x)$), so it keeps its digits when the data sit far from zero.
+
+The **standardized residual** divides by the overall scale: $e_i / s$. It treats every point alike, but points far
+from $\bar x$ pull the line toward themselves, so their residuals are smaller than the noise would suggest.
+
+The **leverage** (hat value) measures how far $x_i$ is from the middle of the data:
+
+$$
+h_i = \frac{1}{n} + \frac{(x_i - \bar x)^2}{S_{xx}}, \qquad \tfrac{1}{n} \le h_i \le 1, \qquad \sum h_i = 2 .
+$$
+
+The **internally studentized residual** corrects for that: the variance of $e_i$ is $\sigma^2 (1 - h_i)$, so
+
+$$
+r_i = \frac{e_i}{s\sqrt{1 - h_i}} .
+$$
+
+**Cook's distance** combines size and leverage into how much the fit would move if point $i$ were dropped
+(two parameters, so $p = 2$):
+
+$$
+D_i = \frac{r_i^2}{2}\cdot\frac{h_i}{1 - h_i} .
+$$
+
+Common rules of thumb, not tests: $|r_i| > 2$ is an outlier, $h_i > 4/n$ is high leverage ($2p/n$), and
+$D_i > 4/n$ is influential. A plot of $e_i$ against $x_i$ should look like an even band around 0; a bend suggests
+curvature and a widening funnel suggests the scatter grows with $x$.
+
+Members: `RegressionPvalue.Residuals()` and `CurveResiduals()`, each returning one `ResidualPoint` per stored point
+in `DataPoints` order. They match statsmodels `OLS.resid` and `get_influence()` (`resid_studentized_internal`,
+`hat_matrix_diag`, `cooks_distance[0]`).
+
+**Not defined.** With the same conditions as the p-value ($n < 3$, any NaN or infinite value, all $x$ equal) every
+field except `X` and `Y` is NaN, and an instance with no points returns an empty list. A perfect fit has $s = 0$:
+`Residual` is 0 and the standardized and studentized residuals and Cook's distance are NaN (0/0), while `Fit` and
+`Leverage` are still reported. Leverage 1 (one point alone fixes the line, for example when all the other $x$ are
+equal) leaves that point's studentized residual and Cook's distance NaN ($0/0$); `Residual` is 0 there.
+
+**Curve fits.** With a curve, `DataPoints` holds the transformed points, so `Residuals()` describes the linearized
+fit (for an exponential fit, $\ln y$ against $x$). `CurveResiduals()` returns `X`, `Y`, `Fit` and `Residual` in
+original units: $X = f^{-1}(x'_i)$, $Y = g^{-1}(y'_i)$, $\mathrm{Fit} = g^{-1}(\hat y'_i)$ (the same as `PredictY`)
+and $\mathrm{Residual} = Y - \mathrm{Fit}$. `Standardized`, `Studentized`, `Leverage` and `CooksDistance` are copied
+from the linearized fit: they are unitless, and "outlier" is judged in log space, where the least-squares fit lives.
+They are not the standardized residuals of the original-unit `Residual`. For the exponential and power fits the
+back-transformed curve is the median curve, so the original-unit residuals do not sum to 0, and they grow with $y$
+(the log-space errors are multiplicative). Where an inverse transform is missing, `X` (no $f^{-1}$) or `Y`, `Fit` and
+`Residual` (no $g^{-1}$) are NaN and the diagnostics are still reported.
+
+In the tiny5 example ($y$ = 2, 4, 5, 4, 5 at $x = 1 \ldots 5$; $\hat y = 2.2 + 0.6\,x$, $s^2 = 2.4/3 = 0.8$) the
+residuals are $-0.8,\ 0.6,\ 1,\ -0.6,\ -0.2$, the leverages are $0.6,\ 0.3,\ 0.2,\ 0.3,\ 0.6$, the studentized
+residuals are $-1.4142,\ 0.8018,\ 1.25,\ -0.8018,\ -0.3536$, and Cook's distances are $1.5,\ 0.1378,\ 0.1953,\ 0.1378,\ 0.0938$.
+
 ## Curve fits (exponential, power, logarithmic)
 
 Three common curves become straight lines after a log transform, so the same least-squares line can fit them:
@@ -199,7 +256,7 @@ and the transform runs again.
 
 Every p-value, standard error and interval is `double.NaN` (never 1, never ∞, never an exception) when:
 $n < 3$; any $x$ or $y$ is NaN or ±∞; or all $x$ are equal ($S_{xx} = 0$). A confidence level outside $(0, 1)$
-makes only the interval NaN. If the residual is zero (perfect fit), SE is 0, the interval collapses to the
+makes only the interval NaN. `Residuals()` follows the same conditions, with its own perfect-fit and leverage-1 cases (see "Residuals, leverage and Cook's distance"). If the residual is zero (perfect fit), SE is 0, the interval collapses to the
 estimate, and p is 0 for a non-zero estimate or NaN for a zero one ($t = 0/0$).
 
 ## Worked example (tiny5)

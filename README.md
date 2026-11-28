@@ -112,6 +112,14 @@ stream.Dec(3, 6.2);                               // re-enter the raw pair to re
 
 var custom = new CurveTransform(x: null, y: v => 1 / v, inverseY: v => 1 / v);   // your own g(y) and its inverse
 var recip = new Regression(census, custom);
+
+// 6. Residuals and diagnostics: one record per stored point, in DataPoints order, for a residual-vs-x plot
+//    and for flagging outliers (|Studentized| > 2), high leverage (Leverage > 4/n) and influence (Cook's D > 4/n).
+foreach (var pt in pr.Residuals())
+    Console.WriteLine($"x {pt.X}: fit {pt.Fit:F2}, residual {pt.Residual:F2}, studentized {pt.Studentized:F2}, " +
+                      $"leverage {pt.Leverage:F2}, Cook's D {pt.CooksDistance:F3}");
+var growthResiduals = growth.CurveResiduals();    // X, Y, Fit, Residual in original units (people);
+                                                  // Standardized, Studentized, Leverage, Cook's D are from the ln y fit
 ```
 
 ### Experimental: q-values (false discovery rate)
@@ -175,6 +183,7 @@ arguments are methods.
 | `RegressionPvalue(CurveFit)`, `RegressionPvalue(CurveTransform)` | constructors | empty curve-fit instance; `Add` updates only the sums, so the tests stay NaN (as for `RegressionPvalue()`) |
 | `RegressionPvalue(List<(double x, double y)>, CurveFit)`, `RegressionPvalue(List<(double x, double y)>, CurveTransform)`, and the same with `(string id, double x, double y)` | constructors | raw points in, **transformed** points stored in `DataPoints`, so p-values, SEs and intervals all describe the linearized fit. A point outside the domain (ln of a value ≤ 0) becomes NaN, so the tests are NaN |
 | `CurveMeanResponseInterval(double x, double confidenceLevel = 0.95)`, `CurvePredictionInterval(double x, double confidenceLevel = 0.95)` | methods | `MeanResponseInterval` / `PredictionInterval` computed at f(x) on the linearized fit, then back-transformed to original units; for Exponential and Power the band is for the median of y and is not symmetric. NaN when the linear interval is NaN, x is outside the domain, or a custom y transform has no inverse |
+| `Residuals()`, `CurveResiduals()` | methods | `IReadOnlyList<ResidualPoint>`, one per stored point in `DataPoints` order: `X`, `Y`, `Fit`, `Residual`, `Standardized` (residual / s), `Studentized` (residual / (s·√(1 − h))), `Leverage` (h) and `CooksDistance`. Matches statsmodels `resid` and `get_influence()`. NaN fields when the fit is undefined (fewer than 3 points, NaN/∞ in the data, all x equal); a perfect fit gives residual 0 with NaN scaled fields. `Residuals()` of a curve fit is in the linearized units; `CurveResiduals()` gives `X`, `Y`, `Fit`, `Residual` in original units, with the other fields from the linearized fit |
 | `MarginOfError(bool useY = false, double confidenceLevel = 0.95)` | method | `(Mean, MarginOfError)` for mean of x or y; NaN when n < 2, any NaN or ±∞ point, or level outside (0, 1) |
 | `ToString()` | method | `Regression` summary plus ` PValue: …` (`n/a` when the p-value is NaN) |
 
