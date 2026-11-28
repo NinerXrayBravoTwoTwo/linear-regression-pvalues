@@ -5,6 +5,11 @@ The NuGet package carries the same notes in its README. The git history has note
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-11-28
+
+Minor version (semantic versioning): adds new public API (`Residuals`/`CurveResiduals` and `ResidualPoint`)
+with no breaking changes.
+
 ### Added
 - Residuals and regression diagnostics on `RegressionPvalue`: `Residuals()` returns one `ResidualPoint` per stored point,
   in `DataPoints` order, with `X`, `Y`, `Fit`, `Residual`, `Standardized` (residual / s), `Studentized`
@@ -223,5 +228,6 @@ Never published to NuGet; these changes first ship in 1.2.0, which follows 1.1.2
 ## [1.0.0] - 2025-06-02
 - First NuGet releases.
 
-[Unreleased]: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/compare/v1.3.0...v1.4.0
