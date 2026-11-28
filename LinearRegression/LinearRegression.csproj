@@ -18,7 +18,7 @@
 	<PropertyGroup>
 		<!-- NuGet metadata -->
 		<PackageId>LinearRegression.Pvalues</PackageId>
-		<Version>1.4.0</Version>
+		<Version>1.5.0</Version>
 		<Authors>Jillian England</Authors>
 		<Company>Hyperfaceted</Company>
 		<Copyright>Copyright © Jillian England 2001–2026</Copyright>
@@ -31,7 +31,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<!-- Matches LICENSE (GNU AGPL v3); "or later" per Jill, 2026-11-20. Was LGPL-3.0-or-later. -->
 		<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
-		<PackageReleaseNotes>1.4.0: new API, no breaking changes. Mean-response and prediction intervals: MeanResponseInterval(x, level) and PredictionInterval(x, level) return (Fit, Lower, Upper). Curve fits after TI ST-12: Exponential, Power, Logarithmic, or custom transforms; CurveB, CurveM, PredictY, PredictX in original units; CurveMeanResponseInterval and CurvePredictionInterval. Full notes: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/blob/main/CHANGELOG.md</PackageReleaseNotes>
+		<PackageReleaseNotes>1.5.0: new API, no breaking changes. Residuals and regression diagnostics: Residuals() returns one ResidualPoint per stored point (X, Y, Fit, Residual, Standardized, Studentized, Leverage, CooksDistance). CurveResiduals() gives X, Y, Fit and Residual in original units for a curve fit, with the scaled fields from the linearized fit. Full notes: https://github.com/NinerXrayBravoTwoTwo/linear-regression-pvalues/blob/main/CHANGELOG.md</PackageReleaseNotes>
 		<IncludeSymbols>true</IncludeSymbols>
 		<!-- Modern symbol package format -->
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
